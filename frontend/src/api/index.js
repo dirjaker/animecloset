@@ -25,3 +25,8 @@ api.interceptors.response.use(
 )
 
 export default api
+
+// Stats API
+export const getWardrobeStats = () => api.get('/stats/wardrobe')
+export const getWearRanking = (limit = 10) => api.get(`/stats/wear-ranking?limit=${limit}`)
+export const getColdPalace = (days = 30) => api.get(`/stats/cold-palace?days=${days}`)

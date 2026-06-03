@@ -15,6 +15,16 @@
       >{{ cat.label }}</button>
     </div>
 
+    <div class="sort-bar">
+      <label class="sort-label">排序:</label>
+      <button
+        v-for="s in sortOptions"
+        :key="s.value"
+        :class="['sort-btn', { active: sortBy === s.value }]"
+        @click="sortBy = s.value; applySort()"
+      >{{ s.label }}</button>
+    </div>
+
     <div v-if="uploading" class="upload-status">
       <div class="spinner"></div>
       <span>{{ uploadStatus }}</span>
@@ -25,8 +35,10 @@
     <div v-else class="grid">
       <div v-for="g in garments" :key="g.id" class="card">
         <div class="card-img-wrap">
-          <img :src="g.image_url || g.thumbnail_url" :alt="g.category" class="card-img" />
-          <button class="btn-delete" @click="deleteGarment(g.id)">×</button>
+            <img :src="g.image_url || g.thumbnail_url" :alt="g.category" class="card-img" />
+            <span v-if="g.wear_count != null" class="wear-count-badge">{{ g.wear_count }}次</span>
+            <span v-if="isColdPalace(g)" class="cold-palace-tag">冷宫</span>
+            <button class="btn-delete" @click="deleteGarment(g.id)">×</button>
         </div>
         <div class="card-info">
           <span class="cat-badge">{{ categoryLabel(g.category) }}</span>
@@ -63,6 +75,12 @@ const categories = [
 
 const categoryMap = { top: '上衣', bottom: '下装', outer: '外套', shoes: '鞋', accessory: '配饰' }
 const categoryLabel = (c) => categoryMap[c] || c
+const COLD_PALACE_DAYS = 30
+const isColdPalace = (g) => {
+  if (!g.last_wear_date) return true
+  const diff = (Date.now() - new Date(g.last_wear_date).getTime()) / 86400000
+  return diff > COLD_PALACE_DAYS
+}
 
 const activeCategory = ref('')
 const garments = ref([])
@@ -72,6 +90,12 @@ const hasMore = ref(false)
 const fileInput = ref(null)
 const uploading = ref(false)
 const uploadStatus = ref('上传中...')
+const sortBy = ref('default')
+const allGarments = ref([])
+const sortOptions = [
+  { label: '默认', value: 'default' },
+  { label: '穿着次数', value: 'wear_count' },
+]
 
 async function loadGarments(append = false) {
   loading.value = true
@@ -81,6 +105,8 @@ async function loadGarments(append = false) {
     const { data } = await api.get('/garments', { params })
     const items = data.items || data.garments || data || []
     garments.value = append ? [...garments.value, ...items] : items
+    allGarments.value = [...garments.value]
+    applySort()
     hasMore.value = data.has_more || (items.length === 20)
   } catch { garments.value = [] }
   finally { loading.value = false }
@@ -139,6 +165,14 @@ async function deleteGarment(id) {
 }
 
 onMounted(() => loadGarments())
+function applySort() {
+  if (sortBy.value === 'wear_count') {
+    garments.value = [...garments.value].sort((a, b) => (b.wear_count || 0) - (a.wear_count || 0))
+  } else {
+    garments.value = [...garments.value]
+  }
+}
+
 </script>
 
 <style scoped>
@@ -224,5 +258,31 @@ onMounted(() => loadGarments())
 .btn-more {
   padding: 8px 24px; border: 2px solid #e9d5ff; background: white;
   border-radius: 20px; color: #7c3aed; cursor: pointer; font-size: 14px;
+}
+
+.sort-bar {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+}
+.sort-label { font-size: 13px; color: #6b21a8; font-weight: 600; }
+.sort-btn {
+  padding: 4px 12px; border: 2px solid #e9d5ff; background: white;
+  border-radius: 16px; font-size: 12px; cursor: pointer;
+  color: #6b21a8; transition: all 0.2s;
+}
+.sort-btn.active {
+  background: linear-gradient(135deg, #e879f9, #a78bfa);
+  color: white; border-color: transparent;
+}
+
+.wear-count-badge {
+  position: absolute; bottom: 6px; left: 6px;
+  background: rgba(124, 58, 237, 0.85); color: white;
+  padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 600;
+}
+
+.cold-palace-tag {
+  position: absolute; top: 6px; left: 6px;
+  background: rgba(59, 130, 246, 0.85); color: white;
+  padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 600;
 }
 </style>

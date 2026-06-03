@@ -30,6 +30,22 @@
       </button>
     </div>
 
+    <!-- 冷宫衣物提示 -->
+    <div class="cold-palace-section" v-if="coldPalaceItems.length">
+      <button class="btn-toggle-cold" @click="showColdPalace = !showColdPalace">
+        ❄️ {{ showColdPalace ? '收起' : '查看' }}冷宫衣物 ({{ coldPalaceItems.length }} 件)
+      </button>
+      <div v-if="showColdPalace" class="cold-palace-grid">
+        <div v-for="item in coldPalaceItems" :key="item.id" class="cold-palace-card">
+          <img v-if="item.image_url || item.thumbnail_url" :src="item.image_url || item.thumbnail_url" class="cp-img" />
+          <div class="cp-info">
+            <span class="cat-badge">{{ item.category }}</span>
+            <span class="cp-days">{{ item.days_since }}天未穿</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div v-if="loading" class="loading-area">
       <div class="big-spinner"></div>
       <p>AI 正在为你搭配中...</p>
@@ -47,6 +63,7 @@
           </div>
           <div class="rec-info">
             <span class="cat-badge">{{ item.category }}</span>
+            <span v-if="item.is_cold_palace" class="cold-palace-badge">❄️ 冷宫唤醒</span>
             <p v-if="item.reason" class="item-reason">{{ item.reason }}</p>
             <div class="tags" v-if="item.tags?.length">
               <span v-for="t in item.tags" :key="t" class="tag">{{ t }}</span>
@@ -65,13 +82,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import api from '../api/index.js'
+import { getColdPalace } from '../api/index.js'
 
 const today = new Date().toISOString().split('T')[0]
 const date = ref(today)
 const occasion = ref('')
 const extra = ref('')
+const showColdPalace = ref(false)
+const coldPalaceItems = ref([])
+const coldPalaceLoading = ref(false)
 const loading = ref(false)
 const result = ref(null)
 const error = ref('')
@@ -102,6 +123,13 @@ async function getRecommend() {
     loading.value = false
   }
 }
+
+onMounted(async () => {
+  try {
+    const { data } = await getColdPalace(30)
+    coldPalaceItems.value = data?.items || []
+  } catch {}
+})
 
 async function saveOutfit() {
   const items = result.value?.recommendations || result.value?.garments || result.value?.items || []
@@ -190,4 +218,29 @@ async function saveOutfit() {
 }
 
 .error { color: #ef4444; text-align: center; margin-top: 12px; }
+
+.cold-palace-badge {
+  display: inline-block; background: linear-gradient(135deg, #bfdbfe, #93c5fd);
+  color: #1e40af; padding: 2px 8px; border-radius: 10px;
+  font-size: 11px; font-weight: 600; margin-left: 4px;
+}
+
+.cold-palace-section { margin-top: 16px; }
+.btn-toggle-cold {
+  width: 100%; padding: 12px; background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+  color: #3b82f6; border: 2px solid #93c5fd; border-radius: 14px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.cold-palace-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-top: 12px;
+}
+@media (max-width: 500px) { .cold-palace-grid { grid-template-columns: repeat(2, 1fr); } }
+.cold-palace-card {
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+}
+.cp-img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.cp-info { padding: 6px 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.cp-days { font-size: 11px; color: #3b82f6; }
 </style>

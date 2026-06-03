@@ -74,14 +74,87 @@
         {{ saving ? '保存中...' : '💾 保存形象' }}
       </button>
     </div>
+
+    <!-- 统计仪表盘 -->
+    <div class="stats-section">
+      <h3>📊 衣橱统计</h3>
+
+      <!-- 衣橱概览 -->
+      <div class="stats-card">
+        <h4>👗 衣橱概览</h4>
+        <div v-if="statsLoading" class="stats-loading">加载中...</div>
+        <div v-else-if="wardrobeStats" class="stats-overview">
+          <div class="stat-item">
+            <span class="stat-num">{{ wardrobeStats.total || 0 }}</span>
+            <span class="stat-label">衣物总数</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">{{ wardrobeStats.total_wears || 0 }}</span>
+            <span class="stat-label">累计穿着</span>
+          </div>
+          <div class="category-breakdown" v-if="wardrobeStats.by_category && Object.keys(wardrobeStats.by_category).length">
+            <span class="stat-label">分类:</span>
+            <span v-for="(count, cat) in wardrobeStats.by_category" :key="cat" class="cat-stat-badge">
+              {{ cat }} {{ count }}
+            </span>
+          </div>
+        </div>
+        <div v-else class="stats-empty">暂无数据~</div>
+      </div>
+
+      <!-- 穿着排行榜 -->
+      <div class="stats-card">
+        <h4>🏆 穿着排行榜 TOP5</h4>
+        <div v-if="statsLoading" class="stats-loading">加载中...</div>
+        <div v-else-if="wearRanking.length" class="ranking-list">
+          <div v-for="(item, idx) in wearRanking" :key="item.id" class="ranking-item">
+            <span class="rank-num">{{ idx + 1 }}</span>
+            <img v-if="item.image_url || item.thumbnail_url" :src="item.image_url || item.thumbnail_url" class="rank-thumb" />
+            <div class="rank-info">
+              <span class="cat-badge">{{ item.category }}</span>
+              <div class="rank-tags" v-if="item.tags?.length">
+                <span v-for="t in item.tags.slice(0, 3)" :key="t" class="tag">{{ t }}</span>
+              </div>
+            </div>
+            <span class="wear-count">{{ item.wear_count }} 次</span>
+          </div>
+        </div>
+        <div v-else class="stats-empty">还没有穿着记录哦~</div>
+      </div>
+
+      <!-- 冷宫衣物 -->
+      <div class="stats-card cold-palace-card">
+        <h4>❄️ 冷宫衣物</h4>
+        <div v-if="statsLoading" class="stats-loading">加载中...</div>
+        <div v-else-if="coldPalaceItems.length">
+          <p class="cold-palace-desc">以下衣物已经 {{ coldPalaceDays }} 天没有被宠幸了~</p>
+          <div class="cold-palace-list">
+            <div v-for="item in coldPalaceItems" :key="item.id" class="cold-item">
+              <img v-if="item.image_url || item.thumbnail_url" :src="item.image_url || item.thumbnail_url" class="cold-thumb" />
+              <div class="cold-info">
+                <span class="cat-badge">{{ item.category }}</span>
+                <span class="days-badge">{{ item.days_since }} 天未穿</span>
+                <div class="rank-tags" v-if="item.tags?.length">
+                  <span v-for="t in item.tags.slice(0, 3)" :key="t" class="tag">{{ t }}</span>
+                </div>
+              </div>
+              <button class="btn-wear-today" @click="wearToday(item)">今天穿它</button>
+            </div>
+          </div>
+        </div>
+        <div v-else class="stats-empty">没有冷宫衣物，太棒了！🎉</div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import api from '../api/index.js'
+import { getWardrobeStats, getWearRanking, getColdPalace } from '../api/index.js'
 import { authStore } from '../stores/auth.js'
 import AvatarCanvas from '../components/AvatarCanvas.vue'
+import { useRouter } from 'vue-router'
 
 // 将 profile 的 avatar 选项转换为 canvas 配置
 const hairIdMap = { short: 1, long: 2, twintail: 3, ponytail: 4, bob: 5 }
@@ -158,7 +231,37 @@ async function saveAvatar() {
   finally { saving.value = false }
 }
 
-onMounted(() => loadProfile())
+onMounted(() => {
+  loadProfile()
+  loadStats()
+})
+
+// Stats
+const router = useRouter()
+const statsLoading = ref(false)
+const wardrobeStats = ref(null)
+const wearRanking = ref([])
+const coldPalaceItems = ref([])
+const coldPalaceDays = ref(30)
+
+async function loadStats() {
+  statsLoading.value = true
+  try {
+    const [statsRes, rankRes, coldRes] = await Promise.all([
+      getWardrobeStats().catch(() => ({ data: null })),
+      getWearRanking(5).catch(() => ({ data: { items: [] } })),
+      getColdPalace(30).catch(() => ({ data: { items: [] } })),
+    ])
+    wardrobeStats.value = statsRes.data
+    wearRanking.value = rankRes.data?.items || []
+    coldPalaceItems.value = coldRes.data?.items || []
+    coldPalaceDays.value = coldRes.data?.threshold_days || 30
+  } catch {} finally { statsLoading.value = false }
+}
+
+function wearToday(item) {
+  router.push({ path: '/recommend', query: { prefer_item: item.id } })
+}
 </script>
 
 <style scoped>
@@ -217,4 +320,66 @@ onMounted(() => loadProfile())
   font-size: 16px; font-weight: 600; cursor: pointer;
 }
 .btn-primary:disabled { opacity: 0.6; }
+
+/* Stats Dashboard */
+.stats-section {
+  margin-top: 24px;
+}
+.stats-section h3 { color: #7c3aed; font-size: 16px; margin-bottom: 16px; }
+
+.stats-card {
+  background: white; border-radius: 20px; padding: 20px;
+  box-shadow: 0 2px 16px rgba(168, 85, 247, 0.1);
+  margin-bottom: 16px;
+}
+.stats-card h4 { color: #7c3aed; font-size: 15px; margin-bottom: 12px; }
+.stats-loading { text-align: center; color: #a78bfa; padding: 20px; }
+.stats-empty { text-align: center; color: #ccc; padding: 20px; font-size: 14px; }
+
+.stats-overview { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+.stat-item { text-align: center; }
+.stat-num { display: block; font-size: 28px; font-weight: 700; color: #e879f9; }
+.stat-label { display: block; font-size: 12px; color: #888; margin-top: 2px; }
+.category-breakdown { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; width: 100%; }
+.cat-stat-badge {
+  background: #f3e8ff; color: #7c3aed; padding: 3px 10px;
+  border-radius: 12px; font-size: 12px; font-weight: 500;
+}
+
+.ranking-list { display: flex; flex-direction: column; gap: 10px; }
+.ranking-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px; background: #faf5ff; border-radius: 14px;
+}
+.rank-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, #e879f9, #a78bfa);
+  color: white; display: flex; align-items: center;
+  justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.rank-thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+.rank-info { flex: 1; min-width: 0; }
+.rank-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 3px; }
+.wear-count { font-size: 14px; font-weight: 700; color: #e879f9; white-space: nowrap; }
+
+.cold-palace-card { border: 2px solid #dbeafe; background: #f0f9ff; }
+.cold-palace-desc { font-size: 13px; color: #6b7280; margin-bottom: 12px; }
+.cold-palace-list { display: flex; flex-direction: column; gap: 10px; }
+.cold-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px; background: white; border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.cold-thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+.cold-info { flex: 1; min-width: 0; }
+.days-badge {
+  display: inline-block; background: #dbeafe; color: #3b82f6;
+  padding: 2px 8px; border-radius: 8px; font-size: 11px; margin-left: 4px;
+}
+.btn-wear-today {
+  padding: 6px 14px; background: linear-gradient(135deg, #60a5fa, #818cf8);
+  color: white; border: none; border-radius: 12px;
+  font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+}
+.btn-wear-today:hover { opacity: 0.9; }
 </style>
