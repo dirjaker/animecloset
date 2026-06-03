@@ -12,6 +12,6 @@ pydantic-settings>=2.3.0
 httpx>=0.27.0
 pyyaml>=6.0
 
-# Phase 2 依赖（后续安装）
-# rembg[cpu]>=2.0.50
-# Pillow>=10.0.0
+# Phase 2 依赖
+rembg[cpu]>=2.0.50
+Pillow>=10.0.0

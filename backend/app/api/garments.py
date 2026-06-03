@@ -1,21 +1,27 @@
 """
 api/garments.py — 衣物接口
 
-Phase 1: 基础骨架，后续 Phase 2 补充上传和抠图逻辑。
+提供衣物的上传、查询、更新、删除功能。
+上传采用异步处理：先返回 task_id，前端轮询状态。
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+import os
+from pathlib import Path
+
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..core.config import settings
 from ..core.database import get_db
 from ..core.security import get_current_user
 from ..models.user import User
 from ..models.garment import Garment
 from ..schemas.garment import (
     GarmentResponse, GarmentUpdate, GarmentListResponse, GarmentTags,
+    TaskResponse, TaskStatusResponse,
 )
-import json
+from ..services.task_manager import create_garment_task, get_task_status
 
 router = APIRouter(prefix="/garments", tags=["衣橱"])
 
@@ -37,6 +43,54 @@ def _garment_to_response(g: Garment) -> GarmentResponse:
     )
 
 
+@router.post("/upload", response_model=TaskResponse)
+async def upload_garment(
+    file: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+):
+    """
+    上传衣物图片
+
+    异步处理：立即返回 task_id，前端通过 /status/{task_id} 查询进度。
+    """
+    # 校验文件格式
+    if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
+        raise HTTPException(status_code=400, detail="仅支持 JPEG/PNG/WEBP 格式")
+
+    # 读取文件
+    file_bytes = await file.read()
+    if len(file_bytes) > settings.MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="文件大小不能超过10MB")
+
+    # 创建异步任务
+    task_id = await create_garment_task(
+        user_id=user.id,
+        file_bytes=file_bytes,
+        filename=file.filename or "upload.jpg",
+    )
+
+    return TaskResponse(task_id=task_id, status="pending")
+
+
+@router.get("/status/{task_id}", response_model=TaskStatusResponse)
+async def get_task(task_id: str):
+    """
+    查询衣物处理任务状态
+
+    状态流转：pending → processing → removing_bg → tagging → saving → success / failed
+    """
+    task = get_task_status(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="任务不存在")
+
+    return TaskStatusResponse(
+        task_id=task_id,
+        status=task.get("status", "unknown"),
+        garment_id=task.get("garment_id"),
+        error=task.get("error"),
+    )
+
+
 @router.get("", response_model=GarmentListResponse)
 async def list_garments(
     category: str | None = None,
@@ -45,9 +99,7 @@ async def list_garments(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """
-    获取衣橱列表（分页 + 类别筛选）
-    """
+    """获取衣橱列表（分页 + 类别筛选）"""
     query = select(Garment).where(Garment.user_id == user.id)
     count_query = select(func.count()).select_from(Garment).where(Garment.user_id == user.id)
 
@@ -55,10 +107,7 @@ async def list_garments(
         query = query.where(Garment.category == category)
         count_query = count_query.where(Garment.category == category)
 
-    # 总数
     total = (await db.execute(count_query)).scalar()
-
-    # 分页
     query = query.order_by(Garment.created_at.desc())
     query = query.offset((page - 1) * page_size).limit(page_size)
     result = await db.execute(query)
