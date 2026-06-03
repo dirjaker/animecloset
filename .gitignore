@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.db
+*.sqlite3
+.env
+static/uploads/*
+!static/uploads/.gitkeep
+avatars/*
+!avatars/.gitkeep
+.venv/
+*.egg-info/
+dist/
+build/
+.DS_Store
+node_modules/
