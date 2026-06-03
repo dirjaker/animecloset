@@ -18,11 +18,21 @@
         @click="day.currentMonth && openDay(day)"
       >
         <span class="day-num">{{ day.date }}</span>
-        <div v-if="day.hasOutfit" class="outfit-dots">
-          <span v-for="j in Math.min(day.garmentCount, 3)" :key="j" class="dot"></span>
+        <div v-if="day.hasOutfit && day.currentMonth" class="avatar-mini-wrap">
+          <AvatarCanvas
+            :width="40"
+            :height="60"
+            :avatar-config="defaultAvatar"
+            :garments="day.outfit?.garments || []"
+          />
         </div>
-        <div v-if="day.outfitPreviews?.length" class="mini-preview">
-          <img v-for="(p, k) in day.outfitPreviews.slice(0,2)" :key="k" :src="p" class="mini-img" />
+        <div v-else-if="day.currentMonth" class="avatar-mini-wrap avatar-mini-empty">
+          <AvatarCanvas
+            :width="40"
+            :height="60"
+            :avatar-config="defaultAvatar"
+            :garments="[]"
+          />
         </div>
       </div>
     </div>
@@ -52,6 +62,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import api from '../api/index.js'
+import AvatarCanvas from '../components/AvatarCanvas.vue'
+
+// 默认头像配置（日历预览用）
+const defaultAvatar = ref({ hair_id: 1, skin_id: 1, eye_id: 'brown', body_id: 'medium' })
 
 const weekdays = ['日', '一', '二', '三', '四', '五', '六']
 const now = new Date()
@@ -167,11 +181,18 @@ onMounted(() => loadCalendar())
 
 .day-num { font-size: 14px; font-weight: 500; }
 
-.outfit-dots { display: flex; gap: 3px; margin-top: 2px; }
-.dot { width: 5px; height: 5px; border-radius: 50%; background: #e879f9; }
-
-.mini-preview { display: flex; gap: 2px; margin-top: 2px; }
-.mini-img { width: 16px; height: 16px; border-radius: 4px; object-fit: cover; }
+.avatar-mini-wrap {
+  margin-top: 2px;
+  display: flex;
+  justify-content: center;
+}
+.avatar-mini-wrap :deep(canvas) {
+  width: 40px !important;
+  height: 60px !important;
+}
+.avatar-mini-empty {
+  opacity: 0.35;
+}
 
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.4);

@@ -15,6 +15,16 @@
     <div class="avatar-config">
       <h3>🎨 虚拟形象配置</h3>
 
+      <!-- 实时预览画布 -->
+      <div class="avatar-preview-section">
+        <AvatarCanvas
+          :width="200"
+          :height="300"
+          :avatar-config="canvasConfig"
+          :garments="[]"
+        />
+      </div>
+
       <div class="config-group">
         <label>发型</label>
         <div class="option-row">
@@ -71,6 +81,19 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import api from '../api/index.js'
 import { authStore } from '../stores/auth.js'
+import AvatarCanvas from '../components/AvatarCanvas.vue'
+
+// 将 profile 的 avatar 选项转换为 canvas 配置
+const hairIdMap = { short: 1, long: 2, twintail: 3, ponytail: 4, bob: 5 }
+const skinIdMap = { light: 1, medium: 2, tan: 3, dark: 4 }
+const eyeIdMap = { brown: 'brown', blue: 'blue', green: 'green', purple: 'purple', red: 'red' }
+
+const canvasConfig = computed(() => ({
+  hair_id: hairIdMap[avatar.hair] || 1,
+  skin_id: skinIdMap[avatar.skin] || 1,
+  eye_id: eyeIdMap[avatar.eye] || 'brown',
+  body_id: avatar.body || 'medium',
+}))
 
 const user = ref(null)
 const saving = ref(false)
@@ -162,6 +185,16 @@ onMounted(() => loadProfile())
   box-shadow: 0 2px 16px rgba(168, 85, 247, 0.1);
 }
 .avatar-config h3 { color: #7c3aed; font-size: 16px; margin-bottom: 16px; }
+
+.avatar-preview-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: linear-gradient(135deg, #fdf2f8, #ede9fe);
+  border-radius: 16px;
+  border: 2px dashed #e9d5ff;
+}
 
 .config-group { margin-bottom: 18px; }
 .config-group label { display: block; font-size: 14px; font-weight: 600; color: #6b21a8; margin-bottom: 8px; }
