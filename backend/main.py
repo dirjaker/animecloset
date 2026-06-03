@@ -20,6 +20,7 @@ import app.models  # noqa: F401
 from app.api.auth import router as auth_router
 from app.api.garments import router as garments_router
 from app.api.user import router as user_router
+from app.api.stats import router as stats_router
 
 
 @asynccontextmanager
@@ -54,6 +55,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(auth_router, prefix="/api")
 app.include_router(garments_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
+app.include_router(stats_router, prefix="/api")
 
 
 @app.get("/")
