@@ -1,0 +1,228 @@
+<template>
+  <div class="wardrobe-page">
+    <div class="header">
+      <h2>👗 我的衣橱</h2>
+      <button class="btn-upload" @click="triggerUpload">+ 上传</button>
+      <input ref="fileInput" type="file" accept="image/*" style="display:none" @change="handleUpload" />
+    </div>
+
+    <div class="tabs">
+      <button
+        v-for="cat in categories"
+        :key="cat.value"
+        :class="['tab', { active: activeCategory === cat.value }]"
+        @click="activeCategory = cat.value; loadGarments()"
+      >{{ cat.label }}</button>
+    </div>
+
+    <div v-if="uploading" class="upload-status">
+      <div class="spinner"></div>
+      <span>{{ uploadStatus }}</span>
+    </div>
+
+    <div v-if="loading" class="loading">加载中...</div>
+
+    <div v-else class="grid">
+      <div v-for="g in garments" :key="g.id" class="card">
+        <div class="card-img-wrap">
+          <img :src="g.image_url || g.thumbnail_url" :alt="g.category" class="card-img" />
+          <button class="btn-delete" @click="deleteGarment(g.id)">×</button>
+        </div>
+        <div class="card-info">
+          <span class="cat-badge">{{ categoryLabel(g.category) }}</span>
+          <div class="tags" v-if="g.tags?.length">
+            <span v-for="t in g.tags" :key="t" class="tag">{{ t }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="!garments.length && !loading" class="empty">
+        <p>衣橱空空如也~</p>
+        <p class="hint">点击右上角上传你的第一件衣服吧！</p>
+      </div>
+    </div>
+
+    <div v-if="hasMore" class="load-more">
+      <button @click="loadMore" class="btn-more">加载更多</button>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import api from '../api/index.js'
+
+const categories = [
+  { label: '全部', value: '' },
+  { label: '上衣', value: 'top' },
+  { label: '下装', value: 'bottom' },
+  { label: '外套', value: 'outer' },
+  { label: '鞋', value: 'shoes' },
+  { label: '配饰', value: 'accessory' },
+]
+
+const categoryMap = { top: '上衣', bottom: '下装', outer: '外套', shoes: '鞋', accessory: '配饰' }
+const categoryLabel = (c) => categoryMap[c] || c
+
+const activeCategory = ref('')
+const garments = ref([])
+const loading = ref(false)
+const page = ref(1)
+const hasMore = ref(false)
+const fileInput = ref(null)
+const uploading = ref(false)
+const uploadStatus = ref('上传中...')
+
+async function loadGarments(append = false) {
+  loading.value = true
+  try {
+    const params = { page: page.value, page_size: 20 }
+    if (activeCategory.value) params.category = activeCategory.value
+    const { data } = await api.get('/garments', { params })
+    const items = data.items || data.garments || data || []
+    garments.value = append ? [...garments.value, ...items] : items
+    hasMore.value = data.has_more || (items.length === 20)
+  } catch { garments.value = [] }
+  finally { loading.value = false }
+}
+
+function loadMore() { page.value++; loadGarments(true) }
+
+function triggerUpload() { fileInput.value?.click() }
+
+async function handleUpload(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  const fd = new FormData()
+  fd.append('file', file)
+  uploading.value = true
+  uploadStatus.value = '上传中...'
+  try {
+    const { data } = await api.post('/garments/upload', fd)
+    const taskId = data.task_id
+    if (taskId) {
+      uploadStatus.value = '识别中...'
+      await pollStatus(taskId)
+    }
+    page.value = 1
+    await loadGarments()
+  } catch (e) {
+    uploadStatus.value = '上传失败'
+    setTimeout(() => { uploading.value = false }, 2000)
+    return
+  }
+  uploading.value = false
+  e.target.value = ''
+}
+
+function pollStatus(taskId) {
+  return new Promise((resolve, reject) => {
+    const iv = setInterval(async () => {
+      try {
+        const { data } = await api.get(`/garments/status/${taskId}`)
+        if (data.status === 'success' || data.status === 'completed' || data.status === 'done') {
+          clearInterval(iv); resolve(data)
+        } else if (data.status === 'failed' || data.status === 'error') {
+          clearInterval(iv); reject(new Error('识别失败'))
+        }
+      } catch { clearInterval(iv); reject(new Error('查询失败')) }
+    }, 2000)
+  })
+}
+
+async function deleteGarment(id) {
+  if (!confirm('确定删除这件衣服吗？')) return
+  try {
+    await api.delete(`/garments/${id}`)
+    garments.value = garments.value.filter(g => g.id !== id)
+  } catch {}
+}
+
+onMounted(() => loadGarments())
+</script>
+
+<style scoped>
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.header h2 { font-size: 20px; color: #7c3aed; }
+.btn-upload {
+  background: linear-gradient(135deg, #e879f9, #a78bfa);
+  color: white; border: none; padding: 8px 18px;
+  border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+}
+
+.tabs {
+  display: flex; gap: 8px; margin-bottom: 16px;
+  overflow-x: auto; padding-bottom: 4px;
+}
+
+.tab {
+  padding: 6px 16px; border: 2px solid #e9d5ff;
+  background: white; border-radius: 20px; font-size: 13px;
+  cursor: pointer; white-space: nowrap; color: #6b21a8; transition: all 0.2s;
+}
+.tab.active {
+  background: linear-gradient(135deg, #e879f9, #a78bfa);
+  color: white; border-color: transparent;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+@media (min-width: 600px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.card {
+  background: white; border-radius: 16px; overflow: hidden;
+  box-shadow: 0 2px 12px rgba(168, 85, 247, 0.1);
+  transition: transform 0.2s;
+}
+.card:hover { transform: translateY(-2px); }
+
+.card-img-wrap { position: relative; aspect-ratio: 1; overflow: hidden; background: #f5f0ff; }
+.card-img { width: 100%; height: 100%; object-fit: cover; }
+.btn-delete {
+  position: absolute; top: 6px; right: 6px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(0,0,0,0.5); color: white; border: none;
+  font-size: 14px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+}
+
+.card-info { padding: 10px; }
+.cat-badge {
+  display: inline-block; background: #f3e8ff; color: #7c3aed;
+  padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 500;
+}
+.tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.tag {
+  background: #fce7f3; color: #db2777;
+  padding: 2px 8px; border-radius: 8px; font-size: 11px;
+}
+
+.upload-status {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; background: #f3e8ff; border-radius: 12px;
+  margin-bottom: 16px; font-size: 14px; color: #7c3aed;
+}
+
+.spinner {
+  width: 20px; height: 20px; border: 3px solid #e9d5ff;
+  border-top-color: #a855f7; border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading { text-align: center; padding: 40px; color: #a78bfa; }
+.empty { text-align: center; padding: 60px 20px; color: #aaa; }
+.empty .hint { font-size: 13px; margin-top: 8px; }
+
+.load-more { text-align: center; margin-top: 16px; }
+.btn-more {
+  padding: 8px 24px; border: 2px solid #e9d5ff; background: white;
+  border-radius: 20px; color: #7c3aed; cursor: pointer; font-size: 14px;
+}
+</style>
