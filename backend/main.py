@@ -21,6 +21,7 @@ from app.api.auth import router as auth_router
 from app.api.garments import router as garments_router
 from app.api.user import router as user_router
 from app.api.stats import router as stats_router
+from app.api.recommend import router as recommend_router
 
 
 @asynccontextmanager
@@ -40,7 +41,7 @@ app = FastAPI(
 # CORS 中间件（前端跨域）
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # MVP 阶段允许所有，生产环境需限制
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,6 +57,7 @@ app.include_router(auth_router, prefix="/api")
 app.include_router(garments_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
 app.include_router(stats_router, prefix="/api")
+app.include_router(recommend_router, prefix="/api")
 
 
 @app.get("/")
