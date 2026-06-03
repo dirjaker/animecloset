@@ -1,18 +1,25 @@
-# AnimeCloset — 动漫风AI穿搭助手
+# 🎫 AnimeCloset — 动漫风AI穿搭助手
 
 > 上传衣物 → 自动抠图+打标 → 衣橱管理 → 天气推荐 → 保存穿搭 → 日历展示
+
+## 功能特性
+
+- 📸 **智能打标** — 上传衣物照片，rembg 本地抠图 + DeepSeek Vision 自动识别属性
+- 👗 **衣橱管理** — 按类别筛选、编辑标签、穿着统计
+- 🌤️ **天气推荐** — 根据天气+场合+温度智能推荐穿搭
+- 📅 **日历展示** — 月视图展示每日穿搭，Canvas 纸娃娃渲染
+- 🎨 **捏人系统** — 自定义发型/肤色/眼睛，实时预览
+- ❄️ **冷宫唤醒** — 自动标记30天未穿衣物，推荐时优先考虑
 
 ## 技术栈
 
 | 层 | 技术 |
 |---|------|
 | 后端 | FastAPI + SQLAlchemy (async) + SQLite |
-| 前端 | Vue 3 + Vite + Canvas (纸娃娃系统) |
-| 抠图 | rembg (本地推理) |
-| 多模态LLM | DeepSeek Vision |
-| 文本LLM | DeepSeek Chat |
+| 前端 | Vue 3 + Vite + Canvas 纸娃娃 |
+| 抠图 | rembg (本地推理, u2net) |
+| LLM | DeepSeek Chat/Vision |
 | 天气 | 和风天气 API |
-| 存储 | 本地文件系统 (MVP) |
 
 ## 项目结构
 
@@ -20,45 +27,21 @@
 animecloset/
 ├── backend/
 │   ├── app/
-│   │   ├── api/           # API 路由
-│   │   │   ├── auth.py    # 认证接口
-│   │   │   ├── garments.py# 衣物接口
-│   │   │   ├── outfits.py # 穿搭接口
-│   │   │   ├── recommend.py# 推荐接口
-│   │   │   └── user.py    # 用户/捏人接口
-│   │   ├── core/          # 核心配置
-│   │   │   ├── config.py  # 环境变量/配置
-│   │   │   ├── database.py# 数据库连接
-│   │   │   └── security.py# JWT/密码
-│   │   ├── models/        # SQLAlchemy ORM 模型
-│   │   ├── schemas/       # Pydantic 请求/响应模型
-│   │   ├── services/      # 业务逻辑
-│   │   │   ├── bg_remove.py   # rembg 抠图
-│   │   │   ├── llm_tag.py     # LLM 打标
-│   │   │   ├── recommend.py   # 推荐算法
-│   │   │   └── weather.py     # 天气查询
-│   │   └── utils/         # 工具函数
-│   ├── static/uploads/    # 图片存储
-│   ├── avatars/           # 捏人素材
-│   └── main.py            # FastAPI 入口
-├── frontend/              # Vue 3 前端 (Phase 6)
-├── docs/                  # 项目文档
-└── README.md
+│   │   ├── api/           # 6个API模块 (auth/garments/outfits/recommend/stats/user)
+│   │   ├── core/          # config/database/security
+│   │   ├── models/        # 4张ORM表
+│   │   ├── schemas/       # Pydantic模型
+│   │   └── services/      # 5个服务 (bg_remove/llm_tag/recommend/weather/task_manager)
+│   └── main.py
+├── frontend/
+│   └── src/
+│       ├── api/           # Axios客户端
+│       ├── components/    # AvatarCanvas纸娃娃组件
+│       ├── views/         # 5个页面 (Login/Wardrobe/Recommend/Calendar/Profile)
+│       ├── router/        # Vue Router + 路由守卫
+│       └── utils/         # 颜色映射工具
+└── docs/
 ```
-
-## 开发计划
-
-| Phase | 内容 | 状态 |
-|-------|------|------|
-| 0 | 项目初始化 | ✅ |
-| 1 | 后端骨架 + 数据库 + 用户认证 | 🔄 |
-| 2 | 衣物上传 + rembg抠图 + LLM打标 | ⏳ |
-| 3 | 衣橱管理 CRUD | ⏳ |
-| 4 | 推荐算法（天气+LLM+降级） | ⏳ |
-| 5 | 穿搭保存 + 日历API | ⏳ |
-| 6 | 前端页面 (Vue3) | ⏳ |
-| 7 | 捏人系统 + Canvas纸娃娃 | ⏳ |
-| 8 | 冷宫唤醒 + 统计 + 联调 | ⏳ |
 
 ## 快速开始
 
@@ -68,9 +51,43 @@ conda activate animecloset
 cd backend
 pip install -r requirements.txt
 python main.py
+# → http://localhost:8000 (API文档: /docs)
 
-# 前端 (Phase 6)
+# 前端
 cd frontend
 npm install
 npm run dev
+# → http://localhost:5173
 ```
+
+## API 接口
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | /api/auth/register | 注册 |
+| POST | /api/auth/login | 登录 |
+| POST | /api/garments/upload | 上传衣物（异步抠图+打标） |
+| GET | /api/garments | 衣橱列表 |
+| PUT | /api/garments/{id} | 更新衣物 |
+| DELETE | /api/garments/{id} | 删除衣物 |
+| POST | /api/recommend | 穿搭推荐 |
+| POST | /api/outfits | 保存穿搭 |
+| GET | /api/outfits/calendar | 日历数据 |
+| GET | /api/stats/wardrobe | 衣橱统计 |
+| GET | /api/stats/cold-palace | 冷宫衣物 |
+| GET | /api/stats/wear-ranking | 穿着排行 |
+| GET/PUT | /api/user/avatar | 捏人配置 |
+
+## 开发日志
+
+| Phase | 内容 | 提交 |
+|-------|------|------|
+| 0 | 项目初始化 | ✅ |
+| 1 | 后端骨架 + JWT认证 | ✅ |
+| 2 | 衣物上传 + rembg抠图 + LLM打标 | ✅ |
+| 3 | 衣橱管理 + 统计API | ✅ |
+| 4 | 推荐算法（天气+LLM+降级） | ✅ |
+| 5 | 穿搭保存 + 日历API | ✅ |
+| 6 | Vue3前端（5个页面） | ✅ |
+| 7 | 捏人系统 + Canvas纸娃娃 | ✅ |
+| 8 | 冷宫唤醒 + 统计面板 | ✅ |
