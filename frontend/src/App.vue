@@ -1,28 +1,130 @@
 <template>
-  <div class="app">
-    <nav v-if="authStore.isLoggedIn" class="nav-bar">
-      <div class="nav-inner">
-        <span class="nav-logo">🏠 AnimeCloset</span>
-        <div class="nav-links">
-          <router-link to="/wardrobe">👗 衣橱</router-link>
-          <router-link to="/recommend">✨ 推荐</router-link>
-          <router-link to="/calendar">📅 日历</router-link>
-          <router-link to="/profile">👤 我的</router-link>
-          <a @click="logout" class="logout-link">退出</a>
-        </div>
-      </div>
-    </nav>
-    <main class="main-content">
-      <router-view />
-    </main>
-  </div>
+  <n-config-provider :theme-overrides="themeOverrides">
+    <n-message-provider>
+      <n-notification-provider>
+        <n-dialog-provider>
+          <div class="app-root">
+            <template v-if="!authStore.isLoggedIn">
+              <router-view />
+            </template>
+
+            <template v-else>
+              <div class="app-layout">
+                <div class="mobile-header">
+                  <n-button quaternary @click="showDrawer = true" size="large">
+                    <template #icon><n-icon :component="MenuOutline" /></template>
+                  </n-button>
+                  <span class="mobile-title">AnimeCloset</span>
+                  <n-button quaternary circle size="small" @click="logout">
+                    <template #icon><n-icon :component="LogOutOutline" /></template>
+                  </n-button>
+                </div>
+
+                <div v-if="showDrawer" class="drawer-overlay" @click="showDrawer = false" />
+                <aside class="sidebar" :class="{ open: showDrawer }">
+                  <div class="sidebar-inner">
+                    <div class="sidebar-logo">
+                      <div class="logo-icon">
+                        <n-icon :component="ShirtOutline" :size="20" color="#fff" />
+                      </div>
+                      <span>AnimeCloset</span>
+                    </div>
+
+                    <n-menu
+                      :value="currentRoute"
+                      :options="menuOptions"
+                      :root-indent="20"
+                      :indent="20"
+                      @update:value="onMenuSelect"
+                    />
+
+                    <div class="sidebar-footer">
+                      <n-button quaternary block @click="logout">
+                        <template #icon><n-icon :component="LogOutOutline" /></template>
+                        退出登录
+                      </n-button>
+                    </div>
+                  </div>
+                </aside>
+
+                <main class="main-area">
+                  <div class="main-content">
+                    <router-view v-slot="{ Component }">
+                      <transition name="page-fade" mode="out-in">
+                        <component :is="Component" />
+                      </transition>
+                    </router-view>
+                  </div>
+                </main>
+              </div>
+            </template>
+          </div>
+        </n-dialog-provider>
+      </n-notification-provider>
+    </n-message-provider>
+  </n-config-provider>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { h, ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { NIcon } from 'naive-ui'
 import { authStore } from './stores/auth.js'
+import {
+  ShirtOutline,
+  CalendarOutline,
+  SparklesOutline,
+  PersonOutline,
+  LogOutOutline,
+  MenuOutline,
+} from '@vicons/ionicons5'
 
 const router = useRouter()
+const route = useRoute()
+const showDrawer = ref(false)
+
+const currentRoute = computed(() => route.path)
+
+const themeOverrides = {
+  common: {
+    primaryColor: '#D4884A',
+    primaryColorHover: '#E8A060',
+    primaryColorPressed: '#B8743E',
+    primaryColorSuppl: '#F0B878',
+    borderRadius: '10px',
+    borderRadiusSmall: '8px',
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif",
+  },
+  Button: {
+    borderRadiusMedium: '12px',
+    borderRadiusSmall: '10px',
+  },
+  Card: {
+    borderRadius: '16px',
+  },
+  Input: {
+    borderRadius: '10px',
+  },
+  Tag: {
+    borderRadius: '8px',
+  },
+}
+
+function renderIcon(icon) {
+  return () => h(NIcon, null, { default: () => h(icon) })
+}
+
+const menuOptions = [
+  { label: '衣橱', key: '/wardrobe', icon: renderIcon(ShirtOutline) },
+  { label: '推荐', key: '/recommend', icon: renderIcon(SparklesOutline) },
+  { label: '日历', key: '/calendar', icon: renderIcon(CalendarOutline) },
+  { label: '我的', key: '/profile', icon: renderIcon(PersonOutline) },
+]
+
+function onMenuSelect(key) {
+  router.push(key)
+  showDrawer.value = false
+}
 
 function logout() {
   authStore.logout()
@@ -31,150 +133,169 @@ function logout() {
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
-
-* {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
 body {
-  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
-  background: #FFF8F0;
-  background-image:
-    radial-gradient(circle at 20% 50%, rgba(212, 165, 116, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(91, 124, 80, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 50% 80%, rgba(193, 122, 58, 0.05) 0%, transparent 50%);
-  color: #4A3728;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: #F8F6F3;
+  color: #1F2937;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app-root {
   min-height: 100vh;
 }
 
-.app {
+.app-layout {
+  display: flex;
   min-height: 100vh;
+}
+
+/* ───── Sidebar ───── */
+.sidebar {
+  width: 240px;
+  background: #FFFFFF;
+  border-right: 1px solid #F0EFEC;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 200;
   display: flex;
   flex-direction: column;
+  transition: transform 0.2s ease;
 }
 
-/* === 木屋导航栏 === */
-.nav-bar {
-  background: linear-gradient(135deg, #5C4033 0%, #8B6914 50%, #6B4226 100%);
-  padding: 0 16px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow:
-    0 3px 12px rgba(92, 64, 51, 0.3),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
-  /* 木纹质感 */
-  background-image:
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 40px,
-      rgba(0,0,0,0.03) 40px,
-      rgba(0,0,0,0.03) 42px
-    );
-}
-
-.nav-inner {
-  max-width: 900px;
-  margin: 0 auto;
+.sidebar-inner {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 52px;
+  flex-direction: column;
+  height: 100%;
+  padding: 32px 0 24px;
 }
 
-.nav-logo {
-  font-size: 16px;
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 28px 28px;
+  font-size: 20px;
   font-weight: 700;
-  color: #F5E6D3;
-  letter-spacing: 1px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  color: #1F2937;
+  letter-spacing: -0.5px;
+  border-bottom: 1px solid #F0EFEC;
+  margin-bottom: 12px;
 }
 
-.nav-links {
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #D4884A 0%, #E8A060 100%);
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(212, 136, 74, 0.25);
 }
 
-.nav-bar a {
-  color: #E8D5B7;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 6px 14px;
-  border-radius: 8px;
-  transition: all 0.2s;
-  cursor: pointer;
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 16px 0;
+  border-top: 1px solid #F0EFEC;
 }
 
-.nav-bar a:hover,
-.nav-bar a.router-link-active {
-  background: rgba(255, 248, 240, 0.15);
-  color: #FFF8F0;
-}
-
-.logout-link {
-  font-size: 12px !important;
-  opacity: 0.7;
-  color: #D4A574 !important;
-}
-
-/* === 主内容区 === */
-.main-content {
+/* ───── Main area ───── */
+.main-area {
   flex: 1;
-  padding: 16px;
-  max-width: 600px;
+  margin-left: 240px;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+.main-content {
   width: 100%;
-  margin: 0 auto;
+  max-width: 960px;
+  padding: 44px 56px;
 }
 
-@media (min-width: 768px) {
-  .main-content {
-    max-width: 900px;
-    padding: 24px;
+/* ───── Page transition ───── */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+/* ───── Mobile ───── */
+.mobile-header {
+  display: none;
+}
+
+.drawer-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
   }
-}
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+  }
 
-/* === 通用木屋卡片样式 === */
-.wood-card {
-  background: #FFF5EB;
-  border: 1px solid #D4A574;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow:
-    0 2px 8px rgba(139, 105, 20, 0.08),
-    0 1px 0 rgba(255, 255, 255, 0.8) inset;
-}
+  .drawer-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 199;
+    animation: fadeOverlay 0.2s ease;
+  }
 
-/* === 通用木屋按钮 === */
-.wood-btn {
-  background: linear-gradient(135deg, #C17A3A, #8B6914);
-  color: #FFF8F0;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 6px rgba(139, 105, 20, 0.2);
-}
+  @keyframes fadeOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 
-.wood-btn:hover {
-  background: linear-gradient(135deg, #D4893A, #9B7924);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(139, 105, 20, 0.3);
-}
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #F0EFEC;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
 
-.wood-btn-green {
-  background: linear-gradient(135deg, #5B7C50, #4A6B3F);
-}
+  .mobile-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1F2937;
+  }
 
-.wood-btn-green:hover {
-  background: linear-gradient(135deg, #6B8C60, #5A7B4F);
+  .main-area {
+    margin-left: 0;
+  }
+
+  .main-content {
+    padding: 24px 20px;
+  }
 }
 </style>

@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     QWEATHER_LOCATION_URL: str = "https://geoapi.qweather.com/v2/city/lookup"
     QWEATHER_WEATHER_URL: str = "https://devapi.qweather.com/v7/weather/now"
 
+    # ---- 通义万相 ----
+    DASHSCOPE_API_KEY: str = ""
+
     # ---- rembg 抠图 ----
     REMBG_MODEL: str = "u2net"  # u2net / u2netp / isnet-general-use
 

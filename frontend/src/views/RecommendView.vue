@@ -1,110 +1,176 @@
 <template>
   <div class="recommend-page">
-    <h2>✨ 智能推荐</h2>
-
-    <div class="form-card">
-      <div class="field">
-        <label>日期</label>
-        <input type="date" v-model="date" class="input" />
+    <div class="page-header">
+      <div>
+        <h2>智能推荐</h2>
+        <p class="page-subtitle">AI 为你搭配今日穿搭</p>
       </div>
-
-      <div class="field">
-        <label>场合</label>
-        <div class="occasion-grid">
-          <button
-            v-for="o in occasions"
-            :key="o.value"
-            :class="['occasion-btn', { active: occasion === o.value }]"
-            @click="occasion = o.value"
-          >{{ o.icon }} {{ o.label }}</button>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>额外要求</label>
-        <textarea v-model="extra" class="input textarea" placeholder="例如：今天想穿得可爱一点~" rows="3"></textarea>
-      </div>
-
-      <button class="btn-primary" @click="getRecommend" :disabled="loading">
-        {{ loading ? '推荐中...' : '🔮 获取推荐' }}
-      </button>
     </div>
 
-    <!-- 冷宫衣物提示 -->
-    <div class="cold-palace-section" v-if="coldPalaceItems.length">
-      <button class="btn-toggle-cold" @click="showColdPalace = !showColdPalace">
-        ❄️ {{ showColdPalace ? '收起' : '查看' }}冷宫衣物 ({{ coldPalaceItems.length }} 件)
-      </button>
-      <div v-if="showColdPalace" class="cold-palace-grid">
-        <div v-for="item in coldPalaceItems" :key="item.id" class="cold-palace-card">
-          <img v-if="item.image_url || item.thumbnail_url" :src="item.image_url || item.thumbnail_url" class="cp-img" />
-          <div class="cp-info">
-            <span class="cat-badge">{{ item.category }}</span>
-            <span class="cp-days">{{ item.days_since }}天未穿</span>
+    <n-card class="form-card" :bordered="false">
+      <n-form label-placement="left" label-width="60">
+        <n-form-item label="日期">
+          <n-date-picker
+            v-model:formatted-value="date"
+            type="date"
+            value-format="yyyy-MM-dd"
+            style="width: 100%"
+          />
+        </n-form-item>
+
+        <n-form-item label="场合">
+          <div class="occasion-pills">
+            <button
+              v-for="o in occasions"
+              :key="o.value"
+              :class="['pill', { active: occasion === o.value }]"
+              @click="occasion = o.value"
+            >
+              <n-icon :component="o.icon" :size="16" />
+              {{ o.label }}
+            </button>
           </div>
-        </div>
-      </div>
-    </div>
+        </n-form-item>
+
+        <n-form-item label="要求">
+          <n-input
+            v-model:value="extra"
+            type="textarea"
+            placeholder="例如：今天想穿得可爱一点"
+            :rows="2"
+          />
+        </n-form-item>
+
+        <n-button
+          type="primary"
+          block
+          :loading="loading"
+          @click="getRecommend"
+          size="large"
+          class="recommend-btn"
+        >
+          <template #icon><n-icon :component="SparklesOutline" /></template>
+          获取推荐
+        </n-button>
+      </n-form>
+    </n-card>
 
     <div v-if="loading" class="loading-area">
-      <div class="big-spinner"></div>
-      <p>AI 正在为你搭配中...</p>
+      <n-spin size="large" />
+      <p class="loading-text">AI 正在为你搭配中...</p>
     </div>
 
-    <div v-if="result" class="result-card">
-      <h3>📋 推荐方案</h3>
-      <p v-if="result.reason" class="reason">{{ result.reason }}</p>
-      <p v-if="result.explanation" class="reason">{{ result.explanation }}</p>
+    <n-card v-if="result" class="result-card" :bordered="false" style="margin-top: 24px">
+      <div class="result-header">
+        <n-icon :component="SparklesOutline" :size="20" color="#D4884A" />
+        <span class="result-title">推荐方案</span>
+      </div>
 
-      <div class="rec-grid">
-        <div v-for="(item, i) in (result.recommendations || result.garments || result.items || [])" :key="i" class="rec-card">
-          <div class="rec-img-wrap">
-            <img :src="item.image_url || item.thumbnail_url" class="rec-img" />
+      <p v-if="result.reason || result.explanation" class="result-reason">
+        {{ result.reason || result.explanation }}
+      </p>
+
+      <div class="result-grid">
+        <div v-for="(item, i) in resultItems" :key="i" class="result-item-card">
+          <div class="result-item-img-wrap">
+            <img :src="getImgUrl(item)" class="result-item-img" />
           </div>
-          <div class="rec-info">
-            <span class="cat-badge">{{ item.category }}</span>
-            <span v-if="item.is_cold_palace" class="cold-palace-badge">❄️ 冷宫唤醒</span>
-            <p v-if="item.reason" class="item-reason">{{ item.reason }}</p>
-            <div class="tags" v-if="item.tags?.length">
-              <span v-for="t in item.tags" :key="t" class="tag">{{ t }}</span>
+          <div class="result-item-info">
+            <div class="result-item-tags">
+              <n-tag size="small" :bordered="false" round style="background: #FDF4EC; color: #D4884A; font-weight: 500;">
+                {{ item.category }}
+              </n-tag>
+              <n-tag v-if="item.is_cold_palace" size="small" :bordered="false" round style="background: #FEF3C7; color: #D97706; font-weight: 500;">
+                冷宫唤醒
+              </n-tag>
             </div>
+            <p v-if="item.reason" class="result-item-reason">{{ item.reason }}</p>
           </div>
         </div>
       </div>
 
-      <button v-if="(result.recommendations || result.garments || result.items || []).length" class="btn-save" @click="saveOutfit">
-        💾 保存这套穿搭
-      </button>
+      <n-button
+        v-if="resultItems.length"
+        type="primary"
+        block
+        size="large"
+        class="save-btn"
+        @click="saveOutfit"
+      >
+        <template #icon><n-icon :component="SaveOutline" /></template>
+        保存这套穿搭
+      </n-button>
+    </n-card>
+
+    <div v-if="coldPalaceItems.length" class="cold-section">
+      <div class="cold-header">
+        <n-icon :component="SparklesOutline" :size="18" color="#6B7280" />
+        <span class="cold-title">冷宫衣物 ({{ coldPalaceItems.length }} 件)</span>
+      </div>
+      <div class="cold-grid">
+        <div v-for="item in coldPalaceItems" :key="item.id" class="cold-card">
+          <img v-if="getImgUrl(item)" :src="getImgUrl(item)" class="cold-img" />
+          <div class="cold-card-info">
+            <n-tag size="tiny" :bordered="false" round style="background: #F3F4F6; color: #6B7280;">
+              {{ item.category }}
+            </n-tag>
+            <span class="cold-days">{{ item.days_since }}天未穿</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <p v-if="error" class="error">{{ error }}</p>
+    <n-alert v-if="error" type="error" :bordered="false" style="margin-top: 16px" closable @close="error = ''">
+      {{ error }}
+    </n-alert>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useMessage } from 'naive-ui'
+import {
+  SparklesOutline,
+  SaveOutline,
+  SunnyOutline,
+  BriefcaseOutline,
+  HeartOutline,
+  WineOutline,
+  BarbellOutline,
+  RibbonOutline,
+} from '@vicons/ionicons5'
 import api from '../api/index.js'
 import { getColdPalace } from '../api/index.js'
+
+const message = useMessage()
+
+const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`
 
 const today = new Date().toISOString().split('T')[0]
 const date = ref(today)
 const occasion = ref('')
 const extra = ref('')
-const showColdPalace = ref(false)
-const coldPalaceItems = ref([])
-const coldPalaceLoading = ref(false)
 const loading = ref(false)
 const result = ref(null)
 const error = ref('')
+const coldPalaceItems = ref([])
 
 const occasions = [
-  { value: 'daily', label: '日常', icon: '🏠' },
-  { value: 'work', label: '工作', icon: '💼' },
-  { value: 'date', label: '约会', icon: '💕' },
-  { value: 'party', label: '聚会', icon: '🎉' },
-  { value: 'sport', label: '运动', icon: '🏃' },
-  { value: 'formal', label: '正式', icon: '👔' },
+  { value: 'daily', label: '日常', icon: SunnyOutline },
+  { value: 'work', label: '工作', icon: BriefcaseOutline },
+  { value: 'date', label: '约会', icon: HeartOutline },
+  { value: 'party', label: '聚会', icon: WineOutline },
+  { value: 'sport', label: '运动', icon: BarbellOutline },
+  { value: 'formal', label: '正式', icon: RibbonOutline },
 ]
+
+const resultItems = computed(() => result.value?.recommendations || result.value?.garments || result.value?.items || [])
+
+function getImgUrl(item) {
+  const url = item.image_url || item.thumbnail_url || item.processed_url
+  if (url && url.startsWith('/')) return `${API_BASE}${url}`
+  return url || ''
+}
 
 async function getRecommend() {
   error.value = ''
@@ -132,122 +198,248 @@ onMounted(async () => {
 })
 
 async function saveOutfit() {
-  const items = result.value?.recommendations || result.value?.garments || result.value?.items || []
+  const items = resultItems.value
   const garmentIds = items.map(g => g.id).filter(Boolean)
   if (!garmentIds.length) return
   try {
     await api.post('/outfits', { date: date.value, garment_ids: garmentIds })
-    alert('穿搭已保存！')
-  } catch { alert('保存失败') }
+    message.success('穿搭已保存')
+  } catch {
+    message.error('保存失败')
+  }
 }
 </script>
 
 <style scoped>
-.recommend-page h2 { font-size: 20px; color: #8B6914; margin-bottom: 16px; }
+.recommend-page {
+  animation: pageEnter 0.25s ease;
+}
+
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-header h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1F2937;
+  letter-spacing: -0.3px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #9CA3AF;
+  margin-top: 6px;
+}
 
 .form-card {
-  background: #FFF5EB; border-radius: 12px; padding: 24px;
-  border: 1px solid #D4A574;
-  box-shadow: 0 2px 16px rgba(139, 105, 20, 0.08);
-  display: flex; flex-direction: column; gap: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03);
+  border: 1px solid #F0EFEC;
+  margin-bottom: 8px;
 }
 
-.field label { display: block; font-size: 14px; font-weight: 600; color: #4A3728; margin-bottom: 8px; }
-
-.input {
-  width: 100%; padding: 12px 14px; border: 2px solid #E8D5B7;
-  border-radius: 10px; font-size: 14px; outline: none;
-  background: #FFFAF5; color: #4A3728; transition: border 0.2s;
-}
-.input:focus { border-color: #C17A3A; }
-.input::placeholder { color: #B8A690; }
-.textarea { resize: vertical; font-family: inherit; }
-
-.occasion-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-.occasion-btn {
-  padding: 8px 14px; border: 2px solid #E8D5B7; background: #FFFAF5;
-  border-radius: 20px; font-size: 13px; color: #8B7355; cursor: pointer; transition: all 0.2s;
-}
-.occasion-btn.active {
-  background: linear-gradient(135deg, #C17A3A, #8B6914);
-  color: white; border-color: transparent;
+.occasion-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.btn-primary {
-  padding: 14px; background: linear-gradient(135deg, #C17A3A, #8B6914);
-  color: white; border: none; border-radius: 12px;
-  font-size: 16px; font-weight: 600; cursor: pointer;
-  transition: opacity 0.2s;
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1px solid #E5E7EB;
+  background: #FFFFFF;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6B7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  outline: none;
 }
-.btn-primary:disabled { opacity: 0.6; }
 
-.loading-area { text-align: center; padding: 40px; color: #8B7355; }
-.big-spinner {
-  width: 48px; height: 48px; border: 4px solid #E8D5B7;
-  border-top-color: #C17A3A; border-radius: 50%;
-  animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+.pill:hover {
+  border-color: #D4884A;
+  color: #D4884A;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+
+.pill.active {
+  background: #D4884A;
+  border-color: #D4884A;
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(212, 136, 74, 0.25);
+}
+
+.recommend-btn {
+  border-radius: 12px;
+  height: 44px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #D4884A, #E8A060) !important;
+  border: none !important;
+  transition: all 0.2s ease;
+}
+
+.recommend-btn:hover {
+  background: linear-gradient(135deg, #E8A060, #F0B878) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 136, 74, 0.3);
+}
+
+.loading-area {
+  text-align: center;
+  padding: 60px 0;
+}
+
+.loading-text {
+  font-size: 13px;
+  color: #6B7280;
+  margin-top: 12px;
+}
 
 .result-card {
-  margin-top: 20px; background: #FFF5EB; border-radius: 12px; padding: 24px;
-  border: 1px solid #D4A574;
-  box-shadow: 0 2px 16px rgba(139, 105, 20, 0.08);
-}
-.result-card h3 { color: #8B6914; margin-bottom: 8px; }
-.reason { color: #8B7355; font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
-
-.rec-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-@media (min-width: 600px) { .rec-grid { grid-template-columns: repeat(3, 1fr); } }
-
-.rec-card {
-  border-radius: 10px; overflow: hidden; border: 1px solid #E8D5B7;
-  box-shadow: 0 2px 8px rgba(139, 105, 20, 0.06);
-}
-.rec-img-wrap { aspect-ratio: 1; background: #FFF8F0; }
-.rec-img { width: 100%; height: 100%; object-fit: cover; }
-.rec-info { padding: 8px; }
-.cat-badge {
-  display: inline-block; background: #FFF0DE; color: #8B6914;
-  padding: 2px 10px; border-radius: 10px; font-size: 12px;
-}
-.item-reason { font-size: 12px; color: #8B7355; margin-top: 4px; }
-.tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-.tag { background: #F5E6D3; color: #8B6914; padding: 2px 8px; border-radius: 8px; font-size: 11px; }
-
-.btn-save {
-  margin-top: 16px; width: 100%; padding: 14px;
-  background: linear-gradient(135deg, #6B9A5B, #5B7C50);
-  color: white; border: none; border-radius: 12px;
-  font-size: 15px; font-weight: 600; cursor: pointer;
-  transition: opacity 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03);
+  border: 1px solid #F0EFEC;
 }
 
-.error { color: #C0392B; text-align: center; margin-top: 12px; }
-
-.cold-palace-badge {
-  display: inline-block; background: linear-gradient(135deg, #D4E8D0, #B8D4B0);
-  color: #3D5C34; padding: 2px 8px; border-radius: 10px;
-  font-size: 11px; font-weight: 600; margin-left: 4px;
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
-.cold-palace-section { margin-top: 16px; }
-.btn-toggle-cold {
-  width: 100%; padding: 12px; background: linear-gradient(135deg, #FFF0DE, #F5E6D3);
-  color: #8B6914; border: 2px solid #D4A574; border-radius: 12px;
-  font-size: 14px; font-weight: 600; cursor: pointer;
-  transition: opacity 0.2s;
+.result-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1F2937;
 }
-.cold-palace-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 10px; margin-top: 12px;
+
+.result-reason {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #4B5563;
+  margin-bottom: 20px;
 }
-@media (max-width: 500px) { .cold-palace-grid { grid-template-columns: repeat(2, 1fr); } }
-.cold-palace-card {
-  border-radius: 10px; overflow: hidden; border: 1px solid #E8D5B7;
-  box-shadow: 0 1px 6px rgba(139, 105, 20, 0.06);
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
 }
-.cp-img { width: 100%; aspect-ratio: 1; object-fit: cover; }
-.cp-info { padding: 6px 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.cp-days { font-size: 11px; color: #8B6914; }
+
+.result-item-card {
+  background: #FFFFFF;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #F0EFEC;
+}
+
+.result-item-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 12px 32px rgba(0, 0, 0, 0.06);
+}
+
+.result-item-img-wrap {
+  aspect-ratio: 1;
+  background: #F8F8F6;
+  overflow: hidden;
+}
+
+.result-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.result-item-info {
+  padding: 10px;
+}
+
+.result-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.result-item-reason {
+  font-size: 12px;
+  color: #6B7280;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.save-btn {
+  margin-top: 24px;
+  border-radius: 12px;
+  height: 44px;
+  font-weight: 600;
+  background: #D4884A !important;
+  border: none !important;
+  transition: all 0.2s ease;
+}
+
+.save-btn:hover {
+  background: #E8A060 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 136, 74, 0.3);
+}
+
+.cold-section {
+  margin-top: 28px;
+}
+
+.cold-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.cold-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.cold-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.cold-card {
+  background: #FFFFFF;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03);
+  border: 1px solid #F0EFEC;
+}
+
+.cold-img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.cold-card-info {
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cold-days {
+  font-size: 11px;
+  color: #9CA3AF;
+}
 </style>

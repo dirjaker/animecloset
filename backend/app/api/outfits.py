@@ -22,6 +22,7 @@ from ..schemas.outfit import (
 )
 from ..schemas.garment import GarmentTags
 from ..services.weather import get_weather
+from ..services.wanx import generate_outfit_illustration
 
 router = APIRouter(prefix="/outfits", tags=["穿搭"])
 
@@ -50,6 +51,7 @@ def _build_outfit_response(outfit: Outfit, garments_map: dict) -> OutfitResponse
         weather=outfit.weather,
         temperature=outfit.temperature,
         reason=outfit.reason,
+        illustration_url=outfit.illustration_url,
     )
 
 
@@ -206,3 +208,76 @@ async def get_calendar(
             days.append(CalendarDay(date=d_str, outfit=None))
 
     return CalendarResponse(year=year, month=mon, days=days)
+
+
+@router.post("/{outfit_id}/illustration")
+async def generate_illustration(
+    outfit_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """
+    为穿搭记录生成 AI 动漫插画
+
+    流程：获取穿搭的衣物图片 → 拼合平铺参考图 → 调通义万相生成动漫插画
+    """
+    # 查找穿搭记录
+    result = await db.execute(
+        select(Outfit).where(
+            and_(Outfit.id == outfit_id, Outfit.user_id == user.id)
+        )
+    )
+    outfit = result.scalar_one_or_none()
+    if not outfit:
+        raise HTTPException(status_code=404, detail="穿搭记录不存在")
+
+    # 如果已有插画，直接返回
+    if outfit.illustration_url:
+        return {
+            "status": "exists",
+            "illustration_url": outfit.illustration_url,
+        }
+
+    # 获取衣物图片路径
+    garment_ids = json.loads(outfit.garment_ids) if outfit.garment_ids else []
+    if not garment_ids:
+        raise HTTPException(status_code=400, detail="穿搭没有衣物，无法生成插画")
+
+    g_result = await db.execute(
+        select(Garment).where(
+            and_(Garment.id.in_(garment_ids), Garment.user_id == user.id)
+        )
+    )
+    garments = g_result.scalars().all()
+
+    # 使用 processed_url（抠图后 PNG）或 original_url
+    import os
+    image_paths = []
+    for g in garments:
+        img_path = g.processed_url or g.original_url
+        if img_path:
+            # 转为绝对路径
+            abs_path = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                img_path.lstrip("/"),
+            )
+            if os.path.exists(abs_path):
+                image_paths.append(abs_path)
+
+    if not image_paths:
+        raise HTTPException(status_code=400, detail="衣物图片文件不存在")
+
+    # 生成插画
+    try:
+        local_path = await generate_outfit_illustration(image_paths, outfit.id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"插画生成失败: {str(e)}")
+
+    # 保存到数据库
+    outfit.illustration_url = local_path
+    await db.flush()
+
+    return {
+        "status": "success",
+        "illustration_url": local_path,
+    }

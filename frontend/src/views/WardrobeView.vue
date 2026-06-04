@@ -1,68 +1,91 @@
 <template>
   <div class="wardrobe-page">
-    <div class="header">
-      <h2>👗 我的衣橱</h2>
-      <button class="btn-upload" @click="triggerUpload">+ 上传</button>
-      <input ref="fileInput" type="file" accept="image/*" style="display:none" @change="handleUpload" />
+    <div class="page-header">
+      <div>
+        <h2>我的衣橱</h2>
+        <p class="page-subtitle">管理你的所有衣物</p>
+      </div>
+      <n-button type="primary" @click="triggerUpload" :loading="uploading">
+        <template #icon><n-icon :component="AddOutline" /></template>
+        上传衣物
+      </n-button>
+      <input ref="fileInput" type="file" accept="image/*" style="display: none" @change="handleUpload" />
     </div>
 
-    <div class="tabs">
-      <button
-        v-for="cat in categories"
-        :key="cat.value"
-        :class="['tab', { active: activeCategory === cat.value }]"
-        @click="activeCategory = cat.value; loadGarments()"
-      >{{ cat.label }}</button>
-    </div>
-
-    <div class="sort-bar">
-      <label class="sort-label">排序:</label>
-      <button
-        v-for="s in sortOptions"
-        :key="s.value"
-        :class="['sort-btn', { active: sortBy === s.value }]"
-        @click="sortBy = s.value; applySort()"
-      >{{ s.label }}</button>
-    </div>
-
-    <div v-if="uploading" class="upload-status">
-      <div class="spinner"></div>
+    <div v-if="uploading" class="upload-bar">
+      <n-spin :size="16" />
       <span>{{ uploadStatus }}</span>
     </div>
 
-    <div v-if="loading" class="loading">加载中...</div>
+    <div class="category-pills">
+      <button
+        v-for="cat in categories"
+        :key="cat.value"
+        :class="['pill', { active: activeCategory === cat.value }]"
+        @click="activeCategory = cat.value; loadGarments()"
+      >
+        {{ cat.label }}
+      </button>
+    </div>
 
-    <div v-else class="grid">
-      <div v-for="g in garments" :key="g.id" class="card">
+    <div class="sort-bar">
+      <span class="sort-label">排序</span>
+      <n-radio-group v-model:value="sortBy" size="small" @update:value="applySort">
+        <n-radio-button value="default">默认</n-radio-button>
+        <n-radio-button value="wear_count">穿着次数</n-radio-button>
+      </n-radio-group>
+    </div>
+
+    <div v-if="loading" class="loading-area">
+      <n-spin size="large" />
+    </div>
+
+    <div v-else-if="garments.length" class="garment-grid">
+      <div v-for="g in garments" :key="g.id" class="garment-card">
         <div class="card-img-wrap">
-            <img :src="g.image_url || g.thumbnail_url" :alt="g.category" class="card-img" />
-            <span v-if="g.wear_count != null" class="wear-count-badge">{{ g.wear_count }}次</span>
-            <span v-if="isColdPalace(g)" class="cold-palace-tag">冷宫</span>
-            <button class="btn-delete" @click="deleteGarment(g.id)">×</button>
+          <img :src="getImgUrl(g)" :alt="g.category" class="card-img" />
+          <div v-if="g.wear_count" class="wear-count-badge">{{ g.wear_count }}次</div>
+          <div v-if="isColdPalace(g)" class="cold-badge">冷宫</div>
+          <div class="card-overlay">
+            <button class="btn-delete" @click.stop="deleteGarment(g.id)">
+              <n-icon :component="CloseOutline" :size="18" />
+            </button>
+          </div>
         </div>
         <div class="card-info">
-          <span class="cat-badge">{{ categoryLabel(g.category) }}</span>
-          <div class="tags" v-if="g.tags?.length">
-            <span v-for="t in g.tags" :key="t" class="tag">{{ t }}</span>
+          <n-tag size="small" :bordered="false" round style="background: #FDF4EC; color: #D4884A; font-weight: 500;">
+            {{ categoryLabel(g.category) }}
+          </n-tag>
+          <div v-if="g.tags" class="card-tags">
+            <span v-for="t in parseTags(g.tags)" :key="t" class="card-tag-chip">{{ t }}</span>
           </div>
         </div>
       </div>
-
-      <div v-if="!garments.length && !loading" class="empty">
-        <p>衣橱空空如也~</p>
-        <p class="hint">点击右上角上传你的第一件衣服吧！</p>
-      </div>
     </div>
 
-    <div v-if="hasMore" class="load-more">
-      <button @click="loadMore" class="btn-more">加载更多</button>
+    <div v-if="!garments.length && !loading" class="empty-state">
+      <div class="empty-icon-ring">
+        <n-icon :component="ShirtOutline" :size="40" color="#D1D5DB" />
+      </div>
+      <p class="empty-title">衣橱空空如也</p>
+      <p class="empty-desc">点击右上角上传你的第一件衣服</p>
+    </div>
+
+    <div v-if="hasMore" style="text-align: center; margin-top: 24px">
+      <n-button quaternary @click="loadMore" size="large">加载更多</n-button>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useMessage } from 'naive-ui'
+import { AddOutline, CloseOutline, ShirtOutline } from '@vicons/ionicons5'
 import api from '../api/index.js'
+
+const message = useMessage()
+
+const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`
 
 const categories = [
   { label: '全部', value: '' },
@@ -72,14 +95,28 @@ const categories = [
   { label: '鞋', value: 'shoes' },
   { label: '配饰', value: 'accessory' },
 ]
-
 const categoryMap = { top: '上衣', bottom: '下装', outer: '外套', shoes: '鞋', accessory: '配饰' }
 const categoryLabel = (c) => categoryMap[c] || c
+
 const COLD_PALACE_DAYS = 30
 const isColdPalace = (g) => {
   if (!g.last_wear_date) return true
-  const diff = (Date.now() - new Date(g.last_wear_date).getTime()) / 86400000
-  return diff > COLD_PALACE_DAYS
+  return (Date.now() - new Date(g.last_wear_date).getTime()) / 86400000 > COLD_PALACE_DAYS
+}
+
+const getImgUrl = (g) => {
+  const url = g.image_url || g.thumbnail_url || g.processed_url
+  if (url && url.startsWith('/')) return `${API_BASE}${url}`
+  return url || ''
+}
+
+const parseTags = (tags) => {
+  if (Array.isArray(tags)) return tags
+  if (typeof tags === 'string') {
+    try { return JSON.parse(tags) } catch { return [] }
+  }
+  if (tags?.color) return [tags.color, tags.material, ...(tags.style || [])].filter(Boolean)
+  return []
 }
 
 const activeCategory = ref('')
@@ -89,13 +126,8 @@ const page = ref(1)
 const hasMore = ref(false)
 const fileInput = ref(null)
 const uploading = ref(false)
-const uploadStatus = ref('上传中...')
+const uploadStatus = ref('')
 const sortBy = ref('default')
-const allGarments = ref([])
-const sortOptions = [
-  { label: '默认', value: 'default' },
-  { label: '穿着次数', value: 'wear_count' },
-]
 
 async function loadGarments(append = false) {
   loading.value = true
@@ -105,16 +137,23 @@ async function loadGarments(append = false) {
     const { data } = await api.get('/garments', { params })
     const items = data.items || data.garments || data || []
     garments.value = append ? [...garments.value, ...items] : items
-    allGarments.value = [...garments.value]
     applySort()
     hasMore.value = data.has_more || (items.length === 20)
-  } catch { garments.value = [] }
-  finally { loading.value = false }
+  } catch {
+    garments.value = []
+  } finally {
+    loading.value = false
+  }
 }
 
-function loadMore() { page.value++; loadGarments(true) }
+function loadMore() {
+  page.value++
+  loadGarments(true)
+}
 
-function triggerUpload() { fileInput.value?.click() }
+function triggerUpload() {
+  fileInput.value?.click()
+}
 
 async function handleUpload(e) {
   const file = e.target.files?.[0]
@@ -122,23 +161,21 @@ async function handleUpload(e) {
   const fd = new FormData()
   fd.append('file', file)
   uploading.value = true
-  uploadStatus.value = '上传中...'
+  uploadStatus.value = '上传并识别中...'
   try {
     const { data } = await api.post('/garments/upload', fd)
-    const taskId = data.task_id
-    if (taskId) {
-      uploadStatus.value = '识别中...'
-      await pollStatus(taskId)
+    if (data.task_id) {
+      await pollStatus(data.task_id)
     }
     page.value = 1
     await loadGarments()
-  } catch (e) {
-    uploadStatus.value = '上传失败'
-    setTimeout(() => { uploading.value = false }, 2000)
-    return
+    message.success('衣物上传成功')
+  } catch {
+    message.error('上传失败')
+  } finally {
+    uploading.value = false
+    e.target.value = ''
   }
-  uploading.value = false
-  e.target.value = ''
 }
 
 function pollStatus(taskId) {
@@ -146,25 +183,31 @@ function pollStatus(taskId) {
     const iv = setInterval(async () => {
       try {
         const { data } = await api.get(`/garments/status/${taskId}`)
-        if (data.status === 'success' || data.status === 'completed' || data.status === 'done') {
-          clearInterval(iv); resolve(data)
-        } else if (data.status === 'failed' || data.status === 'error') {
-          clearInterval(iv); reject(new Error('识别失败'))
+        if (['success', 'completed', 'done'].includes(data.status)) {
+          clearInterval(iv)
+          resolve(data)
+        } else if (['failed', 'error'].includes(data.status)) {
+          clearInterval(iv)
+          reject(new Error('识别失败'))
         }
-      } catch { clearInterval(iv); reject(new Error('查询失败')) }
+      } catch {
+        clearInterval(iv)
+        reject(new Error('查询失败'))
+      }
     }, 2000)
   })
 }
 
 async function deleteGarment(id) {
-  if (!confirm('确定删除这件衣服吗？')) return
   try {
     await api.delete(`/garments/${id}`)
     garments.value = garments.value.filter(g => g.id !== id)
-  } catch {}
+    message.success('已删除')
+  } catch {
+    message.error('删除失败')
+  }
 }
 
-onMounted(() => loadGarments())
 function applySort() {
   if (sortBy.value === 'wear_count') {
     garments.value = [...garments.value].sort((a, b) => (b.wear_count || 0) - (a.wear_count || 0))
@@ -173,118 +216,254 @@ function applySort() {
   }
 }
 
+onMounted(() => loadGarments())
 </script>
 
 <style scoped>
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.header h2 { font-size: 20px; color: #8B6914; }
-.btn-upload {
-  background: linear-gradient(135deg, #C17A3A, #8B6914);
-  color: white; border: none; padding: 8px 18px;
-  border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;
+.wardrobe-page {
+  animation: pageEnter 0.25s ease;
 }
 
-.tabs {
-  display: flex; gap: 8px; margin-bottom: 16px;
-  overflow-x: auto; padding-bottom: 4px;
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.tab {
-  padding: 6px 16px; border: 2px solid #D4A574;
-  background: #FFF5EB; border-radius: 10px; font-size: 13px;
-  cursor: pointer; white-space: nowrap; color: #4A3728; transition: all 0.2s;
-}
-.tab.active {
-  background: linear-gradient(135deg, #C17A3A, #8B6914);
-  color: white; border-color: transparent;
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+.page-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1F2937;
+  letter-spacing: -0.3px;
 }
 
-@media (min-width: 600px) {
-  .grid { grid-template-columns: repeat(3, 1fr); }
+.page-subtitle {
+  font-size: 13px;
+  color: #6B7280;
+  margin-top: 4px;
 }
 
-.card {
-  background: #FFF5EB; border-radius: 12px; overflow: hidden;
-  border: 1px solid #D4A574;
-  box-shadow: 0 2px 12px rgba(139, 105, 20, 0.08);
-  transition: transform 0.2s;
-}
-.card:hover { transform: translateY(-2px); }
-
-.card-img-wrap { position: relative; aspect-ratio: 1; overflow: hidden; background: #FFF8F0; }
-.card-img { width: 100%; height: 100%; object-fit: cover; }
-.btn-delete {
-  position: absolute; top: 6px; right: 6px;
-  width: 24px; height: 24px; border-radius: 50%;
-  background: rgba(0,0,0,0.5); color: white; border: none;
-  font-size: 14px; cursor: pointer; display: flex;
-  align-items: center; justify-content: center;
-}
-
-.card-info { padding: 12px 16px; }
-.cat-badge {
-  display: inline-block; background: #F5E6D3; color: #8B6914;
-  padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 500;
-}
-.tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-.tag {
-  background: #F5E6D3; color: #8B7355;
-  padding: 2px 8px; border-radius: 8px; font-size: 11px;
-}
-
-.upload-status {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px 16px; background: #FFF8F0; border: 1px solid #D4A574;
+.upload-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #FDF4EC;
   border-radius: 12px;
-  margin-bottom: 16px; font-size: 14px; color: #8B6914;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #D4884A;
+  font-weight: 500;
 }
 
-.spinner {
-  width: 20px; height: 20px; border: 3px solid #D4A574;
-  border-top-color: #C17A3A; border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+.category-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
 
-.loading { text-align: center; padding: 40px; color: #C17A3A; }
-.empty { text-align: center; padding: 60px 20px; color: #8B7355; }
-.empty .hint { font-size: 13px; margin-top: 8px; }
+.pill {
+  padding: 7px 18px;
+  border-radius: 20px;
+  border: 1px solid #E5E7EB;
+  background: #FFFFFF;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6B7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  outline: none;
+}
 
-.load-more { text-align: center; margin-top: 16px; }
-.btn-more {
-  padding: 8px 24px; border: 2px solid #D4A574; background: #FFF5EB;
-  border-radius: 10px; color: #8B6914; cursor: pointer; font-size: 14px;
+.pill:hover {
+  border-color: #D4884A;
+  color: #D4884A;
+}
+
+.pill.active {
+  background: #D4884A;
+  border-color: #D4884A;
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(212, 136, 74, 0.25);
 }
 
 .sort-bar {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
 }
-.sort-label { font-size: 13px; color: #4A3728; font-weight: 600; }
-.sort-btn {
-  padding: 4px 12px; border: 2px solid #D4A574; background: #FFF5EB;
-  border-radius: 10px; font-size: 12px; cursor: pointer;
-  color: #4A3728; transition: all 0.2s;
+
+.sort-label {
+  font-size: 13px;
+  color: #6B7280;
+  font-weight: 500;
 }
-.sort-btn.active {
-  background: linear-gradient(135deg, #C17A3A, #8B6914);
-  color: white; border-color: transparent;
+
+.loading-area {
+  text-align: center;
+  padding: 80px 0;
+}
+
+.garment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.garment-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #F0EFEC;
+}
+
+.garment-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 12px 32px rgba(0, 0, 0, 0.06);
+}
+
+.card-img-wrap {
+  position: relative;
+  aspect-ratio: 1;
+  background: #F8F8F6;
+  overflow: hidden;
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.garment-card:hover .card-img {
+  transform: scale(1.03);
 }
 
 .wear-count-badge {
-  position: absolute; bottom: 6px; left: 6px;
-  background: rgba(139, 105, 20, 0.85); color: white;
-  padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 600;
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
 }
 
-.cold-palace-tag {
-  position: absolute; top: 6px; left: 6px;
-  background: rgba(91, 124, 80, 0.85); color: white;
-  padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 600;
+.cold-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #D4884A;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.garment-card:hover .card-overlay {
+  opacity: 1;
+}
+
+.btn-delete {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #EF4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.btn-delete:hover {
+  background: #EF4444;
+  color: #FFFFFF;
+}
+
+.card-info {
+  padding: 12px;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.card-tag-chip {
+  font-size: 11px;
+  color: #6B7280;
+  background: #F3F4F6;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 0;
+}
+
+.empty-icon-ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #F3F4F6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.empty-desc {
+  font-size: 13px;
+  color: #9CA3AF;
+}
+
+@media (max-width: 768px) {
+  .garment-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
 }
 </style>

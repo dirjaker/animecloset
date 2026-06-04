@@ -46,6 +46,9 @@ class Outfit(Base):
     # 推荐理由
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    # AI 生成的穿搭插画路径
+    illustration_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )

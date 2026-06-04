@@ -30,6 +30,7 @@ class OutfitResponse(BaseModel):
     weather: str | None
     temperature: int | None
     reason: str | None
+    illustration_url: str | None = None
 
     model_config = {"from_attributes": True}
 
