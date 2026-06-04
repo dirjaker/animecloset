@@ -143,93 +143,100 @@ async function saveOutfit() {
 </script>
 
 <style scoped>
-.recommend-page h2 { font-size: 20px; color: #7c3aed; margin-bottom: 16px; }
+.recommend-page h2 { font-size: 20px; color: #8B6914; margin-bottom: 16px; }
 
 .form-card {
-  background: white; border-radius: 20px; padding: 24px;
-  box-shadow: 0 2px 16px rgba(168, 85, 247, 0.1);
+  background: #FFF5EB; border-radius: 12px; padding: 24px;
+  border: 1px solid #D4A574;
+  box-shadow: 0 2px 16px rgba(139, 105, 20, 0.08);
   display: flex; flex-direction: column; gap: 16px;
 }
 
-.field label { display: block; font-size: 14px; font-weight: 600; color: #6b21a8; margin-bottom: 8px; }
+.field label { display: block; font-size: 14px; font-weight: 600; color: #4A3728; margin-bottom: 8px; }
 
 .input {
-  width: 100%; padding: 12px 14px; border: 2px solid #f0e4ff;
-  border-radius: 12px; font-size: 14px; outline: none; transition: border 0.2s;
+  width: 100%; padding: 12px 14px; border: 2px solid #E8D5B7;
+  border-radius: 10px; font-size: 14px; outline: none;
+  background: #FFFAF5; color: #4A3728; transition: border 0.2s;
 }
-.input:focus { border-color: #c084fc; }
+.input:focus { border-color: #C17A3A; }
+.input::placeholder { color: #B8A690; }
 .textarea { resize: vertical; font-family: inherit; }
 
 .occasion-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .occasion-btn {
-  padding: 8px 14px; border: 2px solid #e9d5ff; background: white;
-  border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s;
+  padding: 8px 14px; border: 2px solid #E8D5B7; background: #FFFAF5;
+  border-radius: 20px; font-size: 13px; color: #8B7355; cursor: pointer; transition: all 0.2s;
 }
 .occasion-btn.active {
-  background: linear-gradient(135deg, #e879f9, #a78bfa);
+  background: linear-gradient(135deg, #C17A3A, #8B6914);
   color: white; border-color: transparent;
 }
 
 .btn-primary {
-  padding: 14px; background: linear-gradient(135deg, #e879f9, #a78bfa);
-  color: white; border: none; border-radius: 14px;
+  padding: 14px; background: linear-gradient(135deg, #C17A3A, #8B6914);
+  color: white; border: none; border-radius: 12px;
   font-size: 16px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.2s;
 }
 .btn-primary:disabled { opacity: 0.6; }
 
-.loading-area { text-align: center; padding: 40px; }
+.loading-area { text-align: center; padding: 40px; color: #8B7355; }
 .big-spinner {
-  width: 48px; height: 48px; border: 4px solid #e9d5ff;
-  border-top-color: #a855f7; border-radius: 50%;
+  width: 48px; height: 48px; border: 4px solid #E8D5B7;
+  border-top-color: #C17A3A; border-radius: 50%;
   animation: spin 0.8s linear infinite; margin: 0 auto 16px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .result-card {
-  margin-top: 20px; background: white; border-radius: 20px; padding: 24px;
-  box-shadow: 0 2px 16px rgba(168, 85, 247, 0.1);
+  margin-top: 20px; background: #FFF5EB; border-radius: 12px; padding: 24px;
+  border: 1px solid #D4A574;
+  box-shadow: 0 2px 16px rgba(139, 105, 20, 0.08);
 }
-.result-card h3 { color: #7c3aed; margin-bottom: 8px; }
-.reason { color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
+.result-card h3 { color: #8B6914; margin-bottom: 8px; }
+.reason { color: #8B7355; font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
 
 .rec-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 @media (min-width: 600px) { .rec-grid { grid-template-columns: repeat(3, 1fr); } }
 
 .rec-card {
-  border-radius: 14px; overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border-radius: 10px; overflow: hidden; border: 1px solid #E8D5B7;
+  box-shadow: 0 2px 8px rgba(139, 105, 20, 0.06);
 }
-.rec-img-wrap { aspect-ratio: 1; background: #f5f0ff; }
+.rec-img-wrap { aspect-ratio: 1; background: #FFF8F0; }
 .rec-img { width: 100%; height: 100%; object-fit: cover; }
 .rec-info { padding: 8px; }
 .cat-badge {
-  display: inline-block; background: #f3e8ff; color: #7c3aed;
+  display: inline-block; background: #FFF0DE; color: #8B6914;
   padding: 2px 10px; border-radius: 10px; font-size: 12px;
 }
-.item-reason { font-size: 12px; color: #888; margin-top: 4px; }
+.item-reason { font-size: 12px; color: #8B7355; margin-top: 4px; }
 .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-.tag { background: #fce7f3; color: #db2777; padding: 2px 8px; border-radius: 8px; font-size: 11px; }
+.tag { background: #F5E6D3; color: #8B6914; padding: 2px 8px; border-radius: 8px; font-size: 11px; }
 
 .btn-save {
   margin-top: 16px; width: 100%; padding: 14px;
-  background: linear-gradient(135deg, #34d399, #2dd4bf);
-  color: white; border: none; border-radius: 14px;
+  background: linear-gradient(135deg, #6B9A5B, #5B7C50);
+  color: white; border: none; border-radius: 12px;
   font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.2s;
 }
 
-.error { color: #ef4444; text-align: center; margin-top: 12px; }
+.error { color: #C0392B; text-align: center; margin-top: 12px; }
 
 .cold-palace-badge {
-  display: inline-block; background: linear-gradient(135deg, #bfdbfe, #93c5fd);
-  color: #1e40af; padding: 2px 8px; border-radius: 10px;
+  display: inline-block; background: linear-gradient(135deg, #D4E8D0, #B8D4B0);
+  color: #3D5C34; padding: 2px 8px; border-radius: 10px;
   font-size: 11px; font-weight: 600; margin-left: 4px;
 }
 
 .cold-palace-section { margin-top: 16px; }
 .btn-toggle-cold {
-  width: 100%; padding: 12px; background: linear-gradient(135deg, #dbeafe, #e0e7ff);
-  color: #3b82f6; border: 2px solid #93c5fd; border-radius: 14px;
+  width: 100%; padding: 12px; background: linear-gradient(135deg, #FFF0DE, #F5E6D3);
+  color: #8B6914; border: 2px solid #D4A574; border-radius: 12px;
   font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.2s;
 }
 .cold-palace-grid {
   display: grid; grid-template-columns: repeat(3, 1fr);
@@ -237,10 +244,10 @@ async function saveOutfit() {
 }
 @media (max-width: 500px) { .cold-palace-grid { grid-template-columns: repeat(2, 1fr); } }
 .cold-palace-card {
-  border-radius: 12px; overflow: hidden;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+  border-radius: 10px; overflow: hidden; border: 1px solid #E8D5B7;
+  box-shadow: 0 1px 6px rgba(139, 105, 20, 0.06);
 }
 .cp-img { width: 100%; aspect-ratio: 1; object-fit: cover; }
 .cp-info { padding: 6px 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.cp-days { font-size: 11px; color: #3b82f6; }
+.cp-days { font-size: 11px; color: #8B6914; }
 </style>

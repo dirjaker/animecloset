@@ -265,11 +265,11 @@ function wearToday(item) {
 </script>
 
 <style scoped>
-.profile-page h2 { font-size: 20px; color: #7c3aed; margin-bottom: 16px; }
+.profile-page h2 { font-size: 20px; color: #8B6914; margin-bottom: 16px; }
 
 .user-card {
-  background: linear-gradient(135deg, #e879f9, #a78bfa);
-  border-radius: 20px; padding: 32px 24px;
+  background: linear-gradient(135deg, #5C4033, #8B6914);
+  border-radius: 12px; padding: 32px 24px;
   text-align: center; color: white; margin-bottom: 20px;
 }
 
@@ -277,46 +277,47 @@ function wearToday(item) {
   width: 80px; height: 80px; border-radius: 50%;
   margin: 0 auto 12px; display: flex; align-items: center;
   justify-content: center; font-size: 32px; font-weight: 700;
-  border: 3px solid white; color: #7c3aed;
+  border: 3px solid #D4A574; color: #4A3728;
 }
 
 .user-card h3 { font-size: 18px; margin-bottom: 4px; }
 .email { font-size: 13px; opacity: 0.8; }
 
 .avatar-config {
-  background: white; border-radius: 20px; padding: 24px;
-  box-shadow: 0 2px 16px rgba(168, 85, 247, 0.1);
+  background: #FFF5EB; border-radius: 12px; padding: 24px;
+  box-shadow: 0 2px 16px rgba(139, 105, 20, 0.08);
+  border: 1px solid #D4A574;
 }
-.avatar-config h3 { color: #7c3aed; font-size: 16px; margin-bottom: 16px; }
+.avatar-config h3 { color: #8B6914; font-size: 16px; margin-bottom: 16px; }
 
 .avatar-preview-section {
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
   padding: 16px;
-  background: linear-gradient(135deg, #fdf2f8, #ede9fe);
-  border-radius: 16px;
-  border: 2px dashed #e9d5ff;
+  background: linear-gradient(135deg, #FFF8F0, #FFF5EB);
+  border-radius: 12px;
+  border: 2px dashed #D4A574;
 }
 
 .config-group { margin-bottom: 18px; }
-.config-group label { display: block; font-size: 14px; font-weight: 600; color: #6b21a8; margin-bottom: 8px; }
+.config-group label { display: block; font-size: 14px; font-weight: 600; color: #4A3728; margin-bottom: 8px; }
 
 .option-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .opt-btn {
-  padding: 8px 16px; border: 2px solid #e9d5ff; background: white;
-  border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s;
-  color: #6b21a8;
+  padding: 8px 16px; border: 2px solid #D4A574; background: #FFF8F0;
+  border-radius: 10px; font-size: 13px; cursor: pointer; transition: all 0.2s;
+  color: #4A3728;
 }
 .opt-btn.active {
-  background: linear-gradient(135deg, #e879f9, #a78bfa);
+  background: linear-gradient(135deg, #C17A3A, #8B6914);
   color: white; border-color: transparent;
 }
 
 .btn-primary {
   margin-top: 8px; width: 100%; padding: 14px;
-  background: linear-gradient(135deg, #e879f9, #a78bfa);
-  color: white; border: none; border-radius: 14px;
+  background: linear-gradient(135deg, #C17A3A, #8B6914);
+  color: white; border: none; border-radius: 12px;
   font-size: 16px; font-weight: 600; cursor: pointer;
 }
 .btn-primary:disabled { opacity: 0.6; }
@@ -325,59 +326,61 @@ function wearToday(item) {
 .stats-section {
   margin-top: 24px;
 }
-.stats-section h3 { color: #7c3aed; font-size: 16px; margin-bottom: 16px; }
+.stats-section h3 { color: #8B6914; font-size: 16px; margin-bottom: 16px; }
 
 .stats-card {
-  background: white; border-radius: 20px; padding: 20px;
-  box-shadow: 0 2px 16px rgba(168, 85, 247, 0.1);
+  background: #FFF5EB; border-radius: 12px; padding: 20px;
+  box-shadow: 0 2px 16px rgba(139, 105, 20, 0.08);
   margin-bottom: 16px;
+  border: 1px solid #D4A574;
 }
-.stats-card h4 { color: #7c3aed; font-size: 15px; margin-bottom: 12px; }
-.stats-loading { text-align: center; color: #a78bfa; padding: 20px; }
-.stats-empty { text-align: center; color: #ccc; padding: 20px; font-size: 14px; }
+.stats-card h4 { color: #8B6914; font-size: 15px; margin-bottom: 12px; }
+.stats-loading { text-align: center; color: #C17A3A; padding: 20px; }
+.stats-empty { text-align: center; color: #8B7355; padding: 20px; font-size: 14px; }
 
 .stats-overview { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
 .stat-item { text-align: center; }
-.stat-num { display: block; font-size: 28px; font-weight: 700; color: #e879f9; }
-.stat-label { display: block; font-size: 12px; color: #888; margin-top: 2px; }
+.stat-num { display: block; font-size: 28px; font-weight: 700; color: #C17A3A; }
+.stat-label { display: block; font-size: 12px; color: #8B7355; margin-top: 2px; }
 .category-breakdown { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; width: 100%; }
 .cat-stat-badge {
-  background: #f3e8ff; color: #7c3aed; padding: 3px 10px;
-  border-radius: 12px; font-size: 12px; font-weight: 500;
+  background: #D4A574; color: white; padding: 3px 10px;
+  border-radius: 10px; font-size: 12px; font-weight: 500;
 }
 
 .ranking-list { display: flex; flex-direction: column; gap: 10px; }
 .ranking-item {
   display: flex; align-items: center; gap: 10px;
-  padding: 10px; background: #faf5ff; border-radius: 14px;
+  padding: 10px; background: #FFF8F0; border-radius: 12px;
+  border: 1px solid #D4A574;
 }
 .rank-num {
   width: 28px; height: 28px; border-radius: 50%;
-  background: linear-gradient(135deg, #e879f9, #a78bfa);
+  background: linear-gradient(135deg, #C17A3A, #8B6914);
   color: white; display: flex; align-items: center;
   justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;
 }
 .rank-thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
 .rank-info { flex: 1; min-width: 0; }
 .rank-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 3px; }
-.wear-count { font-size: 14px; font-weight: 700; color: #e879f9; white-space: nowrap; }
+.wear-count { font-size: 14px; font-weight: 700; color: #C17A3A; white-space: nowrap; }
 
-.cold-palace-card { border: 2px solid #dbeafe; background: #f0f9ff; }
-.cold-palace-desc { font-size: 13px; color: #6b7280; margin-bottom: 12px; }
+.cold-palace-card { border: 2px solid #D4A574; background: #FFF8F0; }
+.cold-palace-desc { font-size: 13px; color: #8B7355; margin-bottom: 12px; }
 .cold-palace-list { display: flex; flex-direction: column; gap: 10px; }
 .cold-item {
   display: flex; align-items: center; gap: 10px;
-  padding: 10px; background: white; border-radius: 14px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  padding: 10px; background: #FFF5EB; border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(139, 105, 20, 0.08);
 }
 .cold-thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
 .cold-info { flex: 1; min-width: 0; }
 .days-badge {
-  display: inline-block; background: #dbeafe; color: #3b82f6;
+  display: inline-block; background: #D4A574; color: white;
   padding: 2px 8px; border-radius: 8px; font-size: 11px; margin-left: 4px;
 }
 .btn-wear-today {
-  padding: 6px 14px; background: linear-gradient(135deg, #60a5fa, #818cf8);
+  padding: 6px 14px; background: linear-gradient(135deg, #C17A3A, #8B6914);
   color: white; border: none; border-radius: 12px;
   font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0;
 }

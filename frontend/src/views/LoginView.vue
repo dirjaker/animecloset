@@ -62,52 +62,68 @@ async function handleSubmit() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #fce7f3, #ede9fe, #e0e7ff);
+  background: #FFF8F0;
+  background-image:
+    radial-gradient(circle at 30% 40%, rgba(212, 165, 116, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 70% 60%, rgba(91, 124, 80, 0.08) 0%, transparent 50%);
 }
 
 .login-card {
-  background: white;
-  border-radius: 24px;
+  background: #FFF5EB;
+  border: 2px solid #D4A574;
+  border-radius: 20px;
   padding: 40px 32px;
   width: 100%;
   max-width: 380px;
-  box-shadow: 0 8px 32px rgba(168, 85, 247, 0.15);
+  box-shadow:
+    0 8px 32px rgba(139, 105, 20, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.8) inset;
   text-align: center;
 }
 
-.title { font-size: 28px; color: #a855f7; margin-bottom: 4px; }
-.subtitle { color: #888; margin-bottom: 28px; font-size: 14px; }
+.title { font-size: 28px; color: #8B6914; margin-bottom: 4px; }
+.subtitle { color: #8B7355; margin-bottom: 28px; font-size: 14px; }
 
 .form { display: flex; flex-direction: column; gap: 14px; }
 
 .input {
   padding: 14px 16px;
-  border: 2px solid #f0e4ff;
-  border-radius: 14px;
+  border: 2px solid #E8D5B7;
+  border-radius: 10px;
   font-size: 15px;
   outline: none;
   transition: border 0.2s;
+  background: #FFFAF5;
+  color: #4A3728;
 }
 
-.input:focus { border-color: #c084fc; }
+.input:focus { border-color: #C17A3A; }
+.input::placeholder { color: #B8A080; }
 
 .btn-primary {
   padding: 14px;
-  background: linear-gradient(135deg, #e879f9, #a78bfa);
-  color: white;
+  background: linear-gradient(135deg, #C17A3A, #8B6914);
+  color: #FFF8F0;
   border: none;
-  border-radius: 14px;
+  border-radius: 10px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(139, 105, 20, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #D4893A, #9B7924);
+  transform: translateY(-1px);
 }
 
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 
-.error { color: #ef4444; font-size: 13px; }
+.error { color: #C44D2A; font-size: 13px; }
 
-.switch-text { margin-top: 20px; font-size: 13px; color: #888; }
+.switch-text { margin-top: 20px; font-size: 13px; color: #8B7355; }
 
-.link { color: #a855f7; cursor: pointer; font-weight: 500; }
+.link { color: #5B7C50; cursor: pointer; font-weight: 500; }
+.link:hover { color: #4A6B3F; text-decoration: underline; }
 </style>

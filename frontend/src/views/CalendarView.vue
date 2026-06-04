@@ -149,17 +149,20 @@ onMounted(() => loadCalendar())
 .cal-header {
   display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
 }
-.cal-header h2 { font-size: 18px; color: #7c3aed; }
+.cal-header h2 { font-size: 18px; color: #8B6914; font-weight: 700; }
 .nav-btn {
   width: 36px; height: 36px; border-radius: 50%;
-  border: 2px solid #e9d5ff; background: white;
-  font-size: 18px; cursor: pointer; color: #7c3aed;
+  border: 2px solid #D4A574; background: linear-gradient(135deg, #FFF5EB, #FFF8F0);
+  font-size: 18px; cursor: pointer; color: #8B6914;
   display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 6px rgba(139, 105, 20, 0.08);
+  transition: all 0.2s;
 }
+.nav-btn:hover { background: linear-gradient(135deg, #D4A574, #C17A3A); color: #fff; }
 
 .weekdays {
   display: grid; grid-template-columns: repeat(7, 1fr);
-  text-align: center; font-size: 13px; color: #a78bfa;
+  text-align: center; font-size: 13px; color: #C17A3A;
   font-weight: 600; margin-bottom: 8px;
 }
 
@@ -169,17 +172,29 @@ onMounted(() => loadCalendar())
 }
 
 .day-cell {
-  aspect-ratio: 1; border-radius: 12px; padding: 4px;
+  aspect-ratio: 1; border-radius: 10px; padding: 4px;
   display: flex; flex-direction: column; align-items: center;
   justify-content: center; cursor: pointer; transition: all 0.2s;
-  background: white; position: relative;
+  background: #FFF5EB; position: relative;
+  box-shadow: 0 1px 4px rgba(139, 105, 20, 0.08);
 }
-.day-cell:hover { background: #f3e8ff; }
+.day-cell:hover { background: #FFEDD5; }
 .day-cell.other { opacity: 0.3; cursor: default; }
-.day-cell.today { background: #ede9fe; border: 2px solid #a78bfa; }
-.day-cell.hasOutfit { background: #fce7f3; }
+.day-cell.today {
+  background: linear-gradient(135deg, #C17A3A, #8B6914);
+  color: #fff; box-shadow: 0 2px 8px rgba(193, 122, 58, 0.3);
+}
+.day-cell.today .day-num { color: #fff; }
+.day-cell.hasOutfit { border: 2px solid #5B7C50; position: relative; }
+.day-cell.hasOutfit::after {
+  content: '';
+  position: absolute; bottom: 6px; right: 6px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #5B7C50;
+  box-shadow: 0 1px 3px rgba(91, 124, 80, 0.4);
+}
 
-.day-num { font-size: 14px; font-weight: 500; }
+.day-num { font-size: 14px; font-weight: 500; color: #4A3728; }
 
 .avatar-mini-wrap {
   margin-top: 2px;
@@ -195,31 +210,36 @@ onMounted(() => loadCalendar())
 }
 
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  position: fixed; inset: 0; background: rgba(74, 55, 40, 0.45);
   display: flex; align-items: flex-end; justify-content: center;
   z-index: 200;
 }
 .modal {
-  background: white; border-radius: 24px 24px 0 0;
+  background: #FFF5EB; border-radius: 20px 20px 0 0;
   width: 100%; max-width: 500px; max-height: 70vh;
   overflow-y: auto; padding: 24px;
+  border-top: 3px solid #D4A574;
+  box-shadow: 0 -4px 20px rgba(139, 105, 20, 0.12);
 }
 .modal-header {
   display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
 }
-.modal-header h3 { color: #7c3aed; font-size: 16px; }
+.modal-header h3 { color: #8B6914; font-size: 16px; font-weight: 700; }
 .close-btn {
-  width: 32px; height: 32px; border-radius: 50%; border: none;
-  background: #f3e8ff; font-size: 18px; cursor: pointer; color: #7c3aed;
+  width: 32px; height: 32px; border-radius: 8px; border: 2px solid #D4A574;
+  background: linear-gradient(135deg, #FFF8F0, #FFF5EB);
+  font-size: 18px; cursor: pointer; color: #8B6914;
+  transition: all 0.2s;
 }
+.close-btn:hover { background: linear-gradient(135deg, #D4A574, #C17A3A); color: #fff; }
 
 .outfit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .outfit-item { text-align: center; }
 .outfit-img {
-  width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(139, 105, 20, 0.1);
 }
-.outfit-cat { font-size: 12px; color: #888; display: block; margin-top: 4px; }
+.outfit-cat { font-size: 12px; color: #8B6914; display: block; margin-top: 4px; font-weight: 500; }
 
-.no-outfit { text-align: center; padding: 32px; color: #aaa; }
+.no-outfit { text-align: center; padding: 32px; color: #C17A3A; }
 </style>

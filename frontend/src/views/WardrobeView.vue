@@ -177,11 +177,11 @@ function applySort() {
 
 <style scoped>
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.header h2 { font-size: 20px; color: #7c3aed; }
+.header h2 { font-size: 20px; color: #8B6914; }
 .btn-upload {
-  background: linear-gradient(135deg, #e879f9, #a78bfa);
+  background: linear-gradient(135deg, #C17A3A, #8B6914);
   color: white; border: none; padding: 8px 18px;
-  border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+  border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;
 }
 
 .tabs {
@@ -190,12 +190,12 @@ function applySort() {
 }
 
 .tab {
-  padding: 6px 16px; border: 2px solid #e9d5ff;
-  background: white; border-radius: 20px; font-size: 13px;
-  cursor: pointer; white-space: nowrap; color: #6b21a8; transition: all 0.2s;
+  padding: 6px 16px; border: 2px solid #D4A574;
+  background: #FFF5EB; border-radius: 10px; font-size: 13px;
+  cursor: pointer; white-space: nowrap; color: #4A3728; transition: all 0.2s;
 }
 .tab.active {
-  background: linear-gradient(135deg, #e879f9, #a78bfa);
+  background: linear-gradient(135deg, #C17A3A, #8B6914);
   color: white; border-color: transparent;
 }
 
@@ -210,13 +210,14 @@ function applySort() {
 }
 
 .card {
-  background: white; border-radius: 16px; overflow: hidden;
-  box-shadow: 0 2px 12px rgba(168, 85, 247, 0.1);
+  background: #FFF5EB; border-radius: 12px; overflow: hidden;
+  border: 1px solid #D4A574;
+  box-shadow: 0 2px 12px rgba(139, 105, 20, 0.08);
   transition: transform 0.2s;
 }
 .card:hover { transform: translateY(-2px); }
 
-.card-img-wrap { position: relative; aspect-ratio: 1; overflow: hidden; background: #f5f0ff; }
+.card-img-wrap { position: relative; aspect-ratio: 1; overflow: hidden; background: #FFF8F0; }
 .card-img { width: 100%; height: 100%; object-fit: cover; }
 .btn-delete {
   position: absolute; top: 6px; right: 6px;
@@ -226,63 +227,64 @@ function applySort() {
   align-items: center; justify-content: center;
 }
 
-.card-info { padding: 10px; }
+.card-info { padding: 12px 16px; }
 .cat-badge {
-  display: inline-block; background: #f3e8ff; color: #7c3aed;
+  display: inline-block; background: #F5E6D3; color: #8B6914;
   padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 500;
 }
 .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 .tag {
-  background: #fce7f3; color: #db2777;
+  background: #F5E6D3; color: #8B7355;
   padding: 2px 8px; border-radius: 8px; font-size: 11px;
 }
 
 .upload-status {
   display: flex; align-items: center; gap: 10px;
-  padding: 12px 16px; background: #f3e8ff; border-radius: 12px;
-  margin-bottom: 16px; font-size: 14px; color: #7c3aed;
+  padding: 12px 16px; background: #FFF8F0; border: 1px solid #D4A574;
+  border-radius: 12px;
+  margin-bottom: 16px; font-size: 14px; color: #8B6914;
 }
 
 .spinner {
-  width: 20px; height: 20px; border: 3px solid #e9d5ff;
-  border-top-color: #a855f7; border-radius: 50%;
+  width: 20px; height: 20px; border: 3px solid #D4A574;
+  border-top-color: #C17A3A; border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.loading { text-align: center; padding: 40px; color: #a78bfa; }
-.empty { text-align: center; padding: 60px 20px; color: #aaa; }
+.loading { text-align: center; padding: 40px; color: #C17A3A; }
+.empty { text-align: center; padding: 60px 20px; color: #8B7355; }
 .empty .hint { font-size: 13px; margin-top: 8px; }
 
 .load-more { text-align: center; margin-top: 16px; }
 .btn-more {
-  padding: 8px 24px; border: 2px solid #e9d5ff; background: white;
-  border-radius: 20px; color: #7c3aed; cursor: pointer; font-size: 14px;
+  padding: 8px 24px; border: 2px solid #D4A574; background: #FFF5EB;
+  border-radius: 10px; color: #8B6914; cursor: pointer; font-size: 14px;
 }
 
 .sort-bar {
   display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
 }
-.sort-label { font-size: 13px; color: #6b21a8; font-weight: 600; }
+.sort-label { font-size: 13px; color: #4A3728; font-weight: 600; }
 .sort-btn {
-  padding: 4px 12px; border: 2px solid #e9d5ff; background: white;
-  border-radius: 16px; font-size: 12px; cursor: pointer;
-  color: #6b21a8; transition: all 0.2s;
+  padding: 4px 12px; border: 2px solid #D4A574; background: #FFF5EB;
+  border-radius: 10px; font-size: 12px; cursor: pointer;
+  color: #4A3728; transition: all 0.2s;
 }
 .sort-btn.active {
-  background: linear-gradient(135deg, #e879f9, #a78bfa);
+  background: linear-gradient(135deg, #C17A3A, #8B6914);
   color: white; border-color: transparent;
 }
 
 .wear-count-badge {
   position: absolute; bottom: 6px; left: 6px;
-  background: rgba(124, 58, 237, 0.85); color: white;
+  background: rgba(139, 105, 20, 0.85); color: white;
   padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 600;
 }
 
 .cold-palace-tag {
   position: absolute; top: 6px; left: 6px;
-  background: rgba(59, 130, 246, 0.85); color: white;
+  background: rgba(91, 124, 80, 0.85); color: white;
   padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 600;
 }
 </style>
