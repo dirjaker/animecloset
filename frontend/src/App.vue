@@ -16,7 +16,7 @@
                     <div class="logo-seal">
                       <n-icon :component="ShirtOutline" :size="18" color="#FFFFFF" />
                     </div>
-                    <span class="logo-text">衣 楷</span>
+                    <span class="logo-text">衫 间</span>
                   </div>
 
                   <div class="nav-links">

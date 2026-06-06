@@ -1,10 +1,8 @@
 <template>
   <div class="calendar-page">
     <div class="page-header">
-      <div>
-        <h2>穿搭日历</h2>
-        <div class="page-line"></div>
-      </div>
+      <h2>穿搭日历</h2>
+      <div class="page-line"></div>
     </div>
 
     <div class="month-header">
@@ -59,7 +57,6 @@
           <span v-if="selectedDay.outfit.weather" class="drawer-weather">
             {{ selectedDay.outfit.weather }} {{ selectedDay.outfit.temperature }}℃
           </span>
-          <span v-if="selectedDay.outfit.reason" class="drawer-reason">{{ selectedDay.outfit.reason }}</span>
         </div>
         <div v-else class="drawer-empty">
           <span class="drawer-date">{{ selectedDay.fullDate }}</span>
@@ -251,11 +248,14 @@ onMounted(() => loadCalendar())
 </script>
 
 <style scoped>
+/* ── Page layout: height = 100vh - nav(56px) - main-content padding(36+80=116px) ── */
 .calendar-page {
   animation: pageEnter 0.3s ease;
   position: relative;
-  min-height: calc(100vh - 56px - 72px - 36px);
-  padding-bottom: 20px;
+  height: calc(100vh - 56px - 116px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 @keyframes pageEnter {
@@ -263,14 +263,15 @@ onMounted(() => loadCalendar())
   to { opacity: 1; }
 }
 
-/* ── Header ── */
+/* ── Header (compact) ── */
 .page-header {
-  margin-bottom: 16px;
+  flex-shrink: 0;
+  margin-bottom: 8px;
 }
 
 .page-header h2 {
   font-family: 'Noto Serif SC', serif;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
   color: #2E2A23;
   letter-spacing: 1px;
@@ -280,22 +281,23 @@ onMounted(() => loadCalendar())
   width: 100%;
   height: 1px;
   background: #E0D8CC;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
-/* ── Month header ── */
+/* ── Month header (compact) ── */
 .month-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-bottom: 10px;
 }
 
 .month-nav-btn {
-  font-size: 16px;
+  font-size: 15px;
   color: #8C8478;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 2px 6px;
   transition: color 0.2s ease;
   user-select: none;
 }
@@ -306,7 +308,7 @@ onMounted(() => loadCalendar())
 
 .month-label {
   font-family: 'Noto Serif SC', serif;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: #2E2A23;
 }
@@ -323,39 +325,41 @@ onMounted(() => loadCalendar())
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
-  height: 28px;
+  height: 24px;
   align-items: center;
-  margin-bottom: 4px;
+  flex-shrink: 0;
+  margin-bottom: 2px;
 }
 
 .weekday-cell {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: #8C8478;
 }
 
-/* ── Calendar grid — 正方形格子 ── */
+/* ── Calendar grid — fills remaining space ── */
 .cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(6, 1fr);
-  gap: 6px;
+  gap: 3px;
+  flex: 1;
+  min-height: 0;
 }
 
 .day-cell {
-  aspect-ratio: 1;
-  border-radius: 6px;
-  padding: 6px;
+  border-radius: 4px;
+  padding: 4px 6px 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   background: #FFFDF8;
   border: 1px solid #E0D8CC;
-  position: relative;
   min-height: 0;
+  min-width: 0;
 }
 
 .day-cell:hover:not(.other) {
@@ -363,7 +367,7 @@ onMounted(() => loadCalendar())
 }
 
 .day-cell.other {
-  opacity: 0.15;
+  opacity: 0.1;
   cursor: default;
 }
 
@@ -372,7 +376,7 @@ onMounted(() => loadCalendar())
 }
 
 .day-cell.selected {
-  border-left: 2px solid #A0815A;
+  border: 1.5px solid #A0815A;
   background: rgba(160, 129, 90, 0.06);
 }
 
@@ -381,7 +385,7 @@ onMounted(() => loadCalendar())
 }
 
 .day-num {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #2E2A23;
   align-self: flex-end;
@@ -394,16 +398,16 @@ onMounted(() => loadCalendar())
 }
 
 .day-thumb {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   object-fit: cover;
   border: 1.5px solid #E0D8CC;
 }
 
 .day-dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: #C27C4E;
 }
@@ -477,15 +481,6 @@ onMounted(() => loadCalendar())
   flex-shrink: 0;
 }
 
-.drawer-reason {
-  font-size: 12px;
-  color: #8C8478;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .drawer-empty {
   display: flex;
   align-items: center;
@@ -517,13 +512,7 @@ onMounted(() => loadCalendar())
   opacity: 0;
 }
 
-.drawer-enter-to,
-.drawer-leave-from {
-  transform: translateX(-50%) translateY(0);
-  opacity: 1;
-}
-
-/* ── Modal styles ── */
+/* ── Modal ── */
 .illust-display {
   text-align: center;
   margin-bottom: 16px;
@@ -596,5 +585,12 @@ onMounted(() => loadCalendar())
 .modal-empty-text {
   font-family: 'Noto Serif SC', serif;
   color: #8C8478;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .calendar-page {
+    height: calc(100vh - 56px - 94px);
+  }
 }
 </style>

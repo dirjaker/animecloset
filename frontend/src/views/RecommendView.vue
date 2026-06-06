@@ -7,62 +7,61 @@
       </div>
     </div>
 
-    <div class="form-section">
+    <!-- Compact scene pills + big chat card -->
+    <div class="chat-card">
       <p class="guide-text">今天想去哪里？</p>
 
-      <div class="form-field">
-        <label class="field-label">日期</label>
+      <!-- Scene pills — single row, compact -->
+      <div class="scene-pills">
+        <button
+          v-for="o in occasions"
+          :key="o.value"
+          :class="['scene-pill', { active: occasion === o.value }]"
+          @click="occasion = o.value"
+        >
+          <n-icon :component="o.icon" :size="16" />
+          <span>{{ o.label }}</span>
+        </button>
+      </div>
+
+      <!-- Date picker — inline -->
+      <div class="date-row">
         <n-date-picker
           v-model:formatted-value="date"
           type="date"
           value-format="yyyy-MM-dd"
-          style="width: 100%"
+          size="small"
+          class="date-picker"
         />
       </div>
 
-      <div class="form-field">
-        <label class="field-label">场合</label>
-        <div class="scene-grid">
-          <div
-            v-for="o in occasions"
-            :key="o.value"
-            :class="['scene-card', { active: occasion === o.value }]"
-            @click="occasion = o.value"
-          >
-            <n-icon :component="o.icon" :size="24" />
-            <span class="scene-label">{{ o.label }}</span>
-          </div>
-        </div>
+      <!-- Big chat input — hero element -->
+      <div class="chat-input-wrap">
+        <textarea
+          v-model="extra"
+          class="chat-input"
+          placeholder="有什么要求？比如：今天想穿得可爱一点..."
+          rows="5"
+        ></textarea>
       </div>
 
-      <div class="form-field">
-        <label class="field-label">要求</label>
-        <n-input
-          v-model:value="extra"
-          type="textarea"
-          placeholder="例如：今天想穿得可爱一点"
-          :rows="2"
-        />
-      </div>
-
-      <n-button
-        type="primary"
-        block
-        :loading="loading"
-        @click="getRecommend"
-        size="large"
+      <button
         class="recommend-btn"
+        :disabled="loading"
+        @click="getRecommend"
       >
-        <template #icon><n-icon :component="SparklesOutline" /></template>
-        获取推荐
-      </n-button>
+        <n-icon :component="SparklesOutline" :size="18" />
+        <span>{{ loading ? 'AI 正在搭配...' : '获取推荐' }}</span>
+      </button>
     </div>
 
+    <!-- Loading -->
     <div v-if="loading" class="loading-area">
-      <n-spin size="large" />
+      <n-spin size="medium" />
       <p class="loading-text">AI 正在为你搭配中...</p>
     </div>
 
+    <!-- Results (unchanged) -->
     <div v-if="result" class="result-section">
       <div class="result-header">
         <span class="result-title">推荐方案</span>
@@ -87,19 +86,17 @@
         </div>
       </div>
 
-      <n-button
+      <button
         v-if="resultItems.length"
-        type="primary"
-        block
-        size="large"
         class="save-btn"
         @click="saveOutfit"
       >
-        <template #icon><n-icon :component="SaveOutline" /></template>
-        保存这套穿搭
-      </n-button>
+        <n-icon :component="SaveOutline" :size="18" />
+        <span>保存这套穿搭</span>
+      </button>
     </div>
 
+    <!-- Cold palace -->
     <div v-if="coldPalaceItems.length" class="cold-section">
       <div class="cold-header">
         <span class="cold-title">冷宫衣物 ({{ coldPalaceItems.length }} 件)</span>
@@ -138,7 +135,6 @@ import api from '../api/index.js'
 import { getColdPalace } from '../api/index.js'
 
 const message = useMessage()
-
 const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`
 
 const today = new Date().toISOString().split('T')[0]
@@ -216,7 +212,7 @@ async function saveOutfit() {
 }
 
 .page-header {
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .page-header h2 {
@@ -234,90 +230,131 @@ async function saveOutfit() {
   margin-top: 8px;
 }
 
-.form-section {
+/* ── Chat card ── */
+.chat-card {
   background: #FFFDF8;
   border: 1px solid #E0D8CC;
-  border-radius: 8px;
-  padding: 24px;
+  border-radius: 10px;
+  padding: 28px 28px 24px;
   margin-bottom: 24px;
 }
 
 .guide-text {
   font-family: 'Noto Serif SC', serif;
-  font-size: 16px;
+  font-size: 15px;
   color: #2E2A23;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   letter-spacing: 1px;
 }
 
-.form-field {
-  margin-bottom: 20px;
+/* ── Scene pills (compact single-row tags) ── */
+.scene-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
 }
 
-.field-label {
-  display: block;
+.scene-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #E0D8CC;
+  border-radius: 18px;
+  background: transparent;
+  cursor: pointer;
   font-size: 13px;
   color: #8C8478;
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-
-/* Scene cards */
-.scene-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-
-.scene-card {
-  height: 120px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: 1px solid #E0D8CC;
-  border-radius: 8px;
-  cursor: pointer;
   transition: all 0.2s ease;
-  color: #8C8478;
-  background: transparent;
+  font-family: inherit;
 }
 
-.scene-card:hover {
+.scene-pill:hover {
   border-color: #A0815A;
   color: #2E2A23;
 }
 
-.scene-card.active {
+.scene-pill.active {
   border-color: #A0815A;
-  color: #A0815A;
-  background: rgba(160, 129, 90, 0.06);
+  color: #FFFDF8;
+  background: #A0815A;
 }
 
-.scene-label {
-  font-size: 14px;
-  font-weight: 500;
+/* ── Date row ── */
+.date-row {
+  margin-bottom: 16px;
 }
 
-.recommend-btn {
+.date-picker {
+  max-width: 200px;
+}
+
+/* ── Big chat input ── */
+.chat-input-wrap {
+  margin-bottom: 20px;
+}
+
+.chat-input {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #E0D8CC;
   border-radius: 8px;
-  height: 44px;
-  font-weight: 600;
+  background: #FFFDF8;
+  font-size: 15px;
+  color: #2E2A23;
+  line-height: 1.6;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+}
+
+.chat-input::placeholder {
+  color: #C0B8A8;
+  font-size: 14px;
+}
+
+.chat-input:focus {
+  border-color: #A0815A;
+  box-shadow: 0 0 0 3px rgba(160, 129, 90, 0.08);
+}
+
+/* ── Recommend button ── */
+.recommend-btn {
+  width: 100%;
+  height: 46px;
+  background: #A0815A;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
   font-family: 'Noto Serif SC', serif;
-  background: #A0815A !important;
-  border-color: #A0815A !important;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   transition: all 0.2s ease;
 }
 
 .recommend-btn:hover {
-  background: #B8956E !important;
-  border-color: #B8956E !important;
+  background: #B8956E;
+  box-shadow: 0 4px 16px rgba(160, 129, 90, 0.2);
 }
 
+.recommend-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Loading ── */
 .loading-area {
   text-align: center;
-  padding: 60px 0;
+  padding: 40px 0;
 }
 
 .loading-text {
@@ -326,13 +363,13 @@ async function saveOutfit() {
   margin-top: 12px;
 }
 
-/* Results */
+/* ── Results ── */
 .result-section {
   background: #FFFDF8;
   border: 1px solid #E0D8CC;
-  border-radius: 8px;
-  padding: 24px;
-  margin-top: 24px;
+  border-radius: 10px;
+  padding: 24px 28px;
+  margin-bottom: 24px;
 }
 
 .result-header {
@@ -395,7 +432,6 @@ async function saveOutfit() {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-left: 1px solid #E0D8CC;
 }
 
 .result-item-tags {
@@ -427,23 +463,32 @@ async function saveOutfit() {
 }
 
 .save-btn {
-  margin-top: 24px;
-  border-radius: 8px;
+  width: 100%;
+  margin-top: 20px;
   height: 44px;
+  background: #A0815A;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 14px;
   font-weight: 600;
-  background: #A0815A !important;
-  border-color: #A0815A !important;
+  letter-spacing: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   transition: all 0.2s ease;
 }
 
 .save-btn:hover {
-  background: #B8956E !important;
-  border-color: #B8956E !important;
+  background: #B8956E;
 }
 
-/* Cold palace */
+/* ── Cold palace ── */
 .cold-section {
-  margin-top: 28px;
+  margin-top: 8px;
 }
 
 .cold-header {
@@ -504,10 +549,6 @@ async function saveOutfit() {
 }
 
 @media (max-width: 768px) {
-  .scene-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .result-item-card {
     flex-direction: column;
   }
@@ -519,8 +560,17 @@ async function saveOutfit() {
 
   .result-item-info {
     width: 100%;
-    border-left: none;
     border-top: 1px solid #E0D8CC;
+  }
+
+  .scene-pills {
+    gap: 8px;
+  }
+
+  .scene-pill {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
   }
 }
 </style>
