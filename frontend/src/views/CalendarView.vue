@@ -40,39 +40,38 @@
       </div>
     </div>
 
-    <!-- Detail panel -->
-    <div class="detail-panel">
-      <template v-if="selectedDay?.currentMonth">
-        <div v-if="selectedDay?.outfit" class="detail-content">
-          <span class="detail-date">{{ selectedDay.fullDate }}</span>
-          <div class="detail-items">
+    <!-- Floating detail drawer -->
+    <Transition name="drawer">
+      <div v-if="selectedDay?.currentMonth" class="detail-drawer">
+        <div class="drawer-handle" @click="selectedDay = null">
+          <span class="drawer-handle-bar"></span>
+        </div>
+        <div v-if="selectedDay?.outfit" class="drawer-content">
+          <span class="drawer-date">{{ selectedDay.fullDate }}</span>
+          <div class="drawer-items">
             <img
               v-for="(g, i) in (selectedDay.outfit.garments || [])"
               :key="i"
               :src="getGarmentImg(g)"
-              class="detail-item-img"
+              class="drawer-item-img"
             />
           </div>
-          <span v-if="selectedDay.outfit.weather" class="detail-weather">
+          <span v-if="selectedDay.outfit.weather" class="drawer-weather">
             {{ selectedDay.outfit.weather }} {{ selectedDay.outfit.temperature }}℃
           </span>
+          <span v-if="selectedDay.outfit.reason" class="drawer-reason">{{ selectedDay.outfit.reason }}</span>
         </div>
-        <div v-else class="detail-empty">
-          <span class="detail-date">{{ selectedDay.fullDate }}</span>
-          <span class="detail-empty-text">这天还没有穿搭记录</span>
+        <div v-else class="drawer-empty">
+          <span class="drawer-date">{{ selectedDay.fullDate }}</span>
+          <span class="drawer-empty-text">这天还没有穿搭记录</span>
           <n-button type="primary" size="small" class="record-btn" @click="goToRecommend">
             记录今日穿搭
           </n-button>
         </div>
-      </template>
-      <template v-else>
-        <div class="detail-empty">
-          <span class="detail-empty-text">选择一天查看详情</span>
-        </div>
-      </template>
-    </div>
+      </div>
+    </Transition>
 
-    <!-- Illustration modal (preserved logic) -->
+    <!-- Illustration modal -->
     <n-modal
       v-model:show="showModal"
       preset="card"
@@ -84,7 +83,6 @@
         <div v-if="selectedDay.illustrationUrl" class="illust-display">
           <img :src="selectedDay.illustrationUrl" class="illust-img" />
         </div>
-
         <div v-if="!selectedDay.illustrationUrl" class="illust-generate">
           <n-button
             type="primary"
@@ -97,23 +95,17 @@
             生成 AI 穿搭插画
           </n-button>
         </div>
-
         <div class="modal-garment-grid">
           <div v-for="(g, i) in selectedDay.outfit.garments" :key="i" class="modal-garment-item">
             <img :src="getGarmentImg(g)" class="modal-garment-img" />
             <span class="modal-garment-cat">{{ g.category }}</span>
           </div>
         </div>
-
         <div v-if="selectedDay.outfit.weather" class="weather-row">
           <span class="weather-tag">{{ selectedDay.outfit.weather }} {{ selectedDay.outfit.temperature }}℃</span>
         </div>
-
-        <p v-if="selectedDay.outfit.reason" class="outfit-reason">
-          {{ selectedDay.outfit.reason }}
-        </p>
+        <p v-if="selectedDay.outfit.reason" class="outfit-reason">{{ selectedDay.outfit.reason }}</p>
       </template>
-
       <template v-else>
         <div class="modal-empty">
           <p class="modal-empty-text">这天还没有穿搭记录</p>
@@ -127,9 +119,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
-import {
-  ColorWandOutline,
-} from '@vicons/ionicons5'
+import { ColorWandOutline } from '@vicons/ionicons5'
 import api from '../api/index.js'
 
 const message = useMessage()
@@ -174,7 +164,6 @@ function getIllustrationUrl(url) {
 
 const calendarDays = computed(() => {
   const first = new Date(year.value, month.value - 1, 1)
-  // Monday-based: getDay() returns 0=Sun, convert to Mon=0
   let startDay = first.getDay() - 1
   if (startDay < 0) startDay = 6
   const daysInMonth = new Date(year.value, month.value, 0).getDate()
@@ -228,7 +217,6 @@ async function loadCalendar() {
 
 function openDay(day) {
   selectedDay.value = { ...day }
-  // Also allow opening the modal on double click or via detail
 }
 
 function goToRecommend() {
@@ -265,9 +253,9 @@ onMounted(() => loadCalendar())
 <style scoped>
 .calendar-page {
   animation: pageEnter 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 56px - 72px - 36px);
+  position: relative;
+  min-height: calc(100vh - 56px - 72px - 36px);
+  padding-bottom: 20px;
 }
 
 @keyframes pageEnter {
@@ -275,9 +263,9 @@ onMounted(() => loadCalendar())
   to { opacity: 1; }
 }
 
+/* ── Header ── */
 .page-header {
   margin-bottom: 16px;
-  flex-shrink: 0;
 }
 
 .page-header h2 {
@@ -295,13 +283,12 @@ onMounted(() => loadCalendar())
   margin-top: 8px;
 }
 
-/* Month header */
+/* ── Month header ── */
 .month-header {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 16px;
-  flex-shrink: 0;
 }
 
 .month-nav-btn {
@@ -331,14 +318,13 @@ onMounted(() => loadCalendar())
   font-family: 'Noto Serif SC', serif;
 }
 
-/* Weekday header */
+/* ── Weekday row ── */
 .weekday-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
   height: 28px;
   align-items: center;
-  flex-shrink: 0;
   margin-bottom: 4px;
 }
 
@@ -348,31 +334,28 @@ onMounted(() => loadCalendar())
   color: #8C8478;
 }
 
-/* Calendar grid */
+/* ── Calendar grid — 正方形格子 ── */
 .cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(6, 1fr);
   gap: 6px;
-  flex: 0 0 auto;
-  max-height: 55%;
 }
 
 .day-cell {
+  aspect-ratio: 1;
   border-radius: 6px;
   padding: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
+  justify-content: space-between;
   cursor: pointer;
   transition: all 0.2s ease;
   background: #FFFDF8;
   border: 1px solid #E0D8CC;
   position: relative;
-  aspect-ratio: 1;
-  max-height: 90px;
+  min-height: 0;
 }
 
 .day-cell:hover:not(.other) {
@@ -390,6 +373,7 @@ onMounted(() => loadCalendar())
 
 .day-cell.selected {
   border-left: 2px solid #A0815A;
+  background: rgba(160, 129, 90, 0.06);
 }
 
 .day-cell.weekend .day-num {
@@ -401,6 +385,7 @@ onMounted(() => loadCalendar())
   font-weight: 500;
   color: #2E2A23;
   align-self: flex-end;
+  line-height: 1;
 }
 
 .day-num-today {
@@ -409,43 +394,59 @@ onMounted(() => loadCalendar())
 }
 
 .day-thumb {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   object-fit: cover;
   border: 1.5px solid #E0D8CC;
 }
 
 .day-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #C27C4E;
 }
 
-/* Detail panel */
-.detail-panel {
-  flex: 1;
-  min-height: 120px;
-  margin-top: 12px;
-  background: rgba(245, 240, 232, 0.88);
+/* ── Floating detail drawer ── */
+.detail-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90%, 700px);
+  background: rgba(245, 240, 232, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid #E0D8CC;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  padding: 16px 24px;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  padding: 8px 24px 16px;
+  z-index: 100;
+  box-shadow: 0 -4px 24px rgba(46, 42, 35, 0.08);
 }
 
-.detail-content {
+.drawer-handle {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 8px;
+  cursor: pointer;
+}
+
+.drawer-handle-bar {
+  width: 40px;
+  height: 3px;
+  border-radius: 2px;
+  background: #D0C8BC;
+}
+
+.drawer-content {
   display: flex;
   align-items: center;
   gap: 16px;
-  width: 100%;
 }
 
-.detail-date {
+.drawer-date {
   font-family: 'Noto Serif SC', serif;
   font-size: 14px;
   font-weight: 600;
@@ -453,21 +454,21 @@ onMounted(() => loadCalendar())
   flex-shrink: 0;
 }
 
-.detail-items {
+.drawer-items {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex: 1;
 }
 
-.detail-item-img {
-  width: 36px;
-  height: 36px;
+.drawer-item-img {
+  width: 44px;
+  height: 44px;
   border-radius: 6px;
   object-fit: cover;
   border: 1px solid #E0D8CC;
 }
 
-.detail-weather {
+.drawer-weather {
   font-size: 12px;
   color: #8C8478;
   background: #FFFDF8;
@@ -476,14 +477,22 @@ onMounted(() => loadCalendar())
   flex-shrink: 0;
 }
 
-.detail-empty {
+.drawer-reason {
+  font-size: 12px;
+  color: #8C8478;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drawer-empty {
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 100%;
 }
 
-.detail-empty-text {
+.drawer-empty-text {
   font-family: 'Noto Serif SC', serif;
   font-size: 13px;
   color: #8C8478;
@@ -496,35 +505,50 @@ onMounted(() => loadCalendar())
   font-family: 'Noto Serif SC', serif;
 }
 
-/* Modal styles (preserved) */
+/* Drawer transition */
+.drawer-enter-active,
+.drawer-leave-active {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+.drawer-enter-from,
+.drawer-leave-to {
+  transform: translateX(-50%) translateY(100%);
+  opacity: 0;
+}
+
+.drawer-enter-to,
+.drawer-leave-from {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ── Modal styles ── */
 .illust-display {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .illust-img {
-  max-width: 280px;
-  width: 100%;
+  max-width: 100%;
   border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(46, 42, 37, 0.1);
 }
 
 .illust-generate {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .generate-btn {
-  border-radius: 8px;
-  font-weight: 600;
   background: #A0815A !important;
   border-color: #A0815A !important;
 }
 
 .modal-garment-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
 }
 
 .modal-garment-item {
@@ -532,76 +556,45 @@ onMounted(() => loadCalendar())
 }
 
 .modal-garment-img {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
+  width: 56px;
+  height: 56px;
   border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid #E0D8CC;
 }
 
 .modal-garment-cat {
   display: block;
-  margin-top: 4px;
-  font-size: 12px;
+  font-size: 11px;
   color: #8C8478;
+  margin-top: 4px;
 }
 
 .weather-row {
-  text-align: center;
-  margin-top: 16px;
+  margin-bottom: 8px;
 }
 
 .weather-tag {
   font-size: 12px;
   color: #8C8478;
   background: #F5F0E8;
-  padding: 4px 12px;
+  padding: 4px 10px;
   border-radius: 4px;
 }
 
 .outfit-reason {
-  text-align: center;
   font-size: 13px;
   color: #8C8478;
-  margin-top: 10px;
   line-height: 1.6;
 }
 
 .modal-empty {
   text-align: center;
-  padding: 24px 0;
+  padding: 24px;
 }
 
 .modal-empty-text {
   font-family: 'Noto Serif SC', serif;
-  font-size: 14px;
   color: #8C8478;
-}
-
-@media (max-width: 768px) {
-  .calendar-page {
-    height: calc(100vh - 56px - 48px);
-  }
-
-  .day-cell {
-    padding: 4px;
-  }
-
-  .day-num {
-    font-size: 12px;
-  }
-
-  .day-thumb {
-    width: 18px;
-    height: 18px;
-  }
-
-  .detail-panel {
-    min-height: 90px;
-    padding: 12px 16px;
-  }
-
-  .month-header {
-    flex-wrap: wrap;
-  }
 }
 </style>
