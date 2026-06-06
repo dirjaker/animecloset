@@ -6,7 +6,7 @@
 
 [![功能](https://img.shields.io/badge/功能-5-blue?style=flat-square)]()
 [![AI](https://img.shields.io/badge/AI-生成-green?style=flat-square)]()
-[![技术](https://img.shields.io/badge/技术-Naive UI-orange?style=flat-square)]()
+[![技术](https://img.shields.io/badge/技术-Naive%20UI-orange?style=flat-square)]()
 [![更新](https://img.shields.io/badge/更新-2025.06-red?style=flat-square)]()
 
 *智能抠图 · 衣橱管理 · 天气穿搭推荐 · AI 插画生成 · 日历穿搭记录*
