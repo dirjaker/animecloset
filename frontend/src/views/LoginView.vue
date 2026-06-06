@@ -100,6 +100,30 @@ async function handleSubmit() {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  animation: loginFadeIn 0.5s ease-out;
+}
+
+@keyframes loginFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Card slide-up */
+.login-center {
+  position: relative;
+  z-index: 10;
+  animation: cardSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes cardSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Background gradient (warm landscape simulation) ── */
@@ -129,12 +153,7 @@ async function handleSubmit() {
   pointer-events: none;
 }
 
-/* ── Centered card ── */
-.login-center {
-  position: relative;
-  z-index: 10;
-}
-
+/* ── Card ── */
 .login-card {
   width: 400px;
   background: rgba(255, 253, 248, 0.55);

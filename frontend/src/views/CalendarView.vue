@@ -252,10 +252,7 @@ onMounted(() => loadCalendar())
 .calendar-page {
   animation: pageEnter 0.3s ease;
   position: relative;
-  height: calc(100vh - 56px - 116px);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  padding-bottom: 20px;
 }
 
 @keyframes pageEnter {
@@ -337,18 +334,24 @@ onMounted(() => loadCalendar())
   color: #8C8478;
 }
 
-/* ── Calendar grid — fills remaining space ── */
+/* ── Calendar grid — square cells, natural height ── */
 .cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(6, 1fr);
+  grid-auto-rows: 1fr;
   gap: 3px;
-  flex: 1;
-  min-height: 0;
+}
+
+.cal-grid::before {
+  content: '';
+  width: 0;
+  padding-bottom: 100%;
+  grid-row: 1 / 1;
+  grid-column: 1 / 1;
 }
 
 .day-cell {
-  border-radius: 4px;
+  aspect-ratio: 1;
   padding: 4px 6px 4px;
   display: flex;
   flex-direction: column;
