@@ -353,9 +353,9 @@ onMounted(() => loadCalendar())
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(6, 1fr);
-  gap: 4px;
-  flex: 1;
-  min-height: 0;
+  gap: 6px;
+  flex: 0 0 auto;
+  max-height: 55%;
 }
 
 .day-cell {
@@ -364,13 +364,15 @@ onMounted(() => loadCalendar())
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
   background: #FFFDF8;
   border: 1px solid #E0D8CC;
   position: relative;
-  min-height: 0;
+  aspect-ratio: 1;
+  max-height: 90px;
 }
 
 .day-cell:hover:not(.other) {
@@ -407,26 +409,25 @@ onMounted(() => loadCalendar())
 }
 
 .day-thumb {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 2px;
+  border: 1.5px solid #E0D8CC;
 }
 
 .day-dot {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #C27C4E;
-  margin-bottom: 2px;
 }
 
 /* Detail panel */
 .detail-panel {
-  flex-shrink: 0;
-  height: 80px;
-  margin-top: 8px;
+  flex: 1;
+  min-height: 120px;
+  margin-top: 12px;
   background: rgba(245, 240, 232, 0.88);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -434,7 +435,7 @@ onMounted(() => loadCalendar())
   border-radius: 8px;
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 16px 24px;
 }
 
 .detail-content {
@@ -595,8 +596,8 @@ onMounted(() => loadCalendar())
   }
 
   .detail-panel {
-    height: 70px;
-    padding: 0 12px;
+    min-height: 90px;
+    padding: 12px 16px;
   }
 
   .month-header {
