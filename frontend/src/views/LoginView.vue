@@ -81,8 +81,7 @@ async function handleSubmit() {
       email: form.email,
       password: form.password,
     })
-    authStore.setToken(data.access_token)
-    authStore.setUser({ id: data.user_id, nickname: data.nickname })
+    authStore.setAuth(data.access_token, { id: data.user_id, nickname: data.nickname })
     router.push('/wardrobe')
   } catch (e) {
     error.value = e.response?.data?.detail || (isRegister.value ? '注册失败' : '登录失败')
