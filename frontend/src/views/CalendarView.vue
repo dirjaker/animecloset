@@ -2,6 +2,9 @@
   <div class="calendar-page">
     <div class="cal-top-bar">
       <h2 class="cal-title">穿搭日历</h2>
+      <div class="inline-weekdays">
+        <span v-for="d in weekdays" :key="d" class="weekday-cell">{{ d }}</span>
+      </div>
       <div class="top-right">
         <div class="month-controls">
           <span class="month-nav-btn" @click="changeMonth(-1)">◀</span>
@@ -15,9 +18,6 @@
     </div>
 
     <div class="cal-wrapper">
-      <div class="cal-weekday-row">
-        <span v-for="d in weekdays" :key="d" class="weekday-cell">{{ d }}</span>
-      </div>
       <div class="cal-grid" ref="calGridRef">
       <div
         v-for="(day, i) in calendarDays"
@@ -43,6 +43,9 @@
     </div>
 
     <!-- Floating detail drawer -->
+    <Transition name="backdrop-fade">
+      <div v-if="selectedDay?.currentMonth" class="drawer-backdrop" @click="selectedDay = null" />
+    </Transition>
     <Transition name="drawer">
       <div v-if="selectedDay?.currentMonth" class="detail-drawer">
         <div class="drawer-handle" @click="selectedDay = null">
@@ -312,32 +315,63 @@ async function generateIllustration() {
   to { opacity: 1; }
 }
 
-/* ── Top bar: title + controls in one line ── */
+/* ── Top bar: title + weekdays + controls in one line ── */
 .cal-top-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, var(--cell-size, 1fr));
+  gap: 4px;
+  justify-content: center;
   flex-shrink: 0;
-  margin-bottom: 6px;
-  min-height: 28px;
+  margin-bottom: 4px;
+  height: 28px;
+  align-items: center;
 }
 
 .cal-title {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
   font-family: 'Noto Serif SC', serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: #2E2A23;
   letter-spacing: 1px;
   white-space: nowrap;
-  flex-shrink: 0;
+  z-index: 2;
+}
+
+.inline-weekdays {
+  display: contents;
+}
+
+.weekday-cell {
+  font-size: 11px;
+  font-weight: 500;
+  color: #8C8478;
+  letter-spacing: 1px;
+  line-height: 28px;
+  text-align: center;
+}
+
+.weekday-cell:nth-child(6),
+.weekday-cell:nth-child(7) {
+  color: #C27C4E;
 }
 
 .top-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-  margin-left: auto;
+  gap: 8px;
+  white-space: nowrap;
+  z-index: 2;
 }
 
 .month-controls {
@@ -381,37 +415,12 @@ async function generateIllustration() {
   border-radius: 6px !important;
 }
 
-/* ── Calendar wrapper: weekday + grid, fills remaining space ── */
+/* ── Calendar wrapper: fills remaining space ── */
 .cal-wrapper {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
-}
-
-/* ── Weekday row: same columns as grid ── */
-.cal-weekday-row {
-  display: grid;
-  grid-template-columns: repeat(7, var(--cell-size, 1fr));
-  gap: 4px;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-bottom: 2px;
-}
-
-.weekday-cell {
-  font-size: 11px;
-  font-weight: 500;
-  color: #8C8478;
-  letter-spacing: 1px;
-  height: 20px;
-  line-height: 20px;
-  text-align: center;
-}
-
-.weekday-cell:nth-child(6),
-.weekday-cell:nth-child(7) {
-  color: #C27C4E;
 }
 
 /* ── Calendar grid: fills remaining height, square cells via JS ── */
@@ -519,6 +528,27 @@ async function generateIllustration() {
 }
 
 /* ── Floating detail drawer ── */
+.drawer-backdrop {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(245, 240, 232, 0.4);
+  z-index: 50;
+  cursor: pointer;
+}
+
+.backdrop-fade-enter-active,
+.backdrop-fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.backdrop-fade-enter-from,
+.backdrop-fade-leave-to {
+  opacity: 0;
+}
+
 .detail-drawer {
   position: fixed;
   bottom: 0;
