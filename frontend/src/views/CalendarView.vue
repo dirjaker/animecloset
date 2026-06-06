@@ -251,13 +251,17 @@ onMounted(() => loadCalendar())
 /* ── Page: fill viewport minus nav, no scroll ── */
 .calendar-page {
   animation: pageEnter 0.3s ease;
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 56px);
-  margin: -36px -36px -80px;
-  padding: 20px 28px 12px;
+  padding: 24px 36px 16px;
   box-sizing: border-box;
   overflow: hidden;
+  z-index: 1;
 }
 
 @keyframes pageEnter {
@@ -592,7 +596,7 @@ onMounted(() => loadCalendar())
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .calendar-page {
-    padding: 12px 12px 8px;
+    padding: 12px 16px 8px;
   }
 
   .day-num {
