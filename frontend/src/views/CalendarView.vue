@@ -248,11 +248,16 @@ onMounted(() => loadCalendar())
 </script>
 
 <style scoped>
-/* ── Page layout: height = 100vh - nav(56px) - main-content padding(36+80=116px) ── */
+/* ── Page: fill viewport minus nav, no scroll ── */
 .calendar-page {
   animation: pageEnter 0.3s ease;
-  position: relative;
-  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 56px);
+  margin: -36px -36px -80px;
+  padding: 20px 28px 12px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 @keyframes pageEnter {
@@ -260,15 +265,15 @@ onMounted(() => loadCalendar())
   to { opacity: 1; }
 }
 
-/* ── Header (compact) ── */
+/* ── Header ── */
 .page-header {
   flex-shrink: 0;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .page-header h2 {
   font-family: 'Noto Serif SC', serif;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: #2E2A23;
   letter-spacing: 1px;
@@ -278,23 +283,23 @@ onMounted(() => loadCalendar())
   width: 100%;
   height: 1px;
   background: #E0D8CC;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
-/* ── Month header (compact) ── */
+/* ── Month header ── */
 .month-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .month-nav-btn {
-  font-size: 15px;
+  font-size: 14px;
   color: #8C8478;
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 2px 4px;
   transition: color 0.2s ease;
   user-select: none;
 }
@@ -322,7 +327,7 @@ onMounted(() => loadCalendar())
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
-  height: 24px;
+  height: 22px;
   align-items: center;
   flex-shrink: 0;
   margin-bottom: 2px;
@@ -334,20 +339,14 @@ onMounted(() => loadCalendar())
   color: #8C8478;
 }
 
-/* ── Calendar grid — square cells, natural height ── */
+/* ── Calendar grid: fills remaining space, 6 equal rows, square cells ── */
 .cal-grid {
+  flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-auto-rows: 1fr;
+  grid-template-rows: repeat(6, 1fr);
   gap: 3px;
-}
-
-.cal-grid::before {
-  content: '';
-  width: 0;
-  padding-bottom: 100%;
-  grid-row: 1 / 1;
-  grid-column: 1 / 1;
 }
 
 .day-cell {
@@ -593,7 +592,16 @@ onMounted(() => loadCalendar())
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .calendar-page {
-    height: calc(100vh - 56px - 94px);
+    padding: 12px 12px 8px;
+  }
+
+  .day-num {
+    font-size: 11px;
+  }
+
+  .day-thumb {
+    width: 18px;
+    height: 18px;
   }
 }
 </style>
