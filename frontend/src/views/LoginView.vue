@@ -3,7 +3,7 @@
     <div class="login-card">
       <div class="login-header">
         <div class="login-icon-ring">
-          <n-icon :component="ShirtOutline" :size="32" color="#D4884A" />
+          <n-icon :component="ShirtOutline" :size="32" color="#7C5CFC" />
         </div>
         <h1>AnimeCloset</h1>
         <p>{{ isRegister ? '创建你的智能衣橱' : '欢迎回来' }}</p>
@@ -101,7 +101,7 @@ async function handleSubmit() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #F8F6F3;
+  background: #FAFBFE;
   padding: 20px;
 }
 
@@ -111,8 +111,8 @@ async function handleSubmit() {
   padding: 48px 36px 36px;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03);
-  border: 1px solid #F0EFEC;
+  box-shadow: 0 4px 24px rgba(124, 92, 252, 0.08), 0 1px 3px rgba(0,0,0,0.04);
+  border: 1px solid rgba(124, 92, 252, 0.1);
 }
 
 .login-header {
@@ -124,7 +124,7 @@ async function handleSubmit() {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: #FDF4EC;
+  background: linear-gradient(135deg, rgba(124, 92, 252, 0.1), rgba(255, 107, 157, 0.1));
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -134,29 +134,29 @@ async function handleSubmit() {
 .login-header h1 {
   font-size: 26px;
   font-weight: 700;
-  color: #1F2937;
+  color: #1A1625;
   margin-bottom: 6px;
   letter-spacing: -0.5px;
 }
 
 .login-header p {
   font-size: 14px;
-  color: #6B7280;
+  color: #6B6580;
 }
 
 .login-btn {
   border-radius: 12px;
   height: 44px;
   font-weight: 600;
-  background: linear-gradient(135deg, #D4884A, #E8A060) !important;
+  background: linear-gradient(135deg, #7C5CFC, #9B82FD) !important;
   border: none !important;
   transition: all 0.2s ease;
 }
 
 .login-btn:hover {
-  background: linear-gradient(135deg, #E8A060, #F0B878) !important;
+  background: linear-gradient(135deg, #6344E0, #7C5CFC) !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(212, 136, 74, 0.3);
+  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.35);
 }
 
 .login-footer {
@@ -170,6 +170,6 @@ async function handleSubmit() {
 
 .login-footer-text {
   font-size: 14px;
-  color: #6B7280;
+  color: #6B6580;
 }
 </style>

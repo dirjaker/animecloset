@@ -53,7 +53,7 @@
           </div>
         </div>
         <div class="card-info">
-          <n-tag size="small" :bordered="false" round style="background: #FDF4EC; color: #D4884A; font-weight: 500;">
+          <n-tag size="small" :bordered="false" round style="background: rgba(124, 92, 252, 0.1); color: #7C5CFC; font-weight: 500;">
             {{ categoryLabel(g.category) }}
           </n-tag>
           <div v-if="g.tags" class="card-tags">
@@ -239,13 +239,13 @@ onMounted(() => loadGarments())
 .page-header h2 {
   font-size: 24px;
   font-weight: 700;
-  color: #1F2937;
+  color: #1A1625;
   letter-spacing: -0.3px;
 }
 
 .page-subtitle {
   font-size: 13px;
-  color: #6B7280;
+  color: #6B6580;
   margin-top: 4px;
 }
 
@@ -254,11 +254,11 @@ onMounted(() => loadGarments())
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: #FDF4EC;
+  background: rgba(124, 92, 252, 0.08);
   border-radius: 12px;
   margin-bottom: 16px;
   font-size: 13px;
-  color: #D4884A;
+  color: #7C5CFC;
   font-weight: 500;
 }
 
@@ -276,7 +276,7 @@ onMounted(() => loadGarments())
   background: #FFFFFF;
   font-size: 13px;
   font-weight: 500;
-  color: #6B7280;
+  color: #6B6580;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -284,15 +284,15 @@ onMounted(() => loadGarments())
 }
 
 .pill:hover {
-  border-color: #D4884A;
-  color: #D4884A;
+  border-color: #7C5CFC;
+  color: #7C5CFC;
 }
 
 .pill.active {
-  background: #D4884A;
-  border-color: #D4884A;
+  background: #7C5CFC;
+  border-color: #7C5CFC;
   color: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(212, 136, 74, 0.25);
+  box-shadow: 0 2px 8px rgba(124, 92, 252, 0.25);
 }
 
 .sort-bar {
@@ -304,7 +304,7 @@ onMounted(() => loadGarments())
 
 .sort-label {
   font-size: 13px;
-  color: #6B7280;
+  color: #6B6580;
   font-weight: 500;
 }
 
@@ -323,20 +323,20 @@ onMounted(() => loadGarments())
   background: #FFFFFF;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border: 1px solid #F0EFEC;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(124, 92, 252, 0.08);
 }
 
 .garment-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 12px 32px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 24px rgba(124, 92, 252, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .card-img-wrap {
   position: relative;
   aspect-ratio: 1;
-  background: #F8F8F6;
+  background: #F5F3FF;
   overflow: hidden;
 }
 
@@ -344,7 +344,7 @@ onMounted(() => loadGarments())
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.2s ease;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .garment-card:hover .card-img {
@@ -369,7 +369,7 @@ onMounted(() => loadGarments())
   top: 8px;
   left: 8px;
   background: rgba(255, 255, 255, 0.9);
-  color: #D4884A;
+  color: #FF6B9D;
   font-size: 11px;
   font-weight: 600;
   padding: 3px 8px;
@@ -426,8 +426,8 @@ onMounted(() => loadGarments())
 
 .card-tag-chip {
   font-size: 11px;
-  color: #6B7280;
-  background: #F3F4F6;
+  color: #6B6580;
+  background: rgba(124, 92, 252, 0.06);
   padding: 2px 8px;
   border-radius: 6px;
 }
@@ -441,7 +441,7 @@ onMounted(() => loadGarments())
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: #F3F4F6;
+  background: linear-gradient(135deg, rgba(124, 92, 252, 0.08), rgba(255, 107, 157, 0.08));
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -451,13 +451,13 @@ onMounted(() => loadGarments())
 .empty-title {
   font-size: 16px;
   font-weight: 600;
-  color: #374151;
+  color: #1A1625;
   margin-bottom: 6px;
 }
 
 .empty-desc {
   font-size: 13px;
-  color: #9CA3AF;
+  color: #6B6580;
 }
 
 @media (max-width: 768px) {

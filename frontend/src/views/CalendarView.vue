@@ -236,19 +236,19 @@ onMounted(() => loadCalendar())
 .page-header h2 {
   font-size: 26px;
   font-weight: 700;
-  color: #1F2937;
+  color: #1A1625;
   letter-spacing: -0.3px;
 }
 
 .page-subtitle {
   font-size: 14px;
-  color: #9CA3AF;
+  color: #6B6580;
   margin-top: 6px;
 }
 
 .month-nav {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03);
-  border: 1px solid #F0EFEC;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
+  border: 1px solid rgba(124, 92, 252, 0.08);
   margin-bottom: 20px;
 }
 
@@ -261,7 +261,7 @@ onMounted(() => loadCalendar())
 .month-label {
   font-size: 18px;
   font-weight: 700;
-  color: #1F2937;
+  color: #1A1625;
 }
 
 .weekday-row {
@@ -274,7 +274,7 @@ onMounted(() => loadCalendar())
 .weekday-cell {
   font-size: 13px;
   font-weight: 600;
-  color: #9CA3AF;
+  color: #6B6580;
   padding: 8px 0;
 }
 
@@ -293,14 +293,14 @@ onMounted(() => loadCalendar())
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: #FFFFFF;
-  border: 1px solid #F0EFEC;
+  border: 1px solid rgba(124, 92, 252, 0.08);
   position: relative;
 }
 
 .day-cell:hover:not(.other) {
-  background: #F8F8F6;
+  background: #F5F3FF;
   border-color: #E5E7EB;
 }
 
@@ -310,19 +310,19 @@ onMounted(() => loadCalendar())
 }
 
 .day-cell.today {
-  background: linear-gradient(135deg, #D4884A, #E8A060);
+  background: linear-gradient(135deg, #7C5CFC, #9B82FD);
   border-color: transparent;
-  box-shadow: 0 2px 8px rgba(212, 136, 74, 0.3);
+  box-shadow: 0 2px 8px rgba(124, 92, 252, 0.3);
 }
 
 .day-cell.hasOutfit {
-  border-color: #D4884A;
+  border-color: #7C5CFC;
 }
 
 .day-num {
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: #1A1625;
 }
 
 .day-num-today {
@@ -333,7 +333,7 @@ onMounted(() => loadCalendar())
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #D4884A;
+  background: #FF6B9D;
   margin-top: 4px;
 }
 
@@ -364,15 +364,15 @@ onMounted(() => loadCalendar())
 
 .generate-btn {
   font-weight: 600;
-  background: linear-gradient(135deg, #D4884A, #E8A060) !important;
+  background: linear-gradient(135deg, #7C5CFC, #9B82FD) !important;
   border: none !important;
   transition: all 0.2s ease;
 }
 
 .generate-btn:hover {
-  background: linear-gradient(135deg, #E8A060, #F0B878) !important;
+  background: linear-gradient(135deg, #6344E0, #7C5CFC) !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(212, 136, 74, 0.3);
+  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.35);
 }
 
 .modal-garment-grid {
@@ -396,7 +396,7 @@ onMounted(() => loadCalendar())
   display: block;
   margin-top: 4px;
   font-size: 12px;
-  color: #6B7280;
+  color: #6B6580;
 }
 
 .weather-row {
@@ -407,7 +407,7 @@ onMounted(() => loadCalendar())
 .outfit-reason {
   text-align: center;
   font-size: 13px;
-  color: #6B7280;
+  color: #6B6580;
   font-style: italic;
   margin-top: 10px;
   line-height: 1.6;
@@ -422,7 +422,7 @@ onMounted(() => loadCalendar())
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: #F3F4F6;
+  background: linear-gradient(135deg, rgba(124, 92, 252, 0.08), rgba(255, 107, 157, 0.08));
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -431,6 +431,6 @@ onMounted(() => loadCalendar())
 
 .modal-empty-text {
   font-size: 14px;
-  color: #9CA3AF;
+  color: #6B6580;
 }
 </style>

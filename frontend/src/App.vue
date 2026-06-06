@@ -25,7 +25,7 @@
                   <div class="sidebar-inner">
                     <div class="sidebar-logo">
                       <div class="logo-icon">
-                        <n-icon :component="ShirtOutline" :size="20" color="#fff" />
+                        <n-icon :component="ShirtOutline" :size="20" color="#FFFFFF" />
                       </div>
                       <span>AnimeCloset</span>
                     </div>
@@ -87,26 +87,26 @@ const currentRoute = computed(() => route.path)
 
 const themeOverrides = {
   common: {
-    primaryColor: '#D4884A',
-    primaryColorHover: '#E8A060',
-    primaryColorPressed: '#B8743E',
-    primaryColorSuppl: '#F0B878',
-    borderRadius: '10px',
-    borderRadiusSmall: '8px',
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif",
+    primaryColor: '#7C5CFC',
+    primaryColorHover: '#9B82FD',
+    primaryColorPressed: '#6344E0',
+    primaryColorSuppl: '#B4A2FE',
+    borderRadius: '14px',
+    borderRadiusSmall: '10px',
+    fontFamily: "'Outfit', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif",
   },
   Button: {
-    borderRadiusMedium: '12px',
+    borderRadiusMedium: '14px',
     borderRadiusSmall: '10px',
   },
   Card: {
-    borderRadius: '16px',
+    borderRadius: '18px',
   },
   Input: {
-    borderRadius: '10px',
+    borderRadius: '12px',
   },
   Tag: {
-    borderRadius: '8px',
+    borderRadius: '10px',
   },
 }
 
@@ -142,9 +142,9 @@ function logout() {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-  background: #F8F6F3;
-  color: #1F2937;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #FAFBFE;
+  color: #1A1625;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -163,7 +163,7 @@ body {
 .sidebar {
   width: 240px;
   background: #FFFFFF;
-  border-right: 1px solid #F0EFEC;
+  border-right: 1px solid rgba(124, 92, 252, 0.08);
   position: fixed;
   top: 0;
   left: 0;
@@ -171,7 +171,7 @@ body {
   z-index: 200;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar-inner {
@@ -188,9 +188,9 @@ body {
   padding: 0 28px 28px;
   font-size: 20px;
   font-weight: 700;
-  color: #1F2937;
+  color: #1A1625;
   letter-spacing: -0.5px;
-  border-bottom: 1px solid #F0EFEC;
+  border-bottom: 1px solid rgba(124, 92, 252, 0.08);
   margin-bottom: 12px;
 }
 
@@ -198,17 +198,17 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #D4884A 0%, #E8A060 100%);
+  background: linear-gradient(135deg, #7C5CFC 0%, #9B82FD 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(212, 136, 74, 0.25);
+  box-shadow: 0 2px 8px rgba(124, 92, 252, 0.3);
 }
 
 .sidebar-footer {
   margin-top: auto;
   padding: 16px 16px 0;
-  border-top: 1px solid #F0EFEC;
+  border-top: 1px solid rgba(124, 92, 252, 0.08);
 }
 
 /* ───── Main area ───── */
@@ -229,15 +229,15 @@ body {
 /* ───── Page transition ───── */
 .page-fade-enter-active,
 .page-fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .page-fade-enter-from {
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateY(10px);
 }
 .page-fade-leave-to {
   opacity: 0;
-  transform: translateY(-4px);
+  transform: translateY(-6px);
 }
 
 /* ───── Mobile ───── */
@@ -278,7 +278,7 @@ body {
     justify-content: space-between;
     padding: 12px 16px;
     background: #FFFFFF;
-    border-bottom: 1px solid #F0EFEC;
+    border-bottom: 1px solid rgba(124, 92, 252, 0.08);
     position: sticky;
     top: 0;
     z-index: 50;
@@ -287,7 +287,7 @@ body {
   .mobile-title {
     font-size: 18px;
     font-weight: 700;
-    color: #1F2937;
+    color: #1A1625;
   }
 
   .main-area {

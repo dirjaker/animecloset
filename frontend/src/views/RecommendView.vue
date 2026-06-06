@@ -62,7 +62,7 @@
 
     <n-card v-if="result" class="result-card" :bordered="false" style="margin-top: 24px">
       <div class="result-header">
-        <n-icon :component="SparklesOutline" :size="20" color="#D4884A" />
+        <n-icon :component="SparklesOutline" :size="20" color="#7C5CFC" />
         <span class="result-title">推荐方案</span>
       </div>
 
@@ -77,10 +77,10 @@
           </div>
           <div class="result-item-info">
             <div class="result-item-tags">
-              <n-tag size="small" :bordered="false" round style="background: #FDF4EC; color: #D4884A; font-weight: 500;">
+              <n-tag size="small" :bordered="false" round style="background: rgba(124, 92, 252, 0.1); color: #7C5CFC; font-weight: 500;">
                 {{ item.category }}
               </n-tag>
-              <n-tag v-if="item.is_cold_palace" size="small" :bordered="false" round style="background: #FEF3C7; color: #D97706; font-weight: 500;">
+              <n-tag v-if="item.is_cold_palace" size="small" :bordered="false" round style="background: rgba(255, 107, 157, 0.12); color: #FF6B9D; font-weight: 500;">
                 冷宫唤醒
               </n-tag>
             </div>
@@ -227,19 +227,19 @@ async function saveOutfit() {
 .page-header h2 {
   font-size: 26px;
   font-weight: 700;
-  color: #1F2937;
+  color: #1A1625;
   letter-spacing: -0.3px;
 }
 
 .page-subtitle {
   font-size: 14px;
-  color: #9CA3AF;
+  color: #6B6580;
   margin-top: 6px;
 }
 
 .form-card {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03);
-  border: 1px solid #F0EFEC;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
+  border: 1px solid rgba(124, 92, 252, 0.08);
   margin-bottom: 8px;
 }
 
@@ -259,7 +259,7 @@ async function saveOutfit() {
   background: #FFFFFF;
   font-size: 13px;
   font-weight: 500;
-  color: #6B7280;
+  color: #6B6580;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -267,30 +267,30 @@ async function saveOutfit() {
 }
 
 .pill:hover {
-  border-color: #D4884A;
-  color: #D4884A;
+  border-color: #7C5CFC;
+  color: #7C5CFC;
 }
 
 .pill.active {
-  background: #D4884A;
-  border-color: #D4884A;
+  background: #7C5CFC;
+  border-color: #7C5CFC;
   color: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(212, 136, 74, 0.25);
+  box-shadow: 0 2px 8px rgba(124, 92, 252, 0.25);
 }
 
 .recommend-btn {
   border-radius: 12px;
   height: 44px;
   font-weight: 600;
-  background: linear-gradient(135deg, #D4884A, #E8A060) !important;
+  background: linear-gradient(135deg, #7C5CFC, #9B82FD) !important;
   border: none !important;
   transition: all 0.2s ease;
 }
 
 .recommend-btn:hover {
-  background: linear-gradient(135deg, #E8A060, #F0B878) !important;
+  background: linear-gradient(135deg, #6344E0, #7C5CFC) !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(212, 136, 74, 0.3);
+  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.35);
 }
 
 .loading-area {
@@ -300,13 +300,13 @@ async function saveOutfit() {
 
 .loading-text {
   font-size: 13px;
-  color: #6B7280;
+  color: #6B6580;
   margin-top: 12px;
 }
 
 .result-card {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03);
-  border: 1px solid #F0EFEC;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
+  border: 1px solid rgba(124, 92, 252, 0.08);
 }
 
 .result-header {
@@ -319,13 +319,13 @@ async function saveOutfit() {
 .result-title {
   font-size: 18px;
   font-weight: 700;
-  color: #1F2937;
+  color: #1A1625;
 }
 
 .result-reason {
   font-size: 14px;
   line-height: 1.7;
-  color: #4B5563;
+  color: #6B6580;
   margin-bottom: 20px;
 }
 
@@ -339,19 +339,19 @@ async function saveOutfit() {
   background: #FFFFFF;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border: 1px solid #F0EFEC;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(124, 92, 252, 0.08);
 }
 
 .result-item-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 12px 32px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 24px rgba(124, 92, 252, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .result-item-img-wrap {
   aspect-ratio: 1;
-  background: #F8F8F6;
+  background: #F5F3FF;
   overflow: hidden;
 }
 
@@ -373,7 +373,7 @@ async function saveOutfit() {
 
 .result-item-reason {
   font-size: 12px;
-  color: #6B7280;
+  color: #6B6580;
   margin-top: 6px;
   line-height: 1.5;
 }
@@ -383,15 +383,15 @@ async function saveOutfit() {
   border-radius: 12px;
   height: 44px;
   font-weight: 600;
-  background: #D4884A !important;
+  background: #7C5CFC !important;
   border: none !important;
   transition: all 0.2s ease;
 }
 
 .save-btn:hover {
-  background: #E8A060 !important;
+  background: #6344E0 !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(212, 136, 74, 0.3);
+  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.35);
 }
 
 .cold-section {
@@ -408,7 +408,7 @@ async function saveOutfit() {
 .cold-title {
   font-size: 16px;
   font-weight: 600;
-  color: #374151;
+  color: #1A1625;
 }
 
 .cold-grid {
@@ -421,8 +421,8 @@ async function saveOutfit() {
   background: #FFFFFF;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03);
-  border: 1px solid #F0EFEC;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
+  border: 1px solid rgba(124, 92, 252, 0.08);
 }
 
 .cold-img {
@@ -440,6 +440,6 @@ async function saveOutfit() {
 
 .cold-days {
   font-size: 11px;
-  color: #9CA3AF;
+  color: #6B6580;
 }
 </style>
