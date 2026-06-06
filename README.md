@@ -1,21 +1,21 @@
 <div align="center">
 
-# 👗 Anime Closet
+# 👗 衫 间
 
-### 动漫风 AI 穿搭助手
+### 新中式 AI 穿搭助手
 
-[![功能](https://img.shields.io/badge/功能-5-blue?style=flat-square)]()
+[![功能](https://img.shields.io/badge/功能-6-blue?style=flat-square)]()
 [![AI](https://img.shields.io/badge/AI-生成-green?style=flat-square)]()
 [![技术](https://img.shields.io/badge/技术-Naive%20UI-orange?style=flat-square)]()
-[![更新](https://img.shields.io/badge/更新-2025.06-red?style=flat-square)]()
+[![更新](https://img.shields.io/badge/更新-2026.06-red?style=flat-square)]()
 
-*智能抠图 · 衣橱管理 · 天气穿搭推荐 · AI 插画生成 · 日历穿搭记录*
+*智能抠图 · 衣橱管理 · 天气穿搭推荐 · AI 插画生成 · 日历穿搭记录 · 虚拟形象系统*
 
 </div>
 
 ---
 
-> 基于 AI 视觉识别与大模型能力的智能衣柜管理与穿搭推荐系统，以动漫风格呈现。
+> 基于 AI 视觉识别与大模型能力的智能衣柜管理与穿搭推荐系统，以新中式暖木风格呈现。
 
 ---
 
@@ -23,8 +23,9 @@
 
 | 项目信息 | 说明 |
 |---|---|
-| 项目名称 | AnimeCloset |
-| 项目定位 | 动漫风格 AI 穿搭助手 |
+| 项目名称 | 衫间（AnimeCloset） |
+| 项目定位 | 新中式 AI 穿搭助手 |
+| 设计语言 | 新中式暖木色系（胡桃木 #A0815A + 亚麻白 #F5F0E8） |
 | 核心理念 | 将 AI 视觉理解、天气数据、日程管理与动漫插画生成融为一体，打造个性化穿搭体验 |
 | 前端框架 | Vue 3 + Vite + Naive UI |
 | 后端框架 | FastAPI + SQLAlchemy (async) + SQLite |
@@ -43,7 +44,7 @@
 | 自动标签生成 | 对衣物图片进行 AI 视觉分析，自动识别品类、颜色、风格、季节等属性 | DeepSeek Vision API |
 | 衣柜管理 | 可视化管理所有衣物，支持按标签/分类筛选、搜索、编辑、删除 | 前端 Naive UI 组件 + 后端 CRUD API |
 | 天气穿搭推荐 | 根据用户当前城市天气数据，结合衣物标签智能推荐穿搭方案 | 天气 API + LLM 推荐逻辑 |
-| 日历视图 | 以日历形式查看每日穿搭记录，支持回顾与规划 | 前端日历组件 + 后端日程 API |
+| 日历视图 | 以日历形式查看每日穿搭记录，支持回顾与规划，正方形格子适配虚拟形象 | JS ResizeObserver + CSS 变量动态计算 |
 | AI 穿搭插画 | 将推荐穿搭方案生成动漫风格插画，可保存与分享 | 通义万相 API |
 
 ### 辅助功能
@@ -79,7 +80,6 @@
 | Vue 3 | 响应式 UI 框架 (Composition API + `<script setup>`) |
 | Vite | 极速开发构建工具 |
 | Naive UI | Vue 3 组件库，提供丰富 UI 组件 |
-| Pinia | 状态管理 |
 | Vue Router | 路由管理 |
 | Axios | HTTP 请求封装 |
 
@@ -98,7 +98,7 @@
 ```
 ┌─────────────────────────────────────────────────┐
 │                   前端 (Vue 3)                    │
-│     Vite + Naive UI + Pinia + Vue Router         │
+│     Vite + Naive UI + Vue Router                 │
 └──────────────────────┬──────────────────────────┘
                        │ HTTP / REST API
                        ▼
@@ -188,23 +188,28 @@ animecloset/
 ├── backend/
 │   ├── app/
 │   │   ├── api/                    # API 路由
-│   │   │   ├── clothes.py          # 衣物管理接口
-│   │   │   ├── outfits.py          # 穿搭推荐接口
-│   │   │   ├── calendar.py         # 日历记录接口
-│   │   │   └── ai.py              # AI 服务接口（抠图/标注/插画）
+│   │   │   ├── auth.py             # 认证接口（登录/注册）
+│   │   │   ├── garments.py         # 衣物管理接口
+│   │   │   ├── outfits.py          # 穿搭记录与日历接口
+│   │   │   ├── recommend.py        # 穿搭推荐接口
+│   │   │   ├── stats.py            # 数据统计接口
+│   │   │   └── user.py             # 用户信息接口
 │   │   ├── core/
 │   │   │   ├── config.py           # 配置管理
-│   │   │   └── database.py         # 数据库连接与会话
+│   │   │   ├── database.py         # 数据库连接与会话
+│   │   │   └── security.py         # JWT 认证与密码哈希
 │   │   ├── models/                 # SQLAlchemy 数据模型
-│   │   │   ├── clothes.py          # 衣物模型
-│   │   │   └── outfit_record.py    # 穿搭记录模型
+│   │   │   ├── garment.py          # 衣物模型
+│   │   │   ├── outfit.py           # 穿搭记录模型
+│   │   │   └── user.py             # 用户模型
 │   │   ├── schemas/                # Pydantic 请求/响应模型
 │   │   ├── services/               # 业务逻辑层
-│   │   │   ├── image_service.py    # rembg 抠图处理
-│   │   │   ├── tagging_service.py  # DeepSeek Vision 标注
-│   │   │   ├── weather_service.py  # 天气数据获取
-│   │   │   ├── recommend_service.py# 穿搭推荐逻辑
-│   │   │   └── illustration_service.py # 通义万相插画生成
+│   │   │   ├── bg_remove.py        # rembg 抠图处理
+│   │   │   ├── llm_tag.py          # DeepSeek Vision 标注
+│   │   │   ├── recommend.py        # 穿搭推荐逻辑
+│   │   │   ├── task_manager.py     # 异步任务管理
+│   │   │   ├── wanx.py             # 通义万相插画生成
+│   │   │   └── weather.py          # 天气数据获取
 │   │   └── main.py                 # FastAPI 应用入口
 │   ├── alembic/                    # 数据库迁移文件
 │   ├── uploads/                    # 上传图片存储
@@ -213,15 +218,17 @@ animecloset/
 ├── frontend/
 │   ├── src/
 │   │   ├── views/                  # 页面组件
-│   │   │   ├── Wardrobe.vue        # 衣柜管理页
-│   │   │   ├── Recommend.vue       # 穿搭推荐页
-│   │   │   ├── Calendar.vue        # 日历视图页
-│   │   │   └── Upload.vue          # 上传衣物页
-│   │   ├── components/             # 通用组件
-│   │   ├── stores/                 # Pinia 状态管理
+│   │   │   ├── WardrobeView.vue    # 衣柜管理页
+│   │   │   ├── RecommendView.vue   # 穿搭推荐页
+│   │   │   ├── CalendarView.vue    # 日历视图页（正方形格子 + ResizeObserver）
+│   │   │   ├── ProfileView.vue     # 个人中心页
+│   │   │   └── LoginView.vue       # 登录页
 │   │   ├── api/                    # Axios 请求封装
+│   │   ├── stores/                 # 状态管理
+│   │   │   └── auth.js             # 认证状态
 │   │   ├── router/                 # 路由配置
-│   │   └── App.vue
+│   │   ├── App.vue
+│   │   └── main.js
 │   ├── index.html
 │   ├── vite.config.js
 │   └── package.json
@@ -232,39 +239,65 @@ animecloset/
 
 ## API 端点
 
+### 认证
+
+| 方法 | 路径 | 描述 |
+|---|---|---|
+| `POST` | `/api/auth/register` | 用户注册 |
+| `POST` | `/api/auth/login` | 用户登录 |
+
 ### 衣物管理
 
 | 方法 | 路径 | 描述 |
 |---|---|---|
-| `GET` | `/api/clothes` | 获取衣物列表（支持分页与筛选） |
-| `GET` | `/api/clothes/{id}` | 获取单件衣物详情 |
-| `POST` | `/api/clothes` | 上传新衣物（图片 + 自动抠图标注） |
-| `PUT` | `/api/clothes/{id}` | 更新衣物信息 |
-| `DELETE` | `/api/clothes/{id}` | 删除衣物 |
+| `GET` | `/api/garments` | 获取衣物列表（支持分页与筛选） |
+| `GET` | `/api/garments/{id}` | 获取单件衣物详情 |
+| `POST` | `/api/garments/upload` | 上传新衣物（图片 + 自动抠图标注） |
+| `GET` | `/api/garments/status/{task_id}` | 查询上传任务状态 |
+| `PUT` | `/api/garments/{id}` | 更新衣物信息 |
+| `DELETE` | `/api/garments/{id}` | 删除衣物 |
 
-### AI 服务
+### 穿搭记录
 
 | 方法 | 路径 | 描述 |
 |---|---|---|
-| `POST` | `/api/ai/crop` | 智能抠图处理（rembg） |
-| `POST` | `/api/ai/tag` | 自动标签生成（DeepSeek Vision） |
-| `POST` | `/api/ai/illustrate` | 生成动漫风格穿搭插画（通义万相） |
+| `POST` | `/api/outfits` | 保存穿搭方案 |
+| `GET` | `/api/outfits/calendar` | 获取日历穿搭记录 |
+| `POST` | `/api/outfits/{id}/illustration` | 生成穿搭插画 |
 
 ### 穿搭推荐
 
 | 方法 | 路径 | 描述 |
 |---|---|---|
-| `GET` | `/api/outfits/recommend` | 获取天气穿搭推荐 |
-| `GET` | `/api/outfits/weather` | 获取当前天气数据 |
-| `POST` | `/api/outfits/save` | 保存穿搭方案 |
+| `POST` | `/api/recommend` | 获取穿搭推荐方案 |
 
-### 日历记录
+### 数据统计
 
 | 方法 | 路径 | 描述 |
 |---|---|---|
-| `GET` | `/api/calendar` | 获取日历穿搭记录列表 |
-| `GET` | `/api/calendar/{date}` | 获取指定日期穿搭记录 |
-| `PUT` | `/api/calendar/{date}` | 更新指定日期穿搭记录 |
+| `GET` | `/api/stats/wardrobe` | 衣柜统计数据 |
+| `GET` | `/api/stats/cold-palace` | 冷宫衣物（长期未穿） |
+| `GET` | `/api/stats/wear-ranking` | 穿着次数排行 |
+
+### 用户信息
+
+| 方法 | 路径 | 描述 |
+|---|---|---|
+| `GET` | `/api/user/me` | 获取当前用户信息 |
+| `GET` | `/api/user/avatar` | 获取虚拟形象配置 |
+| `PUT` | `/api/user/avatar` | 更新虚拟形象配置 |
+
+---
+
+## 日历布局设计
+
+日历页面采用 `position: fixed` + `ResizeObserver` + CSS 变量的组合方案，确保：
+- ✅ 格子保持正方形（适配虚拟形象）
+- ✅ 星期标签与日期列完全对齐
+- ✅ 填充视口可用空间，无滚动
+- ✅ 底部抽屉支持 × 关闭、拖拽条关闭、点击同一天切换关闭
+
+详见 [animecloset-design-system](~/.hermes/skills/creative/animecloset-design-system/SKILL.md) skill。
 
 ---
 
@@ -281,7 +314,7 @@ animecloset/
 
 - 使用 Vue 3 Composition API + `<script setup>` 语法
 - 组件库选用 Naive UI，遵循其设计规范
-- 全局状态通过 Pinia store 管理
+- 设计规范参考 animecloset-design-system skill
 - API 请求统一封装在 `src/api/` 目录下
 
 ---
@@ -295,4 +328,3 @@ animecloset/
 | [通义万相](https://tongyi.aliyun.com/wanxiang) | AI 图像生成服务 |
 | [Naive UI](https://www.naiveui.com/) | Vue 3 组件库 |
 | [FastAPI](https://fastapi.tiangolo.com/) | 高性能 Python Web 框架 |
-
