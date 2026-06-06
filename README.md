@@ -25,7 +25,6 @@
 |---|---|
 | 项目名称 | 衫间（AnimeCloset） |
 | 项目定位 | 新中式 AI 穿搭助手 |
-| 设计语言 | 新中式暖木色系（胡桃木 #A0815A + 亚麻白 #F5F0E8） |
 | 核心理念 | 将 AI 视觉理解、天气数据、日程管理与动漫插画生成融为一体，打造个性化穿搭体验 |
 | 前端框架 | Vue 3 + Vite + Naive UI |
 | 后端框架 | FastAPI + SQLAlchemy (async) + SQLite |
@@ -289,18 +288,6 @@ animecloset/
 
 ---
 
-## 日历布局设计
-
-日历页面采用 `position: fixed` + `ResizeObserver` + CSS 变量的组合方案，确保：
-- ✅ 格子保持正方形（适配虚拟形象）
-- ✅ 星期标签与日期列完全对齐
-- ✅ 填充视口可用空间，无滚动
-- ✅ 底部抽屉支持 × 关闭、拖拽条关闭、点击同一天切换关闭
-
-详见 [animecloset-design-system](~/.hermes/skills/creative/animecloset-design-system/SKILL.md) skill。
-
----
-
 ## 开发说明
 
 ### 后端开发
@@ -314,7 +301,6 @@ animecloset/
 
 - 使用 Vue 3 Composition API + `<script setup>` 语法
 - 组件库选用 Naive UI，遵循其设计规范
-- 设计规范参考 animecloset-design-system skill
 - API 请求统一封装在 `src/api/` 目录下
 
 ---
