@@ -41,7 +41,11 @@
     </div>
 
     <div v-else-if="garments.length" class="garment-grid">
-      <div v-for="g in garments" :key="g.id" class="garment-card">
+      <div
+        v-for="(g, i) in garments"
+        :key="g.id"
+        :class="['garment-card', getCardSize(i)]"
+      >
         <div class="card-img-wrap">
           <img :src="getImgUrl(g)" :alt="g.category" class="card-img" />
           <div v-if="g.wear_count" class="wear-count-badge">{{ g.wear_count }}次</div>
@@ -53,7 +57,7 @@
           </div>
         </div>
         <div class="card-info">
-          <span class="card-category">{{ categoryLabel(g.category) }}</span>
+          <span class="card-name">{{ categoryLabel(g.category) }}</span>
           <div v-if="g.tags" class="card-tags">
             <span v-for="t in parseTags(g.tags)" :key="t" class="card-tag-chip">{{ t }}</span>
           </div>
@@ -75,7 +79,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useMessage } from 'naive-ui'
-import { AddOutline, CloseOutline, ShirtOutline } from '@vicons/ionicons5'
+import { AddOutline, CloseOutline } from '@vicons/ionicons5'
 import api from '../api/index.js'
 
 const message = useMessage()
@@ -112,6 +116,20 @@ const parseTags = (tags) => {
   }
   if (tags?.color) return [tags.color, tags.material, ...(tags.style || [])].filter(Boolean)
   return []
+}
+
+function getCardSize(index) {
+  // Row 1: large, medium, medium
+  // Row 2: medium, medium, large (alternating)
+  const row = Math.floor(index / 3)
+  const col = index % 3
+  if (row % 2 === 0) {
+    // even row: first is large
+    return col === 0 ? 'card-large' : 'card-medium'
+  } else {
+    // odd row: last is large
+    return col === 2 ? 'card-large' : 'card-medium'
+  }
 }
 
 const activeCategory = ref('')
@@ -233,16 +251,16 @@ onMounted(() => loadGarments())
 
 .page-header h2 {
   font-family: 'Noto Serif SC', serif;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
-  color: #2C2A25;
+  color: #2E2A23;
   letter-spacing: 1px;
 }
 
 .page-line {
   width: 100%;
   height: 1px;
-  background: #E8E3DA;
+  background: #E0D8CC;
   margin-top: 8px;
 }
 
@@ -251,11 +269,11 @@ onMounted(() => loadGarments())
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: rgba(91, 125, 106, 0.06);
+  background: rgba(160, 129, 90, 0.06);
   border-radius: 8px;
   margin-bottom: 16px;
   font-size: 13px;
-  color: #5B7D6A;
+  color: #A0815A;
   font-weight: 500;
 }
 
@@ -264,7 +282,7 @@ onMounted(() => loadGarments())
   flex-wrap: wrap;
   gap: 0;
   margin-bottom: 16px;
-  border-bottom: 1px solid #E8E3DA;
+  border-bottom: 1px solid #E0D8CC;
 }
 
 .tab {
@@ -273,7 +291,7 @@ onMounted(() => loadGarments())
   background: none;
   font-size: 14px;
   font-weight: 500;
-  color: #8A8578;
+  color: #8C8478;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -283,12 +301,12 @@ onMounted(() => loadGarments())
 }
 
 .tab:hover {
-  color: #2C2A25;
+  color: #2E2A23;
 }
 
 .tab.active {
-  color: #5B7D6A;
-  border-bottom-color: #5B7D6A;
+  color: #A0815A;
+  border-bottom-color: #A0815A;
 }
 
 .sort-bar {
@@ -300,7 +318,7 @@ onMounted(() => loadGarments())
 
 .sort-label {
   font-size: 13px;
-  color: #8A8578;
+  color: #8C8478;
   font-weight: 500;
 }
 
@@ -309,30 +327,40 @@ onMounted(() => loadGarments())
   padding: 80px 0;
 }
 
+/* Alternating grid */
 .garment-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 16px;
+  grid-auto-flow: dense;
+}
+
+.garment-card.card-large {
+  grid-column: span 2;
 }
 
 .garment-card {
-  background: #FFFDF9;
+  background: #FFFDF8;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #E8E3DA;
+  border: 1px solid #E0D8CC;
   transition: all 0.3s ease;
 }
 
 .garment-card:hover {
-  border-left: 2px solid #5B7D6A;
-  box-shadow: 0 2px 12px rgba(44, 42, 37, 0.08);
+  border-left: 2px solid #A0815A;
+  box-shadow: 0 2px 12px rgba(46, 42, 37, 0.08);
 }
 
 .card-img-wrap {
   position: relative;
   aspect-ratio: 1;
-  background: #F6F3EE;
+  background: #F5F0E8;
   overflow: hidden;
+}
+
+.card-large .card-img-wrap {
+  aspect-ratio: 16/10;
 }
 
 .card-img {
@@ -350,7 +378,7 @@ onMounted(() => loadGarments())
   position: absolute;
   bottom: 8px;
   left: 8px;
-  background: rgba(44, 42, 37, 0.6);
+  background: rgba(46, 42, 37, 0.6);
   color: #FFFFFF;
   font-size: 11px;
   font-weight: 600;
@@ -363,8 +391,8 @@ onMounted(() => loadGarments())
   position: absolute;
   top: 8px;
   left: 8px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #C49A6C;
+  background: rgba(255, 253, 248, 0.9);
+  color: #C27C4E;
   font-size: 11px;
   font-weight: 600;
   padding: 3px 8px;
@@ -375,7 +403,7 @@ onMounted(() => loadGarments())
 .card-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(44, 42, 37, 0.1);
+  background: rgba(46, 42, 37, 0.1);
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
@@ -393,8 +421,8 @@ onMounted(() => loadGarments())
   height: 32px;
   border-radius: 6px;
   border: none;
-  background: rgba(255, 255, 255, 0.9);
-  color: #8A8578;
+  background: rgba(255, 253, 248, 0.9);
+  color: #8C8478;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -404,19 +432,19 @@ onMounted(() => loadGarments())
 }
 
 .btn-delete:hover {
-  background: #5B7D6A;
+  background: #A0815A;
   color: #FFFFFF;
 }
 
 .card-info {
   padding: 12px;
-  border-top: 1px solid #E8E3DA;
 }
 
-.card-category {
-  font-size: 13px;
+.card-name {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 14px;
   font-weight: 500;
-  color: #5B7D6A;
+  color: #2E2A23;
 }
 
 .card-tags {
@@ -428,8 +456,8 @@ onMounted(() => loadGarments())
 
 .card-tag-chip {
   font-size: 11px;
-  color: #8A8578;
-  background: rgba(91, 125, 106, 0.06);
+  color: #8C8478;
+  background: rgba(160, 129, 90, 0.06);
   padding: 2px 8px;
   border-radius: 4px;
 }
@@ -443,26 +471,27 @@ onMounted(() => loadGarments())
   font-family: 'Noto Serif SC', serif;
   font-size: 16px;
   font-weight: 600;
-  color: #8A8578;
+  color: #8C8478;
   margin-bottom: 6px;
 }
 
 .empty-desc {
   font-size: 13px;
-  color: #8A8578;
+  color: #8C8478;
 }
 
-@media (max-width: 1024px) {
-  .garment-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-}
-
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .garment-grid {
     grid-template-columns: 1fr;
     gap: 14px;
+  }
+
+  .garment-card.card-large {
+    grid-column: span 1;
+  }
+
+  .card-large .card-img-wrap {
+    aspect-ratio: 1;
   }
 }
 </style>

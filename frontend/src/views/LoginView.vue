@@ -1,54 +1,54 @@
 <template>
   <div class="login-page">
-    <div class="login-card">
-      <div class="login-header">
-        <div class="login-icon-ring">
-          <n-icon :component="ShirtOutline" :size="28" color="#FFFFFF" />
-        </div>
-        <h1>衣 楷</h1>
-        <p>{{ isRegister ? '创建你的智能衣橱' : '欢迎回来' }}</p>
+    <!-- Left panel -->
+    <div class="login-left">
+      <div class="left-content">
+        <h1 class="left-title">
+          每日穿搭<br />从衣橱开始
+        </h1>
       </div>
+    </div>
 
-      <n-form ref="formRef" :model="form" :rules="rules" @submit.prevent="handleSubmit">
-        <n-form-item v-if="isRegister" path="nickname" label="昵称">
-          <n-input v-model:value="form.nickname" placeholder="输入昵称" size="large" />
-        </n-form-item>
+    <!-- Right panel -->
+    <div class="login-right">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="login-seal">
+            <n-icon :component="ShirtOutline" :size="28" color="#FFFFFF" />
+          </div>
+          <h1 class="login-title">衣 楷</h1>
+          <p class="login-subtitle">{{ isRegister ? '创建你的智能衣橱' : '欢迎回来' }}</p>
+        </div>
 
-        <n-form-item path="email" label="邮箱">
-          <n-input v-model:value="form.email" placeholder="输入邮箱" size="large" />
-        </n-form-item>
+        <n-form ref="formRef" :model="form" :rules="rules" @submit.prevent="handleSubmit">
+          <div v-if="isRegister" class="form-field">
+            <label class="field-label">昵称</label>
+            <input v-model="form.nickname" class="line-input" placeholder="输入昵称" />
+          </div>
 
-        <n-form-item path="password" label="密码">
-          <n-input
-            v-model:value="form.password"
-            type="password"
-            placeholder="输入密码"
-            show-password-on="click"
-            size="large"
-          />
-        </n-form-item>
+          <div class="form-field">
+            <label class="field-label">邮箱</label>
+            <input v-model="form.email" class="line-input" placeholder="输入邮箱" />
+          </div>
 
-        <n-alert v-if="error" type="error" :bordered="false" closable @close="error = ''" style="margin-bottom: 16px">
-          {{ error }}
-        </n-alert>
+          <div class="form-field">
+            <label class="field-label">密码</label>
+            <input v-model="form.password" type="password" class="line-input" placeholder="输入密码" />
+          </div>
 
-        <n-button
-          type="primary"
-          block
-          :loading="loading"
-          attr-type="submit"
-          size="large"
-          class="login-btn"
-        >
-          {{ isRegister ? '注册' : '登录' }}
-        </n-button>
-      </n-form>
+          <div v-if="error" class="error-msg">{{ error }}</div>
 
-      <div class="login-footer">
-        <span class="login-footer-text">{{ isRegister ? '已有账号？' : '没有账号？' }}</span>
-        <n-button text type="primary" @click="isRegister = !isRegister" size="small">
-          {{ isRegister ? '去登录' : '去注册' }}
-        </n-button>
+          <button type="button" class="login-btn" :disabled="loading" @click="handleSubmit">
+            {{ loading ? '请稍候...' : (isRegister ? '注册' : '登录') }}
+          </button>
+        </n-form>
+
+        <div class="login-footer">
+          <span class="footer-text">{{ isRegister ? '已有账号？' : '没有账号？' }}</span>
+          <a class="footer-link" @click="isRegister = !isRegister">
+            {{ isRegister ? '去登录' : '去注册' }}
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -99,79 +99,190 @@ async function handleSubmit() {
 .login-page {
   min-height: 100vh;
   display: flex;
+}
+
+.login-left {
+  width: 40%;
+  background: #D4C5A9;
+  display: flex;
   align-items: center;
   justify-content: center;
-  background: #F6F3EE;
-  background-image: radial-gradient(circle at 50% 50%, rgba(91, 125, 106, 0.05) 0%, transparent 70%);
-  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.left-content {
+  padding: 48px;
+}
+
+.left-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #2E2A23;
+  line-height: 1.6;
+  letter-spacing: 2px;
+}
+
+.login-right {
+  width: 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F5F0E8;
+  padding: 40px;
 }
 
 .login-card {
-  background: #FFFDF9;
-  border-radius: 8px;
-  padding: 48px 36px 36px;
   width: 100%;
   max-width: 380px;
-  border: 1px solid #E8E3DA;
-  box-shadow: 0 1px 4px rgba(44, 42, 37, 0.06);
+  background: rgba(255, 253, 248, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #E0D8CC;
+  border-radius: 8px;
+  padding: 40px 32px 32px;
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: 36px;
+  margin-bottom: 32px;
 }
 
-.login-icon-ring {
+.login-seal {
   width: 56px;
   height: 56px;
-  border-radius: 4px;
-  background: #5B7D6A;
+  background: #A0815A;
+  border-radius: 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
 }
 
-.login-header h1 {
+.login-title {
   font-family: 'Noto Serif SC', serif;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
-  color: #2C2A25;
-  margin-bottom: 6px;
+  color: #2E2A23;
   letter-spacing: 4px;
+  margin-bottom: 6px;
 }
 
-.login-header p {
+.login-subtitle {
   font-size: 14px;
-  color: #8A8578;
+  color: #8C8478;
+}
+
+.form-field {
+  margin-bottom: 20px;
+}
+
+.field-label {
+  display: block;
+  font-size: 12px;
+  color: #8C8478;
+  margin-bottom: 6px;
+}
+
+.line-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #E0D8CC;
+  background: transparent;
+  padding: 8px 0;
+  font-size: 15px;
+  color: #2E2A23;
+  outline: none;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+}
+
+.line-input:focus {
+  border-bottom-color: #A0815A;
+  border-bottom-width: 2px;
+}
+
+.line-input::placeholder {
+  color: #C0B8A8;
+}
+
+.error-msg {
+  font-size: 13px;
+  color: #C27C4E;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: rgba(194, 124, 78, 0.08);
+  border-radius: 6px;
 }
 
 .login-btn {
-  border-radius: 8px;
+  width: 100%;
   height: 44px;
-  font-weight: 600;
+  background: #A0815A;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
   font-family: 'Noto Serif SC', serif;
-  background: #5B7D6A !important;
-  border-color: #5B7D6A !important;
-  transition: all 0.2s ease;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-top: 8px;
 }
 
 .login-btn:hover {
-  background: #6B8D7A !important;
-  border-color: #6B8D7A !important;
+  background: #B8956E;
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .login-footer {
   text-align: center;
-  margin-top: 28px;
+  margin-top: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
 }
 
-.login-footer-text {
-  font-size: 14px;
-  color: #8A8578;
+.footer-text {
+  font-size: 13px;
+  color: #8C8478;
+}
+
+.footer-link {
+  font-size: 13px;
+  color: #A0815A;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: #C27C4E;
+}
+
+@media (max-width: 768px) {
+  .login-page {
+    flex-direction: column;
+  }
+
+  .login-left {
+    width: 100%;
+    height: 30vh;
+  }
+
+  .left-title {
+    font-size: 24px;
+  }
+
+  .login-right {
+    width: 100%;
+    flex: 1;
+    padding: 24px;
+  }
 }
 </style>

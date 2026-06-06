@@ -9,57 +9,56 @@
             </template>
 
             <template v-else>
-              <div class="app-layout">
-                <div class="mobile-header">
-                  <n-button quaternary @click="showDrawer = true" size="large">
-                    <template #icon><n-icon :component="MenuOutline" /></template>
-                  </n-button>
-                  <span class="mobile-title">衣 楷</span>
-                  <n-button quaternary circle size="small" @click="logout">
-                    <template #icon><n-icon :component="LogOutOutline" /></template>
-                  </n-button>
+              <!-- Desktop top nav -->
+              <nav class="top-nav">
+                <div class="nav-inner">
+                  <div class="nav-logo">
+                    <div class="logo-seal">
+                      <n-icon :component="ShirtOutline" :size="18" color="#FFFFFF" />
+                    </div>
+                    <span class="logo-text">衣 楷</span>
+                  </div>
+
+                  <div class="nav-links">
+                    <a
+                      v-for="item in menuOptions"
+                      :key="item.key"
+                      :class="['nav-link', { active: currentRoute === item.key }]"
+                      @click="onMenuSelect(item.key)"
+                    >
+                      {{ item.label }}
+                    </a>
+                  </div>
+
+                  <div class="nav-right">
+                    <a class="logout-link" @click="logout">退出</a>
+                  </div>
                 </div>
+              </nav>
 
-                <div v-if="showDrawer" class="drawer-overlay" @click="showDrawer = false" />
-                <aside class="sidebar" :class="{ open: showDrawer }">
-                  <div class="sidebar-inner">
-                    <div class="sidebar-logo">
-                      <div class="logo-icon">
-                        <n-icon :component="ShirtOutline" :size="20" color="#FFFFFF" />
-                      </div>
-                      <span>衣 楷</span>
-                    </div>
+              <!-- Main content -->
+              <main class="main-area">
+                <div class="main-content">
+                  <router-view v-slot="{ Component }">
+                    <transition name="page-fade" mode="out-in">
+                      <component :is="Component" />
+                    </transition>
+                  </router-view>
+                </div>
+              </main>
 
-                    <nav class="sidebar-nav">
-                      <a
-                        v-for="item in menuOptions"
-                        :key="item.key"
-                        :class="['nav-item', { active: currentRoute === item.key }]"
-                        @click="onMenuSelect(item.key)"
-                      >
-                        <n-icon :component="item.iconComponent" :size="20" />
-                        <span>{{ item.label }}</span>
-                      </a>
-                    </nav>
-
-                    <div class="sidebar-divider"></div>
-
-                    <div class="sidebar-footer">
-                      <a class="logout-link" @click="logout">退出登录</a>
-                    </div>
-                  </div>
-                </aside>
-
-                <main class="main-area">
-                  <div class="main-content">
-                    <router-view v-slot="{ Component }">
-                      <transition name="page-fade" mode="out-in">
-                        <component :is="Component" />
-                      </transition>
-                    </router-view>
-                  </div>
-                </main>
-              </div>
+              <!-- Mobile bottom tab bar -->
+              <nav class="mobile-tabs">
+                <a
+                  v-for="item in menuOptions"
+                  :key="item.key"
+                  :class="['mobile-tab', { active: currentRoute === item.key }]"
+                  @click="onMenuSelect(item.key)"
+                >
+                  <n-icon :component="item.iconComponent" :size="20" />
+                  <span>{{ item.label }}</span>
+                </a>
+              </nav>
             </template>
           </div>
         </n-dialog-provider>
@@ -78,22 +77,19 @@ import {
   CalendarOutline,
   SparklesOutline,
   PersonOutline,
-  LogOutOutline,
-  MenuOutline,
 } from '@vicons/ionicons5'
 
 const router = useRouter()
 const route = useRoute()
-const showDrawer = ref(false)
 
 const currentRoute = computed(() => route.path)
 
 const themeOverrides = {
   common: {
-    primaryColor: '#5B7D6A',
-    primaryColorHover: '#6B8D7A',
-    primaryColorPressed: '#4A6C59',
-    primaryColorSuppl: '#7FA88E',
+    primaryColor: '#A0815A',
+    primaryColorHover: '#B8956E',
+    primaryColorPressed: '#8A6F4E',
+    primaryColorSuppl: '#C27C4E',
     borderRadius: '8px',
     borderRadiusSmall: '6px',
     fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif",
@@ -106,7 +102,7 @@ const themeOverrides = {
     borderRadius: '8px',
   },
   Input: {
-    borderRadius: '4px',
+    borderRadius: '8px',
   },
   Tag: {
     borderRadius: '6px',
@@ -126,7 +122,6 @@ const menuOptions = [
 
 function onMenuSelect(key) {
   router.push(key)
-  showDrawer.value = false
 }
 
 function logout() {
@@ -145,21 +140,21 @@ function logout() {
 }
 
 :root {
-  --color-primary: #5B7D6A;
-  --color-primary-hover: #6B8D7A;
-  --color-primary-pressed: #4A6C59;
-  --color-accent: #C49A6C;
-  --color-bg: #F6F3EE;
-  --color-surface: #FFFDF9;
-  --color-text: #2C2A25;
-  --color-text-secondary: #8A8578;
-  --color-border: #E8E3DA;
+  --color-primary: #A0815A;
+  --color-primary-hover: #B8956E;
+  --color-primary-pressed: #8A6F4E;
+  --color-accent: #C27C4E;
+  --color-bg: #F5F0E8;
+  --color-surface: #FFFDF8;
+  --color-text: #2E2A23;
+  --color-text-secondary: #8C8478;
+  --color-border: #E0D8CC;
 }
 
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background: #F6F3EE;
-  color: #2C2A25;
+  background: #F5F0E8;
+  color: #2E2A23;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -169,131 +164,103 @@ body {
   min-height: 100vh;
 }
 
-.app-layout {
-  display: flex;
-  min-height: 100vh;
-}
-
-/* Sidebar */
-.sidebar {
-  width: 200px;
-  background: #FDFCF9;
-  background-image:
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 40px,
-      rgba(196, 154, 108, 0.03) 40px,
-      rgba(196, 154, 108, 0.03) 41px
-    ),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 60px,
-      rgba(196, 154, 108, 0.02) 60px,
-      rgba(196, 154, 108, 0.02) 61px
-    );
-  border-right: 1px solid #E8E3DA;
+/* Top nav */
+.top-nav {
   position: fixed;
   top: 0;
   left: 0;
-  bottom: 0;
+  right: 0;
+  height: 56px;
+  background: rgba(245, 240, 232, 0.85);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border-bottom: 1px solid #E0D8CC;
   z-index: 200;
   display: flex;
-  flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  align-items: center;
 }
 
-.sidebar-inner {
+.nav-inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 36px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   height: 100%;
-  padding: 28px 0 20px;
 }
 
-.sidebar-logo {
+.nav-logo {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 24px 24px;
-  font-family: 'Noto Serif SC', serif;
-  font-size: 18px;
-  font-weight: 600;
-  color: #2C2A25;
-  letter-spacing: 2px;
-  border-bottom: 1px solid #E8E3DA;
-  margin-bottom: 16px;
 }
 
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  background: #5B7D6A;
+.logo-seal {
+  width: 36px;
+  height: 36px;
+  background: #A0815A;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 0 12px;
+.logo-text {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2E2A23;
+  letter-spacing: 2px;
 }
 
-.nav-item {
+.nav-links {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 6px;
+  gap: 32px;
+}
+
+.nav-link {
   font-size: 14px;
-  color: #8A8578;
+  color: #8C8478;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
-  border-left: 2px solid transparent;
+  padding: 16px 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
 }
 
-.nav-item:hover {
-  color: #2C2A25;
-  background: rgba(91, 125, 106, 0.04);
+.nav-link:hover {
+  color: #2E2A23;
 }
 
-.nav-item.active {
-  color: #5B7D6A;
-  border-left-color: #5B7D6A;
-  background: rgba(91, 125, 106, 0.06);
+.nav-link.active {
+  color: #A0815A;
+  border-bottom-color: #A0815A;
 }
 
-.sidebar-divider {
-  height: 1px;
-  background: #E8E3DA;
-  margin: 16px 24px;
-}
-
-.sidebar-footer {
-  margin-top: auto;
-  padding: 0 24px;
+.nav-right {
+  display: flex;
+  align-items: center;
 }
 
 .logout-link {
   font-size: 13px;
-  color: #8A8578;
+  color: #8C8478;
   cursor: pointer;
   transition: color 0.2s ease;
   text-decoration: none;
 }
 
 .logout-link:hover {
-  color: #2C2A25;
+  color: #2E2A23;
 }
 
 /* Main area */
 .main-area {
-  flex: 1;
-  margin-left: 200px;
+  padding-top: 56px;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -301,79 +268,74 @@ body {
 
 .main-content {
   width: 100%;
-  max-width: 1080px;
-  padding: 36px 48px;
+  max-width: 1200px;
+  padding: 36px 36px 80px;
 }
 
 /* Page transition */
 .page-fade-enter-active,
 .page-fade-leave-active {
-  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.3s ease;
 }
 .page-fade-enter-from,
 .page-fade-leave-to {
   opacity: 0;
 }
 
-/* Mobile */
-.mobile-header {
-  display: none;
-}
-
-.drawer-overlay {
+/* Mobile bottom tabs */
+.mobile-tabs {
   display: none;
 }
 
 @media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
-  }
-  .sidebar.open {
-    transform: translateX(0);
-    box-shadow: 4px 0 20px rgba(44, 42, 37, 0.1);
-  }
-
-  .drawer-overlay {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: #F6F3EE;
-    opacity: 0.85;
-    z-index: 199;
-    animation: fadeOverlay 0.2s ease;
-  }
-
-  @keyframes fadeOverlay {
-    from { opacity: 0; }
-    to { opacity: 0.85; }
-  }
-
-  .mobile-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    background: #FDFCF9;
-    border-bottom: 1px solid #E8E3DA;
-    position: sticky;
-    top: 0;
-    z-index: 50;
-  }
-
-  .mobile-title {
-    font-family: 'Noto Serif SC', serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: #2C2A25;
-    letter-spacing: 2px;
+  .top-nav {
+    display: none;
   }
 
   .main-area {
-    margin-left: 0;
+    padding-top: 0;
+    padding-bottom: 56px;
   }
 
   .main-content {
-    padding: 24px 20px;
+    padding: 24px 16px 70px;
+  }
+
+  .mobile-tabs {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: rgba(245, 240, 232, 0.85);
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    border-top: 1px solid #E0D8CC;
+    z-index: 200;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .mobile-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 11px;
+    color: #8C8478;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 6px 0;
+    transition: color 0.2s ease;
+  }
+
+  .mobile-tab:hover {
+    color: #2E2A23;
+  }
+
+  .mobile-tab.active {
+    color: #A0815A;
   }
 }
 </style>

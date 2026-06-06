@@ -7,61 +7,63 @@
       </div>
     </div>
 
-    <n-card class="form-card" :bordered="false">
+    <div class="form-section">
       <p class="guide-text">今天想去哪里？</p>
-      <n-form label-placement="left" label-width="60">
-        <n-form-item label="日期">
-          <n-date-picker
-            v-model:formatted-value="date"
-            type="date"
-            value-format="yyyy-MM-dd"
-            style="width: 100%"
-          />
-        </n-form-item>
 
-        <n-form-item label="场合">
-          <div class="scene-tabs">
-            <button
-              v-for="o in occasions"
-              :key="o.value"
-              :class="['tab', { active: occasion === o.value }]"
-              @click="occasion = o.value"
-            >
-              <n-icon :component="o.icon" :size="16" />
-              {{ o.label }}
-            </button>
+      <div class="form-field">
+        <label class="field-label">日期</label>
+        <n-date-picker
+          v-model:formatted-value="date"
+          type="date"
+          value-format="yyyy-MM-dd"
+          style="width: 100%"
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="field-label">场合</label>
+        <div class="scene-grid">
+          <div
+            v-for="o in occasions"
+            :key="o.value"
+            :class="['scene-card', { active: occasion === o.value }]"
+            @click="occasion = o.value"
+          >
+            <n-icon :component="o.icon" :size="24" />
+            <span class="scene-label">{{ o.label }}</span>
           </div>
-        </n-form-item>
+        </div>
+      </div>
 
-        <n-form-item label="要求">
-          <n-input
-            v-model:value="extra"
-            type="textarea"
-            placeholder="例如：今天想穿得可爱一点"
-            :rows="2"
-          />
-        </n-form-item>
+      <div class="form-field">
+        <label class="field-label">要求</label>
+        <n-input
+          v-model:value="extra"
+          type="textarea"
+          placeholder="例如：今天想穿得可爱一点"
+          :rows="2"
+        />
+      </div>
 
-        <n-button
-          type="primary"
-          block
-          :loading="loading"
-          @click="getRecommend"
-          size="large"
-          class="recommend-btn"
-        >
-          <template #icon><n-icon :component="SparklesOutline" /></template>
-          获取推荐
-        </n-button>
-      </n-form>
-    </n-card>
+      <n-button
+        type="primary"
+        block
+        :loading="loading"
+        @click="getRecommend"
+        size="large"
+        class="recommend-btn"
+      >
+        <template #icon><n-icon :component="SparklesOutline" /></template>
+        获取推荐
+      </n-button>
+    </div>
 
     <div v-if="loading" class="loading-area">
       <n-spin size="large" />
       <p class="loading-text">AI 正在为你搭配中...</p>
     </div>
 
-    <n-card v-if="result" class="result-card" :bordered="false" style="margin-top: 24px">
+    <div v-if="result" class="result-section">
       <div class="result-header">
         <span class="result-title">推荐方案</span>
       </div>
@@ -96,7 +98,7 @@
         <template #icon><n-icon :component="SaveOutline" /></template>
         保存这套穿搭
       </n-button>
-    </n-card>
+    </div>
 
     <div v-if="coldPalaceItems.length" class="cold-section">
       <div class="cold-header">
@@ -219,79 +221,98 @@ async function saveOutfit() {
 
 .page-header h2 {
   font-family: 'Noto Serif SC', serif;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
-  color: #2C2A25;
+  color: #2E2A23;
   letter-spacing: 1px;
 }
 
 .page-line {
   width: 100%;
   height: 1px;
-  background: #E8E3DA;
+  background: #E0D8CC;
   margin-top: 8px;
+}
+
+.form-section {
+  background: #FFFDF8;
+  border: 1px solid #E0D8CC;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
 }
 
 .guide-text {
   font-family: 'Noto Serif SC', serif;
   font-size: 16px;
-  color: #2C2A25;
+  color: #2E2A23;
   margin-bottom: 20px;
   letter-spacing: 1px;
 }
 
-.form-card {
-  border: 1px solid #E8E3DA;
-  box-shadow: 0 1px 4px rgba(44, 42, 37, 0.04);
-  margin-bottom: 8px;
+.form-field {
+  margin-bottom: 20px;
 }
 
-.scene-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0;
-  border-bottom: 1px solid #E8E3DA;
-}
-
-.tab {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 14px;
-  border: none;
-  background: none;
+.field-label {
+  display: block;
   font-size: 13px;
+  color: #8C8478;
+  margin-bottom: 8px;
   font-weight: 500;
-  color: #8A8578;
+}
+
+/* Scene cards */
+.scene-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.scene-card {
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #E0D8CC;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: inherit;
-  outline: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
+  color: #8C8478;
+  background: transparent;
 }
 
-.tab:hover {
-  color: #2C2A25;
+.scene-card:hover {
+  border-color: #A0815A;
+  color: #2E2A23;
 }
 
-.tab.active {
-  color: #5B7D6A;
-  border-bottom-color: #5B7D6A;
+.scene-card.active {
+  border-color: #A0815A;
+  color: #A0815A;
+  background: rgba(160, 129, 90, 0.06);
+}
+
+.scene-label {
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .recommend-btn {
   border-radius: 8px;
   height: 44px;
   font-weight: 600;
-  background: #5B7D6A !important;
-  border-color: #5B7D6A !important;
+  font-family: 'Noto Serif SC', serif;
+  background: #A0815A !important;
+  border-color: #A0815A !important;
   transition: all 0.2s ease;
 }
 
 .recommend-btn:hover {
-  background: #6B8D7A !important;
-  border-color: #6B8D7A !important;
+  background: #B8956E !important;
+  border-color: #B8956E !important;
 }
 
 .loading-area {
@@ -301,13 +322,17 @@ async function saveOutfit() {
 
 .loading-text {
   font-size: 13px;
-  color: #8A8578;
+  color: #8C8478;
   margin-top: 12px;
 }
 
-.result-card {
-  border: 1px solid #E8E3DA;
-  box-shadow: 0 1px 4px rgba(44, 42, 37, 0.04);
+/* Results */
+.result-section {
+  background: #FFFDF8;
+  border: 1px solid #E0D8CC;
+  border-radius: 8px;
+  padding: 24px;
+  margin-top: 24px;
 }
 
 .result-header {
@@ -321,13 +346,13 @@ async function saveOutfit() {
   font-family: 'Noto Serif SC', serif;
   font-size: 18px;
   font-weight: 600;
-  color: #2C2A25;
+  color: #2E2A23;
 }
 
 .result-reason {
   font-size: 14px;
   line-height: 1.7;
-  color: #8A8578;
+  color: #8C8478;
   margin-bottom: 20px;
 }
 
@@ -339,21 +364,21 @@ async function saveOutfit() {
 
 .result-item-card {
   display: flex;
-  background: #FFFDF9;
+  background: #FFFDF8;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #E8E3DA;
+  border: 1px solid #E0D8CC;
   transition: all 0.3s ease;
 }
 
 .result-item-card:hover {
-  border-left: 2px solid #5B7D6A;
+  border-left: 2px solid #A0815A;
 }
 
 .result-item-img-wrap {
-  width: 40%;
+  width: 50%;
   aspect-ratio: 1;
-  background: #F6F3EE;
+  background: #F5F0E8;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -365,12 +390,12 @@ async function saveOutfit() {
 }
 
 .result-item-info {
-  width: 60%;
+  width: 50%;
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-left: 1px solid #E8E3DA;
+  border-left: 1px solid #E0D8CC;
 }
 
 .result-item-tags {
@@ -383,20 +408,20 @@ async function saveOutfit() {
 .result-cat {
   font-size: 13px;
   font-weight: 500;
-  color: #5B7D6A;
+  color: #A0815A;
 }
 
 .cold-wake {
   font-size: 11px;
-  color: #C49A6C;
-  background: rgba(196, 154, 108, 0.1);
+  color: #C27C4E;
+  background: rgba(194, 124, 78, 0.1);
   padding: 2px 8px;
   border-radius: 4px;
 }
 
 .result-item-reason {
   font-size: 12px;
-  color: #8A8578;
+  color: #8C8478;
   margin-top: 8px;
   line-height: 1.5;
 }
@@ -406,16 +431,17 @@ async function saveOutfit() {
   border-radius: 8px;
   height: 44px;
   font-weight: 600;
-  background: #5B7D6A !important;
-  border-color: #5B7D6A !important;
+  background: #A0815A !important;
+  border-color: #A0815A !important;
   transition: all 0.2s ease;
 }
 
 .save-btn:hover {
-  background: #6B8D7A !important;
-  border-color: #6B8D7A !important;
+  background: #B8956E !important;
+  border-color: #B8956E !important;
 }
 
+/* Cold palace */
 .cold-section {
   margin-top: 28px;
 }
@@ -431,7 +457,7 @@ async function saveOutfit() {
   font-family: 'Noto Serif SC', serif;
   font-size: 16px;
   font-weight: 600;
-  color: #2C2A25;
+  color: #2E2A23;
 }
 
 .cold-grid {
@@ -441,15 +467,15 @@ async function saveOutfit() {
 }
 
 .cold-card {
-  background: #FFFDF9;
+  background: #FFFDF8;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #E8E3DA;
+  border: 1px solid #E0D8CC;
   transition: all 0.3s ease;
 }
 
 .cold-card:hover {
-  border-left: 2px solid #5B7D6A;
+  border-left: 2px solid #A0815A;
 }
 
 .cold-img {
@@ -463,17 +489,38 @@ async function saveOutfit() {
   display: flex;
   align-items: center;
   gap: 6px;
-  border-top: 1px solid #E8E3DA;
+  border-top: 1px solid #E0D8CC;
 }
 
 .cold-cat {
   font-size: 12px;
-  color: #5B7D6A;
+  color: #A0815A;
   font-weight: 500;
 }
 
 .cold-days {
   font-size: 11px;
-  color: #8A8578;
+  color: #8C8478;
+}
+
+@media (max-width: 768px) {
+  .scene-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .result-item-card {
+    flex-direction: column;
+  }
+
+  .result-item-img-wrap {
+    width: 100%;
+    aspect-ratio: 16/9;
+  }
+
+  .result-item-info {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #E0D8CC;
+  }
 }
 </style>
