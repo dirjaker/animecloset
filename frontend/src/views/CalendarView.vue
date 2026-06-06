@@ -348,9 +348,10 @@ onMounted(() => loadCalendar())
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(7, auto);
   grid-template-rows: repeat(6, minmax(0, 1fr));
   gap: 3px;
+  justify-content: center;
 }
 
 .day-cell {
@@ -394,7 +395,7 @@ onMounted(() => loadCalendar())
 }
 
 .day-num {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: #2E2A23;
   align-self: flex-end;
@@ -407,16 +408,16 @@ onMounted(() => loadCalendar())
 }
 
 .day-thumb {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   object-fit: cover;
   border: 1.5px solid #E0D8CC;
 }
 
 .day-dot {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   background: #C27C4E;
 }
