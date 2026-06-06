@@ -1,24 +1,24 @@
 <template>
   <div class="calendar-page">
-    <div class="page-header">
-      <h2>穿搭日历</h2>
-      <div class="page-line"></div>
+    <div class="cal-top-bar">
+      <h2 class="cal-title">穿搭日历</h2>
+      <div class="top-right">
+        <div class="month-controls">
+          <span class="month-nav-btn" @click="changeMonth(-1)">◀</span>
+          <span class="month-label">{{ year }}年{{ month }}月</span>
+          <span class="month-nav-btn" @click="changeMonth(1)">▶</span>
+        </div>
+        <n-button type="primary" size="small" class="gen-today-btn" @click="generateToday">
+          生成今日推荐
+        </n-button>
+      </div>
     </div>
 
-    <div class="month-header">
-      <span class="month-nav-btn" @click="changeMonth(-1)">◀</span>
-      <span class="month-label">{{ year }}年{{ month }}月</span>
-      <span class="month-nav-btn" @click="changeMonth(1)">▶</span>
-      <n-button type="primary" size="small" class="gen-today-btn" @click="generateToday">
-        生成今日推荐
-      </n-button>
-    </div>
-
-    <div class="weekday-row">
-      <span v-for="d in weekdays" :key="d" class="weekday-cell">{{ d }}</span>
-    </div>
-
-    <div class="cal-grid">
+    <div class="cal-wrapper">
+      <div class="cal-weekday-row">
+        <span v-for="d in weekdays" :key="d" class="weekday-cell">{{ d }}</span>
+      </div>
+      <div class="cal-grid" ref="calGridRef">
       <div
         v-for="(day, i) in calendarDays"
         :key="i"
@@ -30,12 +30,16 @@
         }]"
         @click="day.currentMonth && openDay(day)"
       >
-        <span :class="['day-num', { 'day-num-today': day.isToday }]">{{ day.date }}</span>
-        <template v-if="day.hasOutfit && day.currentMonth">
+        <span class="day-num">
+          <span v-if="day.isToday" class="day-num-today">{{ day.date }}</span>
+          <template v-else>{{ day.date }}</template>
+        </span>
+        <div v-if="day.hasOutfit && day.currentMonth" class="day-cell-body">
           <img v-if="day.thumbnailUrl" :src="day.thumbnailUrl" class="day-thumb" />
           <div v-else class="day-dot" />
-        </template>
+        </div>
       </div>
+    </div>
     </div>
 
     <!-- Floating detail drawer -->
@@ -44,6 +48,7 @@
         <div class="drawer-handle" @click="selectedDay = null">
           <span class="drawer-handle-bar"></span>
         </div>
+        <button class="drawer-close" @click="selectedDay = null" title="关闭">×</button>
         <div v-if="selectedDay?.outfit" class="drawer-content">
           <span class="drawer-date">{{ selectedDay.fullDate }}</span>
           <div class="drawer-items">
@@ -113,7 +118,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import { ColorWandOutline } from '@vicons/ionicons5'
@@ -131,6 +136,41 @@ const outfits = ref({})
 const showModal = ref(false)
 const selectedDay = ref(null)
 const generating = ref(false)
+const calGridRef = ref(null)
+
+let resizeObserver = null
+
+function updateCellSize() {
+  if (!calGridRef.value) return
+  const grid = calGridRef.value
+  const style = getComputedStyle(grid)
+  const paddingTop = parseFloat(style.paddingTop) || 0
+  const paddingBottom = parseFloat(style.paddingBottom) || 0
+  const gap = parseFloat(style.gap) || parseFloat(style.gridRowGap) || 4
+  const rows = 6
+  const availableH = grid.clientHeight - paddingTop - paddingBottom - gap * (rows - 1)
+  const cellSize = Math.floor(availableH / rows)
+  // Set on calendar-page so both inline-weekdays and cal-grid inherit it
+  const page = grid.closest('.calendar-page')
+  if (page) {
+    page.style.setProperty('--cell-size', cellSize + 'px')
+  }
+}
+
+onMounted(() => {
+  loadCalendar()
+  nextTick(() => {
+    updateCellSize()
+    if (calGridRef.value) {
+      resizeObserver = new ResizeObserver(updateCellSize)
+      resizeObserver.observe(calGridRef.value)
+    }
+  })
+})
+
+onUnmounted(() => {
+  if (resizeObserver) resizeObserver.disconnect()
+})
 
 function monthStr() {
   return `${year.value}-${String(month.value).padStart(2, '0')}`
@@ -213,7 +253,12 @@ async function loadCalendar() {
 }
 
 function openDay(day) {
-  selectedDay.value = { ...day }
+  // Toggle: click same day to close
+  if (selectedDay.value?.fullDate === day.fullDate) {
+    selectedDay.value = null
+  } else {
+    selectedDay.value = { ...day }
+  }
 }
 
 function goToRecommend() {
@@ -243,8 +288,6 @@ async function generateIllustration() {
     generating.value = false
   }
 }
-
-onMounted(() => loadCalendar())
 </script>
 
 <style scoped>
@@ -258,7 +301,7 @@ onMounted(() => loadCalendar())
   bottom: 0;
   display: flex;
   flex-direction: column;
-  padding: 24px 36px 16px;
+  padding: 12px 24px 8px;
   box-sizing: border-box;
   overflow: hidden;
   z-index: 1;
@@ -269,155 +312,208 @@ onMounted(() => loadCalendar())
   to { opacity: 1; }
 }
 
-/* ── Header ── */
-.page-header {
+/* ── Top bar: title + controls in one line ── */
+.cal-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   flex-shrink: 0;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  min-height: 28px;
 }
 
-.page-header h2 {
+.cal-title {
   font-family: 'Noto Serif SC', serif;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: #2E2A23;
   letter-spacing: 1px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.page-line {
-  width: 100%;
-  height: 1px;
-  background: #E0D8CC;
-  margin-top: 4px;
-}
-
-/* ── Month header ── */
-.month-header {
+.top-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
-  margin-bottom: 8px;
+  margin-left: auto;
+}
+
+.month-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .month-nav-btn {
-  font-size: 14px;
+  font-size: 12px;
   color: #8C8478;
   cursor: pointer;
-  padding: 2px 4px;
-  transition: color 0.2s ease;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
   user-select: none;
 }
 
 .month-nav-btn:hover {
   color: #A0815A;
+  background: rgba(160, 129, 90, 0.06);
 }
 
 .month-label {
   font-family: 'Noto Serif SC', serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: #2E2A23;
+  min-width: 80px;
+  text-align: center;
 }
 
 .gen-today-btn {
-  margin-left: auto;
   background: #A0815A !important;
   border-color: #A0815A !important;
   font-family: 'Noto Serif SC', serif;
+  border-radius: 6px !important;
 }
 
-/* ── Weekday row ── */
-.weekday-row {
+/* ── Calendar wrapper: weekday + grid, fills remaining space ── */
+.cal-wrapper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Weekday row: same columns as grid ── */
+.cal-weekday-row {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  text-align: center;
-  height: 22px;
-  align-items: center;
+  grid-template-columns: repeat(7, var(--cell-size, 1fr));
+  gap: 4px;
+  justify-content: center;
   flex-shrink: 0;
   margin-bottom: 2px;
 }
 
 .weekday-cell {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   color: #8C8478;
+  letter-spacing: 1px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
 }
 
-/* ── Calendar grid: fills remaining space, 6 equal rows, square cells ── */
+.weekday-cell:nth-child(6),
+.weekday-cell:nth-child(7) {
+  color: #C27C4E;
+}
+
+/* ── Calendar grid: fills remaining height, square cells via JS ── */
 .cal-grid {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(7, auto);
+  grid-template-columns: repeat(7, var(--cell-size, 1fr));
   grid-template-rows: repeat(6, minmax(0, 1fr));
-  gap: 3px;
+  gap: 4px;
   justify-content: center;
 }
 
 .day-cell {
-  aspect-ratio: 1;
   min-height: 0;
   min-width: 0;
-  max-height: 100%;
   overflow: hidden;
-  padding: 4px 6px;
-  border-radius: 4px;
+  padding: 6px 8px;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.18s ease;
   background: #FFFDF8;
   border: 1px solid #E0D8CC;
+  position: relative;
+  box-sizing: border-box;
 }
 
 .day-cell:hover:not(.other) {
-  background: rgba(160, 129, 90, 0.04);
+  background: rgba(160, 129, 90, 0.05);
+  border-color: #C8B99E;
 }
 
 .day-cell.other {
-  opacity: 0.1;
+  opacity: 0.08;
   cursor: default;
+  background: transparent;
+  border-color: transparent;
 }
 
 .day-cell.today {
-  background: rgba(160, 129, 90, 0.08);
+  background: rgba(160, 129, 90, 0.06);
+  border-color: #A0815A;
 }
 
 .day-cell.selected {
   border: 1.5px solid #A0815A;
-  background: rgba(160, 129, 90, 0.06);
+  background: rgba(160, 129, 90, 0.08);
+  box-shadow: 0 1px 4px rgba(160, 129, 90, 0.12);
 }
 
-.day-cell.weekend .day-num {
-  color: #C27C4E;
+.day-cell.weekend:not(.other) {
+  background: rgba(194, 124, 78, 0.03);
 }
 
 .day-num {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: #2E2A23;
-  align-self: flex-end;
   line-height: 1;
+  margin-bottom: auto;
+}
+
+.day-cell.weekend:not(.other) .day-num {
+  color: #C27C4E;
 }
 
 .day-num-today {
-  color: #A0815A;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #A0815A;
+  color: #FFFDF8 !important;
+  font-size: 11px;
   font-weight: 700;
 }
 
+.day-cell-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 0;
+}
+
 .day-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 6px;
   object-fit: cover;
-  border: 1.5px solid #E0D8CC;
+  border: 1px solid #E0D8CC;
 }
 
 .day-dot {
-  width: 4px;
-  height: 4px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #C27C4E;
 }
@@ -452,6 +548,30 @@ onMounted(() => loadCalendar())
   height: 3px;
   border-radius: 2px;
   background: #D0C8BC;
+}
+
+.drawer-close {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #8C8478;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.drawer-close:hover {
+  color: #A0815A;
+  background: rgba(160, 129, 90, 0.08);
 }
 
 .drawer-content {
@@ -607,9 +727,20 @@ onMounted(() => loadCalendar())
     font-size: 11px;
   }
 
-  .day-thumb {
+  .day-num-today {
     width: 18px;
     height: 18px;
+    font-size: 10px;
+  }
+
+  .day-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  .day-cell {
+    padding: 4px 5px;
+    border-radius: 4px;
   }
 }
 </style>
