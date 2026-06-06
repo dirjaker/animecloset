@@ -1,3 +1,20 @@
+<div align="center">
+
+# 👗 Anime Closet
+
+### 动漫风 AI 穿搭助手
+
+[![功能](https://img.shields.io/badge/功能-5-blue?style=flat-square)]()
+[![AI](https://img.shields.io/badge/AI-生成-green?style=flat-square)]()
+[![技术](https://img.shields.io/badge/技术-Naive UI-orange?style=flat-square)]()
+[![更新](https://img.shields.io/badge/更新-2025.06-red?style=flat-square)]()
+
+*智能抠图 · 衣橱管理 · 天气穿搭推荐 · AI 插画生成 · 日历穿搭记录*
+
+</div>
+
+---
+
 # AnimeCloset — 动漫风格 AI 穿搭助手
 
 > 基于 AI 视觉识别与大模型能力的智能衣柜管理与穿搭推荐系统，以动漫风格呈现。
@@ -280,3 +297,4 @@ animecloset/
 | [通义万相](https://tongyi.aliyun.com/wanxiang) | AI 图像生成服务 |
 | [Naive UI](https://www.naiveui.com/) | Vue 3 组件库 |
 | [FastAPI](https://fastapi.tiangolo.com/) | 高性能 Python Web 框架 |
+
