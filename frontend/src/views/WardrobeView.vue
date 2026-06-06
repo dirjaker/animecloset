@@ -2,8 +2,8 @@
   <div class="wardrobe-page">
     <div class="page-header">
       <div>
-        <h2>我的衣橱</h2>
-        <p class="page-subtitle">管理你的所有衣物</p>
+        <h2>衣橱</h2>
+        <div class="page-line"></div>
       </div>
       <n-button type="primary" @click="triggerUpload" :loading="uploading">
         <template #icon><n-icon :component="AddOutline" /></template>
@@ -17,11 +17,11 @@
       <span>{{ uploadStatus }}</span>
     </div>
 
-    <div class="category-pills">
+    <div class="category-tabs">
       <button
         v-for="cat in categories"
         :key="cat.value"
-        :class="['pill', { active: activeCategory === cat.value }]"
+        :class="['tab', { active: activeCategory === cat.value }]"
         @click="activeCategory = cat.value; loadGarments()"
       >
         {{ cat.label }}
@@ -53,9 +53,7 @@
           </div>
         </div>
         <div class="card-info">
-          <n-tag size="small" :bordered="false" round style="background: rgba(124, 92, 252, 0.1); color: #7C5CFC; font-weight: 500;">
-            {{ categoryLabel(g.category) }}
-          </n-tag>
+          <span class="card-category">{{ categoryLabel(g.category) }}</span>
           <div v-if="g.tags" class="card-tags">
             <span v-for="t in parseTags(g.tags)" :key="t" class="card-tag-chip">{{ t }}</span>
           </div>
@@ -64,9 +62,6 @@
     </div>
 
     <div v-if="!garments.length && !loading" class="empty-state">
-      <div class="empty-icon-ring">
-        <n-icon :component="ShirtOutline" :size="40" color="#D1D5DB" />
-      </div>
       <p class="empty-title">衣橱空空如也</p>
       <p class="empty-desc">点击右上角上传你的第一件衣服</p>
     </div>
@@ -221,12 +216,12 @@ onMounted(() => loadGarments())
 
 <style scoped>
 .wardrobe-page {
-  animation: pageEnter 0.25s ease;
+  animation: pageEnter 0.3s ease;
 }
 
 @keyframes pageEnter {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .page-header {
@@ -237,16 +232,18 @@ onMounted(() => loadGarments())
 }
 
 .page-header h2 {
+  font-family: 'Noto Serif SC', serif;
   font-size: 24px;
-  font-weight: 700;
-  color: #1A1625;
-  letter-spacing: -0.3px;
+  font-weight: 600;
+  color: #2C2A25;
+  letter-spacing: 1px;
 }
 
-.page-subtitle {
-  font-size: 13px;
-  color: #6B6580;
-  margin-top: 4px;
+.page-line {
+  width: 100%;
+  height: 1px;
+  background: #E8E3DA;
+  margin-top: 8px;
 }
 
 .upload-bar {
@@ -254,45 +251,44 @@ onMounted(() => loadGarments())
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: rgba(124, 92, 252, 0.08);
-  border-radius: 12px;
+  background: rgba(91, 125, 106, 0.06);
+  border-radius: 8px;
   margin-bottom: 16px;
   font-size: 13px;
-  color: #7C5CFC;
+  color: #5B7D6A;
   font-weight: 500;
 }
 
-.category-pills {
+.category-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 0;
   margin-bottom: 16px;
+  border-bottom: 1px solid #E8E3DA;
 }
 
-.pill {
-  padding: 7px 18px;
-  border-radius: 20px;
-  border: 1px solid #E5E7EB;
-  background: #FFFFFF;
-  font-size: 13px;
+.tab {
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  font-size: 14px;
   font-weight: 500;
-  color: #6B6580;
+  color: #8A8578;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
   outline: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
 }
 
-.pill:hover {
-  border-color: #7C5CFC;
-  color: #7C5CFC;
+.tab:hover {
+  color: #2C2A25;
 }
 
-.pill.active {
-  background: #7C5CFC;
-  border-color: #7C5CFC;
-  color: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(124, 92, 252, 0.25);
+.tab.active {
+  color: #5B7D6A;
+  border-bottom-color: #5B7D6A;
 }
 
 .sort-bar {
@@ -304,7 +300,7 @@ onMounted(() => loadGarments())
 
 .sort-label {
   font-size: 13px;
-  color: #6B6580;
+  color: #8A8578;
   font-weight: 500;
 }
 
@@ -315,28 +311,27 @@ onMounted(() => loadGarments())
 
 .garment-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
 
 .garment-card {
-  background: #FFFFFF;
-  border-radius: 16px;
+  background: #FFFDF9;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(124, 92, 252, 0.08);
+  border: 1px solid #E8E3DA;
+  transition: all 0.3s ease;
 }
 
 .garment-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(124, 92, 252, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
+  border-left: 2px solid #5B7D6A;
+  box-shadow: 0 2px 12px rgba(44, 42, 37, 0.08);
 }
 
 .card-img-wrap {
   position: relative;
   aspect-ratio: 1;
-  background: #F5F3FF;
+  background: #F6F3EE;
   overflow: hidden;
 }
 
@@ -355,12 +350,12 @@ onMounted(() => loadGarments())
   position: absolute;
   bottom: 8px;
   left: 8px;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(44, 42, 37, 0.6);
   color: #FFFFFF;
   font-size: 11px;
   font-weight: 600;
   padding: 3px 8px;
-  border-radius: 8px;
+  border-radius: 4px;
   backdrop-filter: blur(4px);
 }
 
@@ -369,18 +364,18 @@ onMounted(() => loadGarments())
   top: 8px;
   left: 8px;
   background: rgba(255, 255, 255, 0.9);
-  color: #FF6B9D;
+  color: #C49A6C;
   font-size: 11px;
   font-weight: 600;
   padding: 3px 8px;
-  border-radius: 8px;
+  border-radius: 4px;
   backdrop-filter: blur(4px);
 }
 
 .card-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(44, 42, 37, 0.1);
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
@@ -396,10 +391,10 @@ onMounted(() => loadGarments())
 .btn-delete {
   width: 32px;
   height: 32px;
-  border-radius: 10px;
+  border-radius: 6px;
   border: none;
   background: rgba(255, 255, 255, 0.9);
-  color: #EF4444;
+  color: #8A8578;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -409,27 +404,34 @@ onMounted(() => loadGarments())
 }
 
 .btn-delete:hover {
-  background: #EF4444;
+  background: #5B7D6A;
   color: #FFFFFF;
 }
 
 .card-info {
   padding: 12px;
+  border-top: 1px solid #E8E3DA;
+}
+
+.card-category {
+  font-size: 13px;
+  font-weight: 500;
+  color: #5B7D6A;
 }
 
 .card-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .card-tag-chip {
   font-size: 11px;
-  color: #6B6580;
-  background: rgba(124, 92, 252, 0.06);
+  color: #8A8578;
+  background: rgba(91, 125, 106, 0.06);
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 .empty-state {
@@ -437,33 +439,30 @@ onMounted(() => loadGarments())
   padding: 80px 0;
 }
 
-.empty-icon-ring {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(124, 92, 252, 0.08), rgba(255, 107, 157, 0.08));
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
 .empty-title {
+  font-family: 'Noto Serif SC', serif;
   font-size: 16px;
   font-weight: 600;
-  color: #1A1625;
+  color: #8A8578;
   margin-bottom: 6px;
 }
 
 .empty-desc {
   font-size: 13px;
-  color: #6B6580;
+  color: #8A8578;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .garment-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .garment-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
 }
 </style>

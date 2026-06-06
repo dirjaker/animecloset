@@ -14,7 +14,7 @@
                   <n-button quaternary @click="showDrawer = true" size="large">
                     <template #icon><n-icon :component="MenuOutline" /></template>
                   </n-button>
-                  <span class="mobile-title">AnimeCloset</span>
+                  <span class="mobile-title">衣 楷</span>
                   <n-button quaternary circle size="small" @click="logout">
                     <template #icon><n-icon :component="LogOutOutline" /></template>
                   </n-button>
@@ -27,22 +27,25 @@
                       <div class="logo-icon">
                         <n-icon :component="ShirtOutline" :size="20" color="#FFFFFF" />
                       </div>
-                      <span>AnimeCloset</span>
+                      <span>衣 楷</span>
                     </div>
 
-                    <n-menu
-                      :value="currentRoute"
-                      :options="menuOptions"
-                      :root-indent="20"
-                      :indent="20"
-                      @update:value="onMenuSelect"
-                    />
+                    <nav class="sidebar-nav">
+                      <a
+                        v-for="item in menuOptions"
+                        :key="item.key"
+                        :class="['nav-item', { active: currentRoute === item.key }]"
+                        @click="onMenuSelect(item.key)"
+                      >
+                        <n-icon :component="item.iconComponent" :size="20" />
+                        <span>{{ item.label }}</span>
+                      </a>
+                    </nav>
+
+                    <div class="sidebar-divider"></div>
 
                     <div class="sidebar-footer">
-                      <n-button quaternary block @click="logout">
-                        <template #icon><n-icon :component="LogOutOutline" /></template>
-                        退出登录
-                      </n-button>
+                      <a class="logout-link" @click="logout">退出登录</a>
                     </div>
                   </div>
                 </aside>
@@ -87,26 +90,26 @@ const currentRoute = computed(() => route.path)
 
 const themeOverrides = {
   common: {
-    primaryColor: '#7C5CFC',
-    primaryColorHover: '#9B82FD',
-    primaryColorPressed: '#6344E0',
-    primaryColorSuppl: '#B4A2FE',
-    borderRadius: '14px',
-    borderRadiusSmall: '10px',
-    fontFamily: "'Outfit', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif",
+    primaryColor: '#5B7D6A',
+    primaryColorHover: '#6B8D7A',
+    primaryColorPressed: '#4A6C59',
+    primaryColorSuppl: '#7FA88E',
+    borderRadius: '8px',
+    borderRadiusSmall: '6px',
+    fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif",
   },
   Button: {
-    borderRadiusMedium: '14px',
-    borderRadiusSmall: '10px',
+    borderRadiusMedium: '8px',
+    borderRadiusSmall: '6px',
   },
   Card: {
-    borderRadius: '18px',
+    borderRadius: '8px',
   },
   Input: {
-    borderRadius: '12px',
+    borderRadius: '4px',
   },
   Tag: {
-    borderRadius: '10px',
+    borderRadius: '6px',
   },
 }
 
@@ -115,10 +118,10 @@ function renderIcon(icon) {
 }
 
 const menuOptions = [
-  { label: '衣橱', key: '/wardrobe', icon: renderIcon(ShirtOutline) },
-  { label: '推荐', key: '/recommend', icon: renderIcon(SparklesOutline) },
-  { label: '日历', key: '/calendar', icon: renderIcon(CalendarOutline) },
-  { label: '我的', key: '/profile', icon: renderIcon(PersonOutline) },
+  { label: '衣橱', key: '/wardrobe', icon: renderIcon(ShirtOutline), iconComponent: ShirtOutline },
+  { label: '推荐', key: '/recommend', icon: renderIcon(SparklesOutline), iconComponent: SparklesOutline },
+  { label: '日历', key: '/calendar', icon: renderIcon(CalendarOutline), iconComponent: CalendarOutline },
+  { label: '我的', key: '/profile', icon: renderIcon(PersonOutline), iconComponent: PersonOutline },
 ]
 
 function onMenuSelect(key) {
@@ -141,10 +144,22 @@ function logout() {
   box-sizing: border-box;
 }
 
+:root {
+  --color-primary: #5B7D6A;
+  --color-primary-hover: #6B8D7A;
+  --color-primary-pressed: #4A6C59;
+  --color-accent: #C49A6C;
+  --color-bg: #F6F3EE;
+  --color-surface: #FFFDF9;
+  --color-text: #2C2A25;
+  --color-text-secondary: #8A8578;
+  --color-border: #E8E3DA;
+}
+
 body {
-  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background: #FAFBFE;
-  color: #1A1625;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #F6F3EE;
+  color: #2C2A25;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -159,11 +174,26 @@ body {
   min-height: 100vh;
 }
 
-/* ───── Sidebar ───── */
+/* Sidebar */
 .sidebar {
-  width: 240px;
-  background: #FFFFFF;
-  border-right: 1px solid rgba(124, 92, 252, 0.08);
+  width: 200px;
+  background: #FDFCF9;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 40px,
+      rgba(196, 154, 108, 0.03) 40px,
+      rgba(196, 154, 108, 0.03) 41px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 60px,
+      rgba(196, 154, 108, 0.02) 60px,
+      rgba(196, 154, 108, 0.02) 61px
+    );
+  border-right: 1px solid #E8E3DA;
   position: fixed;
   top: 0;
   left: 0;
@@ -178,43 +208,92 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 32px 0 24px;
+  padding: 28px 0 20px;
 }
 
 .sidebar-logo {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 28px 28px;
-  font-size: 20px;
-  font-weight: 700;
-  color: #1A1625;
-  letter-spacing: -0.5px;
-  border-bottom: 1px solid rgba(124, 92, 252, 0.08);
-  margin-bottom: 12px;
+  gap: 10px;
+  padding: 0 24px 24px;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2C2A25;
+  letter-spacing: 2px;
+  border-bottom: 1px solid #E8E3DA;
+  margin-bottom: 16px;
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #7C5CFC 0%, #9B82FD 100%);
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  background: #5B7D6A;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(124, 92, 252, 0.3);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 12px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #8A8578;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  border-left: 2px solid transparent;
+}
+
+.nav-item:hover {
+  color: #2C2A25;
+  background: rgba(91, 125, 106, 0.04);
+}
+
+.nav-item.active {
+  color: #5B7D6A;
+  border-left-color: #5B7D6A;
+  background: rgba(91, 125, 106, 0.06);
+}
+
+.sidebar-divider {
+  height: 1px;
+  background: #E8E3DA;
+  margin: 16px 24px;
 }
 
 .sidebar-footer {
   margin-top: auto;
-  padding: 16px 16px 0;
-  border-top: 1px solid rgba(124, 92, 252, 0.08);
+  padding: 0 24px;
 }
 
-/* ───── Main area ───── */
+.logout-link {
+  font-size: 13px;
+  color: #8A8578;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+.logout-link:hover {
+  color: #2C2A25;
+}
+
+/* Main area */
 .main-area {
   flex: 1;
-  margin-left: 240px;
+  margin-left: 200px;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -222,25 +301,21 @@ body {
 
 .main-content {
   width: 100%;
-  max-width: 960px;
-  padding: 44px 56px;
+  max-width: 1080px;
+  padding: 36px 48px;
 }
 
-/* ───── Page transition ───── */
+/* Page transition */
 .page-fade-enter-active,
 .page-fade-leave-active {
-  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.page-fade-enter-from {
-  opacity: 0;
-  transform: translateY(10px);
-}
+.page-fade-enter-from,
 .page-fade-leave-to {
   opacity: 0;
-  transform: translateY(-6px);
 }
 
-/* ───── Mobile ───── */
+/* Mobile */
 .mobile-header {
   display: none;
 }
@@ -255,21 +330,22 @@ body {
   }
   .sidebar.open {
     transform: translateX(0);
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+    box-shadow: 4px 0 20px rgba(44, 42, 37, 0.1);
   }
 
   .drawer-overlay {
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.2);
+    background: #F6F3EE;
+    opacity: 0.85;
     z-index: 199;
     animation: fadeOverlay 0.2s ease;
   }
 
   @keyframes fadeOverlay {
     from { opacity: 0; }
-    to { opacity: 1; }
+    to { opacity: 0.85; }
   }
 
   .mobile-header {
@@ -277,17 +353,19 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    background: #FFFFFF;
-    border-bottom: 1px solid rgba(124, 92, 252, 0.08);
+    background: #FDFCF9;
+    border-bottom: 1px solid #E8E3DA;
     position: sticky;
     top: 0;
     z-index: 50;
   }
 
   .mobile-title {
+    font-family: 'Noto Serif SC', serif;
     font-size: 18px;
-    font-weight: 700;
-    color: #1A1625;
+    font-weight: 600;
+    color: #2C2A25;
+    letter-spacing: 2px;
   }
 
   .main-area {

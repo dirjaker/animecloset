@@ -3,9 +3,9 @@
     <div class="login-card">
       <div class="login-header">
         <div class="login-icon-ring">
-          <n-icon :component="ShirtOutline" :size="32" color="#7C5CFC" />
+          <n-icon :component="ShirtOutline" :size="28" color="#FFFFFF" />
         </div>
-        <h1>AnimeCloset</h1>
+        <h1>衣 楷</h1>
         <p>{{ isRegister ? '创建你的智能衣橱' : '欢迎回来' }}</p>
       </div>
 
@@ -101,18 +101,19 @@ async function handleSubmit() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #FAFBFE;
+  background: #F6F3EE;
+  background-image: radial-gradient(circle at 50% 50%, rgba(91, 125, 106, 0.05) 0%, transparent 70%);
   padding: 20px;
 }
 
 .login-card {
-  background: #FFFFFF;
-  border-radius: 20px;
+  background: #FFFDF9;
+  border-radius: 8px;
   padding: 48px 36px 36px;
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 4px 24px rgba(124, 92, 252, 0.08), 0 1px 3px rgba(0,0,0,0.04);
-  border: 1px solid rgba(124, 92, 252, 0.1);
+  max-width: 380px;
+  border: 1px solid #E8E3DA;
+  box-shadow: 0 1px 4px rgba(44, 42, 37, 0.06);
 }
 
 .login-header {
@@ -121,10 +122,10 @@ async function handleSubmit() {
 }
 
 .login-icon-ring {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(124, 92, 252, 0.1), rgba(255, 107, 157, 0.1));
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
+  background: #5B7D6A;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -132,31 +133,32 @@ async function handleSubmit() {
 }
 
 .login-header h1 {
-  font-size: 26px;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 24px;
   font-weight: 700;
-  color: #1A1625;
+  color: #2C2A25;
   margin-bottom: 6px;
-  letter-spacing: -0.5px;
+  letter-spacing: 4px;
 }
 
 .login-header p {
   font-size: 14px;
-  color: #6B6580;
+  color: #8A8578;
 }
 
 .login-btn {
-  border-radius: 12px;
+  border-radius: 8px;
   height: 44px;
   font-weight: 600;
-  background: linear-gradient(135deg, #7C5CFC, #9B82FD) !important;
-  border: none !important;
+  font-family: 'Noto Serif SC', serif;
+  background: #5B7D6A !important;
+  border-color: #5B7D6A !important;
   transition: all 0.2s ease;
 }
 
 .login-btn:hover {
-  background: linear-gradient(135deg, #6344E0, #7C5CFC) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.35);
+  background: #6B8D7A !important;
+  border-color: #6B8D7A !important;
 }
 
 .login-footer {
@@ -170,6 +172,6 @@ async function handleSubmit() {
 
 .login-footer-text {
   font-size: 14px;
-  color: #6B6580;
+  color: #8A8578;
 }
 </style>

@@ -2,16 +2,16 @@
   <div class="profile-page">
     <div class="page-header">
       <div>
-        <h2>个人中心</h2>
-        <p class="page-subtitle">你的衣橱数据概览</p>
+        <h2>我的</h2>
+        <div class="page-line"></div>
       </div>
     </div>
 
     <!-- 用户卡片 -->
     <n-card class="user-card" :bordered="false">
       <div class="user-card-inner">
-        <div class="avatar-ring">
-          <n-avatar :size="56" round :style="{ background: 'linear-gradient(135deg, #7C5CFC 0%, #9B82FD 100%)', fontSize: '24px', fontWeight: '600' }">
+        <div class="avatar-wrap">
+          <n-avatar :size="56" round :style="{ background: '#5B7D6A', fontSize: '24px', fontWeight: '600', fontFamily: 'Noto Serif SC, serif' }">
             {{ user?.nickname?.charAt(0) || '?' }}
           </n-avatar>
         </div>
@@ -22,26 +22,17 @@
       </div>
     </n-card>
 
-    <!-- 统计概览 - 3列并排 -->
+    <!-- 统计概览 -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-icon-wrap stat-icon-amber">
-          <n-icon :component="ShirtOutline" :size="20" />
-        </div>
         <p class="stat-num">{{ stats?.total_garments || 0 }}</p>
         <p class="stat-label">衣物总数</p>
       </div>
       <div class="stat-card">
-        <div class="stat-icon-wrap stat-icon-green">
-          <n-icon :component="CalendarOutline" :size="20" />
-        </div>
         <p class="stat-num">{{ stats?.total_outfits || 0 }}</p>
         <p class="stat-label">穿搭记录</p>
       </div>
       <div class="stat-card">
-        <div class="stat-icon-wrap stat-icon-brown">
-          <n-icon :component="HeartOutline" :size="20" />
-        </div>
         <p class="stat-num">{{ stats?.total_wears || 0 }}</p>
         <p class="stat-label">总穿着次数</p>
       </div>
@@ -51,7 +42,7 @@
     <n-card class="ai-card" :bordered="false">
       <div class="ai-card-inner">
         <div class="ai-icon-wrap">
-          <n-icon :component="SparklesOutline" :size="22" color="#fff" />
+          <n-icon :component="SparklesOutline" :size="20" color="#fff" />
         </div>
         <div class="ai-text">
           <p class="ai-title">AI 穿搭插画</p>
@@ -64,7 +55,6 @@
     <n-card class="section-card" :bordered="false">
       <template #header>
         <div class="section-header">
-          <n-icon :component="TrophyOutline" :size="18" color="#7C5CFC" />
           <span>穿着最多</span>
         </div>
       </template>
@@ -82,7 +72,6 @@
           </div>
         </div>
         <div v-else class="empty-inline">
-          <n-icon :component="ShirtOutline" :size="32" color="#E5E7EB" />
           <p class="empty-inline-text">暂无数据</p>
           <p class="empty-inline-sub">穿着记录会出现在这里</p>
         </div>
@@ -93,7 +82,6 @@
     <n-card class="section-card" :bordered="false">
       <template #header>
         <div class="section-header">
-          <n-icon :component="SnowOutline" :size="18" color="#6B7280" />
           <span>冷宫衣物</span>
         </div>
       </template>
@@ -102,16 +90,13 @@
           <div v-for="item in coldItems" :key="item.id" class="cold-item">
             <img v-if="getImgUrl(item)" :src="getImgUrl(item)" class="cold-img" />
             <div class="cold-info">
-              <n-tag size="tiny" :bordered="false" round style="background: #F3F4F6; color: #6B7280;">
-                {{ item.category }}
-              </n-tag>
+              <span class="cold-cat">{{ item.category }}</span>
               <span v-if="item.last_wear_date" class="cold-days">{{ item.days_since }}天未穿</span>
               <span v-else class="cold-days">从未穿过</span>
             </div>
           </div>
         </div>
         <div v-else class="empty-inline">
-          <n-icon :component="CheckmarkCircleOutline" :size="32" color="#10B981" />
           <p class="empty-inline-text">没有冷宫衣物，太棒了</p>
           <p class="empty-inline-sub">所有衣物都在正常使用</p>
         </div>
@@ -177,38 +162,39 @@ onMounted(() => loadAll())
 
 <style scoped>
 .profile-page {
-  animation: pageEnter 0.25s ease;
+  animation: pageEnter 0.3s ease;
 }
 
 @keyframes pageEnter {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* ─── Page header ─── */
+/* Page header */
 .page-header {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .page-header h2 {
-  font-size: 26px;
-  font-weight: 700;
-  color: #1A1625;
-  letter-spacing: -0.3px;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #2C2A25;
+  letter-spacing: 1px;
 }
 
-.page-subtitle {
-  font-size: 14px;
-  color: #6B6580;
-  margin-top: 6px;
+.page-line {
+  width: 100%;
+  height: 1px;
+  background: #E8E3DA;
+  margin-top: 8px;
 }
 
-/* ─── User card ─── */
+/* User card */
 .user-card {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
-  border: 1px solid rgba(124, 92, 252, 0.08);
+  border: 1px solid #E8E3DA;
+  box-shadow: 0 1px 4px rgba(44, 42, 37, 0.04);
   margin-bottom: 24px;
-  border-radius: 16px;
 }
 
 .user-card-inner {
@@ -217,30 +203,24 @@ onMounted(() => loadAll())
   gap: 18px;
 }
 
-.avatar-ring {
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(124, 92, 252, 0.12), rgba(255, 107, 157, 0.12));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(124, 92, 252, 0.12);
+.avatar-wrap {
+  flex-shrink: 0;
 }
 
 .user-name {
+  font-family: 'Noto Serif SC', serif;
   font-size: 18px;
-  font-weight: 700;
-  color: #1A1625;
+  font-weight: 600;
+  color: #2C2A25;
 }
 
 .user-email {
   font-size: 13px;
-  color: #6B6580;
+  color: #8A8578;
   margin-top: 4px;
 }
 
-/* ─── Stats row ─── */
+/* Stats row */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -249,65 +229,38 @@ onMounted(() => loadAll())
 }
 
 .stat-card {
-  background: #FFFFFF;
-  border-radius: 16px;
+  background: #FFFDF9;
+  border-radius: 8px;
   padding: 24px 20px;
   text-align: center;
-  border: 1px solid rgba(124, 92, 252, 0.08);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #E8E3DA;
+  transition: all 0.2s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(124, 92, 252, 0.12), 0 4px 12px rgba(0,0,0,0.04);
-}
-
-.stat-icon-wrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 14px;
-}
-
-.stat-icon-amber {
-  background: linear-gradient(135deg, rgba(124, 92, 252, 0.12), rgba(124, 92, 252, 0.06));
-  color: #7C5CFC;
-}
-
-.stat-icon-green {
-  background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
-  color: #10B981;
-}
-
-.stat-icon-brown {
-  background: linear-gradient(135deg, rgba(255, 107, 157, 0.12), rgba(255, 107, 157, 0.06));
-  color: #FF6B9D;
+  border-color: #5B7D6A;
 }
 
 .stat-num {
+  font-family: 'Noto Serif SC', serif;
   font-size: 36px;
   font-weight: 700;
-  color: #1A1625;
+  color: #2C2A25;
   line-height: 1.1;
 }
 
 .stat-label {
   font-size: 13px;
-  color: #6B6580;
+  color: #8A8578;
   margin-top: 6px;
   font-weight: 500;
 }
 
-/* ─── AI card ─── */
+/* AI card */
 .ai-card {
-  background: linear-gradient(135deg, #7C5CFC 0%, #FF6B9D 100%);
-  border-radius: 16px;
+  background: #5B7D6A;
+  border-radius: 8px;
   margin-bottom: 24px;
-  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.2);
 }
 
 .ai-card :deep(.n-card__content) {
@@ -321,36 +274,35 @@ onMounted(() => loadAll())
 }
 
 .ai-icon-wrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.2);
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  backdrop-filter: blur(8px);
 }
 
 .ai-title {
-  font-size: 17px;
-  font-weight: 700;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 16px;
+  font-weight: 600;
   color: #FFFFFF;
   margin-bottom: 4px;
 }
 
 .ai-desc {
   font-size: 13px;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255, 255, 255, 0.8);
   line-height: 1.6;
 }
 
-/* ─── Section cards ─── */
+/* Section cards */
 .section-card {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
-  border: 1px solid rgba(124, 92, 252, 0.08);
+  border: 1px solid #E8E3DA;
+  box-shadow: 0 1px 4px rgba(44, 42, 37, 0.04);
   margin-bottom: 20px;
-  border-radius: 16px;
 }
 
 .section-card :deep(.n-card-header) {
@@ -365,70 +317,69 @@ onMounted(() => loadAll())
   display: flex;
   align-items: center;
   gap: 10px;
+  font-family: 'Noto Serif SC', serif;
   font-size: 16px;
   font-weight: 600;
-  color: #1A1625;
+  color: #2C2A25;
 }
 
-/* ─── Ranking ─── */
+/* Ranking */
 .ranking-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .ranking-item {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px 14px;
-  background: rgba(124, 92, 252, 0.03);
-  border-radius: 12px;
-  transition: background 0.3s ease, transform 0.15s ease;
+  padding: 10px 14px;
+  background: #F6F3EE;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .ranking-item:hover {
-  background: rgba(124, 92, 252, 0.06);
-  transform: translateX(2px);
+  background: rgba(91, 125, 106, 0.06);
 }
 
 .rank-badge {
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 14px;
   font-weight: 700;
-  background: rgba(124, 92, 252, 0.06);
-  color: #6B6580;
+  background: #E8E3DA;
+  color: #8A8578;
   flex-shrink: 0;
 }
 
 .rank-0 {
-  background: linear-gradient(135deg, rgba(124, 92, 252, 0.15), rgba(124, 92, 252, 0.08));
-  color: #7C5CFC;
-  box-shadow: 0 2px 6px rgba(124, 92, 252, 0.15);
+  background: #5B7D6A;
+  color: #FFFFFF;
 }
 
 .rank-1 {
-  background: rgba(255, 107, 157, 0.08);
-  color: #FF6B9D;
+  background: #C49A6C;
+  color: #FFFFFF;
 }
 
 .rank-2 {
-  background: #F3F4F6;
-  color: #9CA3AF;
+  background: #E8E3DA;
+  color: #8A8578;
 }
 
 .ranking-img {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid rgba(124, 92, 252, 0.08);
+  border: 1px solid #E8E3DA;
 }
 
 .ranking-info {
@@ -438,16 +389,17 @@ onMounted(() => loadAll())
 .ranking-cat {
   font-size: 14px;
   font-weight: 500;
-  color: #1A1625;
+  color: #2C2A25;
 }
 
 .ranking-count {
+  font-family: 'Noto Serif SC', serif;
   font-size: 15px;
   font-weight: 700;
-  color: #7C5CFC;
+  color: #5B7D6A;
 }
 
-/* ─── Cold items ─── */
+/* Cold items */
 .cold-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -455,16 +407,15 @@ onMounted(() => loadAll())
 }
 
 .cold-item {
-  background: rgba(124, 92, 252, 0.03);
-  border-radius: 14px;
+  background: #FFFDF9;
+  border-radius: 8px;
   overflow: hidden;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(124, 92, 252, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #E8E3DA;
 }
 
 .cold-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(124, 92, 252, 0.12);
+  border-left: 2px solid #5B7D6A;
 }
 
 .cold-img {
@@ -478,33 +429,40 @@ onMounted(() => loadAll())
   display: flex;
   align-items: center;
   gap: 6px;
+  border-top: 1px solid #E8E3DA;
+}
+
+.cold-cat {
+  font-size: 12px;
+  color: #5B7D6A;
+  font-weight: 500;
 }
 
 .cold-days {
   font-size: 12px;
-  color: #6B6580;
+  color: #8A8578;
 }
 
-/* ─── Empty state ─── */
+/* Empty state */
 .empty-inline {
   text-align: center;
   padding: 36px 0;
 }
 
 .empty-inline-text {
+  font-family: 'Noto Serif SC', serif;
   font-size: 14px;
-  color: #6B6580;
-  margin-top: 12px;
+  color: #8A8578;
   font-weight: 500;
 }
 
 .empty-inline-sub {
   font-size: 12px;
-  color: #6B6580;
+  color: #8A8578;
   margin-top: 4px;
 }
 
-/* ─── Responsive ─── */
+/* Responsive */
 @media (max-width: 768px) {
   .stats-row {
     grid-template-columns: repeat(3, 1fr);
@@ -517,12 +475,6 @@ onMounted(() => loadAll())
 
   .stat-num {
     font-size: 28px;
-  }
-
-  .stat-icon-wrap {
-    width: 36px;
-    height: 36px;
-    margin-bottom: 10px;
   }
 
   .cold-grid {

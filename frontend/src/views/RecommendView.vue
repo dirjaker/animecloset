@@ -2,12 +2,13 @@
   <div class="recommend-page">
     <div class="page-header">
       <div>
-        <h2>智能推荐</h2>
-        <p class="page-subtitle">AI 为你搭配今日穿搭</p>
+        <h2>穿搭推荐</h2>
+        <div class="page-line"></div>
       </div>
     </div>
 
     <n-card class="form-card" :bordered="false">
+      <p class="guide-text">今天想去哪里？</p>
       <n-form label-placement="left" label-width="60">
         <n-form-item label="日期">
           <n-date-picker
@@ -19,11 +20,11 @@
         </n-form-item>
 
         <n-form-item label="场合">
-          <div class="occasion-pills">
+          <div class="scene-tabs">
             <button
               v-for="o in occasions"
               :key="o.value"
-              :class="['pill', { active: occasion === o.value }]"
+              :class="['tab', { active: occasion === o.value }]"
               @click="occasion = o.value"
             >
               <n-icon :component="o.icon" :size="16" />
@@ -62,7 +63,6 @@
 
     <n-card v-if="result" class="result-card" :bordered="false" style="margin-top: 24px">
       <div class="result-header">
-        <n-icon :component="SparklesOutline" :size="20" color="#7C5CFC" />
         <span class="result-title">推荐方案</span>
       </div>
 
@@ -70,19 +70,15 @@
         {{ result.reason || result.explanation }}
       </p>
 
-      <div class="result-grid">
+      <div class="result-list">
         <div v-for="(item, i) in resultItems" :key="i" class="result-item-card">
           <div class="result-item-img-wrap">
             <img :src="getImgUrl(item)" class="result-item-img" />
           </div>
           <div class="result-item-info">
             <div class="result-item-tags">
-              <n-tag size="small" :bordered="false" round style="background: rgba(124, 92, 252, 0.1); color: #7C5CFC; font-weight: 500;">
-                {{ item.category }}
-              </n-tag>
-              <n-tag v-if="item.is_cold_palace" size="small" :bordered="false" round style="background: rgba(255, 107, 157, 0.12); color: #FF6B9D; font-weight: 500;">
-                冷宫唤醒
-              </n-tag>
+              <span class="result-cat">{{ item.category }}</span>
+              <span v-if="item.is_cold_palace" class="cold-wake">冷宫唤醒</span>
             </div>
             <p v-if="item.reason" class="result-item-reason">{{ item.reason }}</p>
           </div>
@@ -104,16 +100,13 @@
 
     <div v-if="coldPalaceItems.length" class="cold-section">
       <div class="cold-header">
-        <n-icon :component="SparklesOutline" :size="18" color="#6B7280" />
         <span class="cold-title">冷宫衣物 ({{ coldPalaceItems.length }} 件)</span>
       </div>
       <div class="cold-grid">
         <div v-for="item in coldPalaceItems" :key="item.id" class="cold-card">
           <img v-if="getImgUrl(item)" :src="getImgUrl(item)" class="cold-img" />
           <div class="cold-card-info">
-            <n-tag size="tiny" :bordered="false" round style="background: #F3F4F6; color: #6B7280;">
-              {{ item.category }}
-            </n-tag>
+            <span class="cold-cat">{{ item.category }}</span>
             <span class="cold-days">{{ item.days_since }}天未穿</span>
           </div>
         </div>
@@ -212,85 +205,93 @@ async function saveOutfit() {
 
 <style scoped>
 .recommend-page {
-  animation: pageEnter 0.25s ease;
+  animation: pageEnter 0.3s ease;
 }
 
 @keyframes pageEnter {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .page-header {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .page-header h2 {
-  font-size: 26px;
-  font-weight: 700;
-  color: #1A1625;
-  letter-spacing: -0.3px;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #2C2A25;
+  letter-spacing: 1px;
 }
 
-.page-subtitle {
-  font-size: 14px;
-  color: #6B6580;
-  margin-top: 6px;
+.page-line {
+  width: 100%;
+  height: 1px;
+  background: #E8E3DA;
+  margin-top: 8px;
+}
+
+.guide-text {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 16px;
+  color: #2C2A25;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
 }
 
 .form-card {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
-  border: 1px solid rgba(124, 92, 252, 0.08);
+  border: 1px solid #E8E3DA;
+  box-shadow: 0 1px 4px rgba(44, 42, 37, 0.04);
   margin-bottom: 8px;
 }
 
-.occasion-pills {
+.scene-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 0;
+  border-bottom: 1px solid #E8E3DA;
 }
 
-.pill {
+.tab {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 16px;
-  border-radius: 20px;
-  border: 1px solid #E5E7EB;
-  background: #FFFFFF;
+  gap: 4px;
+  padding: 8px 14px;
+  border: none;
+  background: none;
   font-size: 13px;
   font-weight: 500;
-  color: #6B6580;
+  color: #8A8578;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
   outline: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
 }
 
-.pill:hover {
-  border-color: #7C5CFC;
-  color: #7C5CFC;
+.tab:hover {
+  color: #2C2A25;
 }
 
-.pill.active {
-  background: #7C5CFC;
-  border-color: #7C5CFC;
-  color: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(124, 92, 252, 0.25);
+.tab.active {
+  color: #5B7D6A;
+  border-bottom-color: #5B7D6A;
 }
 
 .recommend-btn {
-  border-radius: 12px;
+  border-radius: 8px;
   height: 44px;
   font-weight: 600;
-  background: linear-gradient(135deg, #7C5CFC, #9B82FD) !important;
-  border: none !important;
+  background: #5B7D6A !important;
+  border-color: #5B7D6A !important;
   transition: all 0.2s ease;
 }
 
 .recommend-btn:hover {
-  background: linear-gradient(135deg, #6344E0, #7C5CFC) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.35);
+  background: #6B8D7A !important;
+  border-color: #6B8D7A !important;
 }
 
 .loading-area {
@@ -300,13 +301,13 @@ async function saveOutfit() {
 
 .loading-text {
   font-size: 13px;
-  color: #6B6580;
+  color: #8A8578;
   margin-top: 12px;
 }
 
 .result-card {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
-  border: 1px solid rgba(124, 92, 252, 0.08);
+  border: 1px solid #E8E3DA;
+  box-shadow: 0 1px 4px rgba(44, 42, 37, 0.04);
 }
 
 .result-header {
@@ -317,42 +318,44 @@ async function saveOutfit() {
 }
 
 .result-title {
+  font-family: 'Noto Serif SC', serif;
   font-size: 18px;
-  font-weight: 700;
-  color: #1A1625;
+  font-weight: 600;
+  color: #2C2A25;
 }
 
 .result-reason {
   font-size: 14px;
   line-height: 1.7;
-  color: #6B6580;
+  color: #8A8578;
   margin-bottom: 20px;
 }
 
-.result-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 14px;
+.result-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .result-item-card {
-  background: #FFFFFF;
-  border-radius: 14px;
+  display: flex;
+  background: #FFFDF9;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(124, 92, 252, 0.08);
+  border: 1px solid #E8E3DA;
+  transition: all 0.3s ease;
 }
 
 .result-item-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(124, 92, 252, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
+  border-left: 2px solid #5B7D6A;
 }
 
 .result-item-img-wrap {
+  width: 40%;
   aspect-ratio: 1;
-  background: #F5F3FF;
+  background: #F6F3EE;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .result-item-img {
@@ -362,36 +365,55 @@ async function saveOutfit() {
 }
 
 .result-item-info {
-  padding: 10px;
+  width: 60%;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-left: 1px solid #E8E3DA;
 }
 
 .result-item-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
+  align-items: center;
+}
+
+.result-cat {
+  font-size: 13px;
+  font-weight: 500;
+  color: #5B7D6A;
+}
+
+.cold-wake {
+  font-size: 11px;
+  color: #C49A6C;
+  background: rgba(196, 154, 108, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
 }
 
 .result-item-reason {
   font-size: 12px;
-  color: #6B6580;
-  margin-top: 6px;
+  color: #8A8578;
+  margin-top: 8px;
   line-height: 1.5;
 }
 
 .save-btn {
   margin-top: 24px;
-  border-radius: 12px;
+  border-radius: 8px;
   height: 44px;
   font-weight: 600;
-  background: #7C5CFC !important;
-  border: none !important;
+  background: #5B7D6A !important;
+  border-color: #5B7D6A !important;
   transition: all 0.2s ease;
 }
 
 .save-btn:hover {
-  background: #6344E0 !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.35);
+  background: #6B8D7A !important;
+  border-color: #6B8D7A !important;
 }
 
 .cold-section {
@@ -406,9 +428,10 @@ async function saveOutfit() {
 }
 
 .cold-title {
+  font-family: 'Noto Serif SC', serif;
   font-size: 16px;
   font-weight: 600;
-  color: #1A1625;
+  color: #2C2A25;
 }
 
 .cold-grid {
@@ -418,11 +441,15 @@ async function saveOutfit() {
 }
 
 .cold-card {
-  background: #FFFFFF;
-  border-radius: 14px;
+  background: #FFFDF9;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
-  border: 1px solid rgba(124, 92, 252, 0.08);
+  border: 1px solid #E8E3DA;
+  transition: all 0.3s ease;
+}
+
+.cold-card:hover {
+  border-left: 2px solid #5B7D6A;
 }
 
 .cold-img {
@@ -436,10 +463,17 @@ async function saveOutfit() {
   display: flex;
   align-items: center;
   gap: 6px;
+  border-top: 1px solid #E8E3DA;
+}
+
+.cold-cat {
+  font-size: 12px;
+  color: #5B7D6A;
+  font-weight: 500;
 }
 
 .cold-days {
   font-size: 11px;
-  color: #6B6580;
+  color: #8A8578;
 }
 </style>

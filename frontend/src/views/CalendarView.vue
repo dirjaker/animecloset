@@ -3,7 +3,7 @@
     <div class="page-header">
       <div>
         <h2>穿搭日历</h2>
-        <p class="page-subtitle">记录每日穿搭，AI 生成动漫形象</p>
+        <div class="page-line"></div>
       </div>
     </div>
 
@@ -41,7 +41,7 @@
     <n-modal
       v-model:show="showModal"
       preset="card"
-      style="max-width: 460px; border-radius: 20px"
+      style="max-width: 460px; border-radius: 12px"
       :title="selectedDay ? `${selectedDay.fullDate} 穿搭` : ''"
       :bordered="false"
     >
@@ -53,7 +53,6 @@
         <div v-if="!selectedDay.illustrationUrl" class="illust-generate">
           <n-button
             type="primary"
-            round
             :loading="generating"
             @click="generateIllustration"
             size="large"
@@ -72,9 +71,7 @@
         </div>
 
         <div v-if="selectedDay.outfit.weather" class="weather-row">
-          <n-tag :bordered="false" size="small" round style="background: #F3F4F6; color: #6B7280;">
-            {{ selectedDay.outfit.weather }} {{ selectedDay.outfit.temperature }}℃
-          </n-tag>
+          <span class="weather-tag">{{ selectedDay.outfit.weather }} {{ selectedDay.outfit.temperature }}℃</span>
         </div>
 
         <p v-if="selectedDay.outfit.reason" class="outfit-reason">
@@ -84,9 +81,6 @@
 
       <template v-else>
         <div class="modal-empty">
-          <div class="modal-empty-icon">
-            <n-icon :component="CalendarOutline" :size="36" color="#D1D5DB" />
-          </div>
           <p class="modal-empty-text">这天还没有穿搭记录</p>
         </div>
       </template>
@@ -221,34 +215,36 @@ onMounted(() => loadCalendar())
 
 <style scoped>
 .calendar-page {
-  animation: pageEnter 0.25s ease;
+  animation: pageEnter 0.3s ease;
 }
 
 @keyframes pageEnter {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .page-header {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .page-header h2 {
-  font-size: 26px;
-  font-weight: 700;
-  color: #1A1625;
-  letter-spacing: -0.3px;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #2C2A25;
+  letter-spacing: 1px;
 }
 
-.page-subtitle {
-  font-size: 14px;
-  color: #6B6580;
-  margin-top: 6px;
+.page-line {
+  width: 100%;
+  height: 1px;
+  background: #E8E3DA;
+  margin-top: 8px;
 }
 
 .month-nav {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(124, 92, 252, 0.04);
-  border: 1px solid rgba(124, 92, 252, 0.08);
+  border: 1px solid #E8E3DA;
+  box-shadow: 0 1px 4px rgba(44, 42, 37, 0.04);
   margin-bottom: 20px;
 }
 
@@ -259,9 +255,10 @@ onMounted(() => loadCalendar())
 }
 
 .month-label {
+  font-family: 'Noto Serif SC', serif;
   font-size: 18px;
-  font-weight: 700;
-  color: #1A1625;
+  font-weight: 600;
+  color: #2C2A25;
 }
 
 .weekday-row {
@@ -274,34 +271,34 @@ onMounted(() => loadCalendar())
 .weekday-cell {
   font-size: 13px;
   font-weight: 600;
-  color: #6B6580;
+  color: #8A8578;
   padding: 8px 0;
 }
 
 .cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 4px;
 }
 
 .day-cell {
   aspect-ratio: 1;
-  border-radius: 14px;
+  border-radius: 6px;
   padding: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: #FFFFFF;
-  border: 1px solid rgba(124, 92, 252, 0.08);
+  transition: all 0.2s ease;
+  background: #FFFDF9;
+  border: 1px solid #E8E3DA;
   position: relative;
 }
 
 .day-cell:hover:not(.other) {
-  background: #F5F3FF;
-  border-color: #E5E7EB;
+  background: rgba(91, 125, 106, 0.04);
+  border-color: #5B7D6A;
 }
 
 .day-cell.other {
@@ -310,30 +307,30 @@ onMounted(() => loadCalendar())
 }
 
 .day-cell.today {
-  background: linear-gradient(135deg, #7C5CFC, #9B82FD);
-  border-color: transparent;
-  box-shadow: 0 2px 8px rgba(124, 92, 252, 0.3);
+  background: rgba(91, 125, 106, 0.08);
+  border-color: #5B7D6A;
 }
 
 .day-cell.hasOutfit {
-  border-color: #7C5CFC;
+  border-color: #C49A6C;
 }
 
 .day-num {
   font-size: 14px;
   font-weight: 600;
-  color: #1A1625;
+  color: #2C2A25;
 }
 
 .day-num-today {
-  color: #FFFFFF;
+  color: #5B7D6A;
+  font-weight: 700;
 }
 
 .day-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #FF6B9D;
+  background: #C49A6C;
   margin-top: 4px;
 }
 
@@ -341,7 +338,7 @@ onMounted(() => loadCalendar())
   width: 36px;
   height: 50px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 4px;
   margin-top: 4px;
 }
 
@@ -353,8 +350,8 @@ onMounted(() => loadCalendar())
 .illust-img {
   max-width: 280px;
   width: 100%;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(44, 42, 37, 0.1);
 }
 
 .illust-generate {
@@ -363,16 +360,16 @@ onMounted(() => loadCalendar())
 }
 
 .generate-btn {
+  border-radius: 8px;
   font-weight: 600;
-  background: linear-gradient(135deg, #7C5CFC, #9B82FD) !important;
-  border: none !important;
+  background: #5B7D6A !important;
+  border-color: #5B7D6A !important;
   transition: all 0.2s ease;
 }
 
 .generate-btn:hover {
-  background: linear-gradient(135deg, #6344E0, #7C5CFC) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.35);
+  background: #6B8D7A !important;
+  border-color: #6B8D7A !important;
 }
 
 .modal-garment-grid {
@@ -389,14 +386,14 @@ onMounted(() => loadCalendar())
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 6px;
 }
 
 .modal-garment-cat {
   display: block;
   margin-top: 4px;
   font-size: 12px;
-  color: #6B6580;
+  color: #8A8578;
 }
 
 .weather-row {
@@ -404,11 +401,18 @@ onMounted(() => loadCalendar())
   margin-top: 16px;
 }
 
+.weather-tag {
+  font-size: 12px;
+  color: #8A8578;
+  background: #F6F3EE;
+  padding: 4px 12px;
+  border-radius: 4px;
+}
+
 .outfit-reason {
   text-align: center;
   font-size: 13px;
-  color: #6B6580;
-  font-style: italic;
+  color: #8A8578;
   margin-top: 10px;
   line-height: 1.6;
 }
@@ -418,19 +422,9 @@ onMounted(() => loadCalendar())
   padding: 24px 0;
 }
 
-.modal-empty-icon {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(124, 92, 252, 0.08), rgba(255, 107, 157, 0.08));
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-
 .modal-empty-text {
+  font-family: 'Noto Serif SC', serif;
   font-size: 14px;
-  color: #6B6580;
+  color: #8A8578;
 }
 </style>
