@@ -348,14 +348,19 @@ onMounted(() => loadCalendar())
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(6, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(0, 1fr));
   gap: 3px;
 }
 
 .day-cell {
   aspect-ratio: 1;
-  padding: 4px 6px 4px;
+  min-height: 0;
+  min-width: 0;
+  max-height: 100%;
+  overflow: hidden;
+  padding: 4px 6px;
+  border-radius: 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -364,8 +369,6 @@ onMounted(() => loadCalendar())
   transition: all 0.15s ease;
   background: #FFFDF8;
   border: 1px solid #E0D8CC;
-  min-height: 0;
-  min-width: 0;
 }
 
 .day-cell:hover:not(.other) {
