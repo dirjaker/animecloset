@@ -217,13 +217,13 @@ async function handleSubmit() {
 .brand-seal {
   width: 48px;
   height: 48px;
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(80, 70, 65, 0.4);
   backdrop-filter: blur(12px);
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
 }
 
 .brand-name {
