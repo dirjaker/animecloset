@@ -12,7 +12,7 @@
       <div class="user-card">
         <div class="user-card-inner">
           <div class="avatar-wrap">
-            <n-avatar :size="56" round :style="{ background: '#A0815A', fontSize: '24px', fontWeight: '600', fontFamily: 'Noto Serif SC, serif' }">
+            <n-avatar :size="56" round :style="{ background: 'rgba(80, 70, 65, 0.45)', backdropFilter: 'blur(12px)', fontSize: '24px', fontWeight: '600', fontFamily: 'Noto Serif SC, serif' }">
               {{ user?.nickname?.charAt(0) || '?' }}
             </n-avatar>
           </div>
@@ -206,7 +206,7 @@ onMounted(() => loadAll())
 .page-line {
   width: 100%;
   height: 1px;
-  background: #E0D8CC;
+  background: rgba(255, 255, 255, 0.4);
   margin-top: 8px;
 }
 
@@ -219,10 +219,13 @@ onMounted(() => loadAll())
 }
 
 .user-card {
-  background: #FFFDF8;
-  border: 1px solid #E0D8CC;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 12px;
   padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
 }
 
 .user-card-inner {
@@ -249,12 +252,15 @@ onMounted(() => loadAll())
 }
 
 .stats-card {
-  background: #FFFDF8;
-  border: 1px solid #E0D8CC;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 12px;
   padding: 24px;
   display: flex;
   align-items: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
 }
 
 .stats-grid {
@@ -285,10 +291,14 @@ onMounted(() => loadAll())
 
 /* AI card */
 .ai-card {
-  background: #A0815A;
-  border-radius: 8px;
+  background: rgba(80, 70, 65, 0.45);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
   margin-bottom: 24px;
   padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .ai-card-inner {
@@ -332,11 +342,14 @@ onMounted(() => loadAll())
 
 /* Section cards */
 .section-card {
-  background: #FFFDF8;
-  border: 1px solid #E0D8CC;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 12px;
   padding: 20px 24px;
   margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
 }
 
 .section-header {
@@ -362,13 +375,14 @@ onMounted(() => loadAll())
   align-items: center;
   gap: 14px;
   padding: 10px 14px;
-  background: #F5F0E8;
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .ranking-item:hover {
-  background: rgba(160, 129, 90, 0.08);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .rank-badge {
@@ -380,23 +394,23 @@ onMounted(() => loadAll())
   justify-content: center;
   font-size: 14px;
   font-weight: 700;
-  background: #E0D8CC;
+  background: rgba(255, 255, 255, 0.3);
   color: #8C8478;
   flex-shrink: 0;
 }
 
 .rank-0 {
-  background: #A0815A;
+  background: rgba(80, 70, 65, 0.5);
   color: #FFFFFF;
 }
 
 .rank-1 {
-  background: #C27C4E;
+  background: rgba(200, 160, 155, 0.5);
   color: #FFFFFF;
 }
 
 .rank-2 {
-  background: #E0D8CC;
+  background: rgba(255, 255, 255, 0.25);
   color: #8C8478;
 }
 
@@ -406,7 +420,7 @@ onMounted(() => loadAll())
   border-radius: 6px;
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid #E0D8CC;
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .ranking-info {
@@ -423,7 +437,7 @@ onMounted(() => loadAll())
   font-family: 'Noto Serif SC', serif;
   font-size: 15px;
   font-weight: 700;
-  color: #A0815A;
+  color: #5A5048;
 }
 
 /* Cold items - alternating grid like wardrobe */
@@ -435,11 +449,14 @@ onMounted(() => loadAll())
 }
 
 .cold-item {
-  background: #FFFDF8;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
-  border: 1px solid #E0D8CC;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
 }
 
 .cold-item.cold-large {
@@ -447,7 +464,9 @@ onMounted(() => loadAll())
 }
 
 .cold-item:hover {
-  border-left: 2px solid #A0815A;
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
 }
 
 .cold-img-wrap {
@@ -470,12 +489,12 @@ onMounted(() => loadAll())
   display: flex;
   align-items: center;
   gap: 6px;
-  border-top: 1px solid #E0D8CC;
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .cold-cat {
   font-size: 12px;
-  color: #A0815A;
+  color: #5A5048;
   font-weight: 500;
 }
 

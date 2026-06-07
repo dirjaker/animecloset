@@ -4,62 +4,63 @@
       <n-notification-provider>
         <n-dialog-provider>
           <div class="app-root">
-            <template v-if="!authStore.isLoggedIn">
-              <router-view />
-            </template>
+            <!-- Floating orbs background (shared across all internal pages) -->
+            <div v-show="!isLoginPage" class="app-bg">
+              <div class="app-orb app-orb-1"></div>
+              <div class="app-orb app-orb-2"></div>
+              <div class="app-orb app-orb-3"></div>
+              <div class="app-orb app-orb-4"></div>
+            </div>
 
-            <template v-else>
-              <!-- Desktop top nav -->
-              <nav class="top-nav">
-                <div class="nav-inner">
-                  <div class="nav-logo">
-                    <div class="logo-seal">
-                      <n-icon :component="ShirtOutline" :size="18" color="#FFFFFF" />
-                    </div>
-                    <span class="logo-text">Vestio</span>
+            <!-- Nav: always mounted, hidden on login -->
+            <nav v-show="!isLoginPage" class="top-nav">
+              <div class="nav-inner">
+                <div class="nav-logo">
+                  <div class="logo-seal">
+                    <n-icon :component="ShirtOutline" :size="18" color="#FFFFFF" />
                   </div>
-
-                  <div class="nav-links">
-                    <a
-                      v-for="item in menuOptions"
-                      :key="item.key"
-                      :class="['nav-link', { active: currentRoute === item.key }]"
-                      @click="onMenuSelect(item.key)"
-                    >
-                      {{ item.label }}
-                    </a>
-                  </div>
-
-                  <div class="nav-right">
-                    <a class="logout-link" @click="logout">退出</a>
-                  </div>
+                  <span class="logo-text">Vestio</span>
                 </div>
-              </nav>
 
-              <!-- Main content -->
-              <main class="main-area">
-                <div class="main-content">
-                  <router-view v-slot="{ Component }">
-                    <transition name="page-fade" mode="out-in">
-                      <component :is="Component" />
-                    </transition>
-                  </router-view>
+                <div class="nav-links">
+                  <a
+                    v-for="item in menuOptions"
+                    :key="item.key"
+                    :class="['nav-link', { active: currentRoute === item.key }]"
+                    @click="onMenuSelect(item.key)"
+                  >
+                    {{ item.label }}
+                  </a>
                 </div>
-              </main>
 
-              <!-- Mobile bottom tab bar -->
-              <nav class="mobile-tabs">
-                <a
-                  v-for="item in menuOptions"
-                  :key="item.key"
-                  :class="['mobile-tab', { active: currentRoute === item.key }]"
-                  @click="onMenuSelect(item.key)"
-                >
-                  <n-icon :component="item.iconComponent" :size="20" />
-                  <span>{{ item.label }}</span>
-                </a>
-              </nav>
-            </template>
+                <div class="nav-right">
+                  <a class="logout-link" @click="logout">退出</a>
+                </div>
+              </div>
+            </nav>
+
+            <!-- Main: always mounted, router-view is the single source of truth -->
+            <main v-show="!isLoginPage" class="main-area">
+              <div class="main-content">
+                <router-view />
+              </div>
+            </main>
+
+            <!-- Mobile bottom tab bar -->
+            <nav v-show="!isLoginPage" class="mobile-tabs">
+              <a
+                v-for="item in menuOptions"
+                :key="item.key"
+                :class="['mobile-tab', { active: currentRoute === item.key }]"
+                @click="onMenuSelect(item.key)"
+              >
+                <n-icon :component="item.iconComponent" :size="20" />
+                <span>{{ item.label }}</span>
+              </a>
+            </nav>
+
+            <!-- Login page: rendered by router, overlays everything (position: fixed in LoginView) -->
+            <router-view v-if="isLoginPage" />
           </div>
         </n-dialog-provider>
       </n-notification-provider>
@@ -68,7 +69,7 @@
 </template>
 
 <script setup>
-import { h, ref, computed } from 'vue'
+import { h, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { NIcon } from 'naive-ui'
 import { authStore } from './stores/auth.js'
@@ -83,13 +84,14 @@ const router = useRouter()
 const route = useRoute()
 
 const currentRoute = computed(() => route.path)
+const isLoginPage = computed(() => route.path === '/login')
 
 const themeOverrides = {
   common: {
-    primaryColor: '#A0815A',
-    primaryColorHover: '#B8956E',
-    primaryColorPressed: '#8A6F4E',
-    primaryColorSuppl: '#C27C4E',
+    primaryColor: '#70645A',
+    primaryColorHover: '#8A7A6E',
+    primaryColorPressed: '#5A5048',
+    primaryColorSuppl: '#C8A09B',
     borderRadius: '8px',
     borderRadiusSmall: '6px',
     fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif",
@@ -140,20 +142,26 @@ function logout() {
 }
 
 :root {
-  --color-primary: #A0815A;
-  --color-primary-hover: #B8956E;
-  --color-primary-pressed: #8A6F4E;
-  --color-accent: #C27C4E;
-  --color-bg: #F5F0E8;
-  --color-surface: #FFFDF8;
+  --color-primary: #70645A;
+  --color-primary-hover: #8A7A6E;
+  --color-primary-pressed: #5A5048;
+  --color-accent: #C8A09B;
+  --color-bg: #F0EBE3;
+  --color-surface: rgba(255, 255, 255, 0.35);
   --color-text: #2E2A23;
   --color-text-secondary: #8C8478;
-  --color-border: #E0D8CC;
+  --color-border: rgba(255, 255, 255, 0.45);
+  --glass-blur: blur(40px) saturate(160%);
+  --glass-bg: rgba(255, 255, 255, 0.35);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.45);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  --dark-glass-bg: rgba(80, 70, 65, 0.4);
+  --dark-glass-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
 }
 
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background: #F5F0E8;
+  background: var(--color-bg);
   color: #2E2A23;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -162,22 +170,99 @@ body {
 
 .app-root {
   min-height: 100vh;
+  position: relative;
 }
 
-/* Top nav */
+/* ── Floating orbs background ── */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.app-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.35;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+.app-orb-1 {
+  width: 500px;
+  height: 500px;
+  background: #D4A0A0;
+  top: -8%;
+  left: -5%;
+  animation: orbFloat1 20s infinite alternate;
+}
+
+.app-orb-2 {
+  width: 400px;
+  height: 400px;
+  background: #D4C5A0;
+  top: -3%;
+  right: -8%;
+  animation: orbFloat2 24s infinite alternate;
+}
+
+.app-orb-3 {
+  width: 450px;
+  height: 450px;
+  background: #D9B896;
+  bottom: -8%;
+  right: 5%;
+  animation: orbFloat3 22s infinite alternate;
+}
+
+.app-orb-4 {
+  width: 350px;
+  height: 350px;
+  background: #C5B8D4;
+  bottom: 5%;
+  left: 10%;
+  animation: orbFloat4 26s infinite alternate;
+}
+
+@keyframes orbFloat1 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(80px, 60px) scale(1.1); }
+}
+
+@keyframes orbFloat2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-60px, 80px) scale(1.15); }
+}
+
+@keyframes orbFloat3 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-50px, -70px) scale(1.08); }
+}
+
+@keyframes orbFloat4 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(70px, -40px) scale(1.12); }
+}
+
+/* ── Top nav (glass) ── */
 .top-nav {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 56px;
-  background: rgba(245, 240, 232, 0.85);
-  backdrop-filter: blur(8px) saturate(120%);
-  -webkit-backdrop-filter: blur(8px) saturate(120%);
-  border-bottom: 1px solid #E0D8CC;
+  background: rgba(240, 235, 227, 0.65);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
   z-index: 200;
   display: flex;
   align-items: center;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
 }
 
 .nav-inner {
@@ -200,11 +285,13 @@ body {
 .logo-seal {
   width: 36px;
   height: 36px;
-  background: #A0815A;
-  border-radius: 6px;
+  background: rgba(80, 70, 65, 0.4);
+  backdrop-filter: blur(12px);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .logo-text {
@@ -237,8 +324,8 @@ body {
 }
 
 .nav-link.active {
-  color: #A0815A;
-  border-bottom-color: #A0815A;
+  color: #5A5048;
+  border-bottom-color: #5A5048;
 }
 
 .nav-right {
@@ -258,8 +345,10 @@ body {
   color: #2E2A23;
 }
 
-/* Main area */
+/* ── Main area ── */
 .main-area {
+  position: relative;
+  z-index: 1;
   padding-top: 56px;
   min-height: 100vh;
   display: flex;
@@ -272,17 +361,7 @@ body {
   padding: 36px 36px 80px;
 }
 
-/* Page transition */
-.page-fade-enter-active,
-.page-fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-.page-fade-enter-from,
-.page-fade-leave-to {
-  opacity: 0;
-}
-
-/* Mobile bottom tabs */
+/* ── Mobile bottom tabs (glass) ── */
 .mobile-tabs {
   display: none;
 }
@@ -308,10 +387,10 @@ body {
     left: 0;
     right: 0;
     height: 56px;
-    background: rgba(245, 240, 232, 0.85);
-    backdrop-filter: blur(8px) saturate(120%);
-    -webkit-backdrop-filter: blur(8px) saturate(120%);
-    border-top: 1px solid #E0D8CC;
+    background: rgba(240, 235, 227, 0.65);
+    backdrop-filter: blur(40px) saturate(160%);
+    -webkit-backdrop-filter: blur(40px) saturate(160%);
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
     z-index: 200;
     align-items: center;
     justify-content: space-around;
@@ -324,18 +403,13 @@ body {
     gap: 2px;
     font-size: 11px;
     color: #8C8478;
-    cursor: pointer;
     text-decoration: none;
-    padding: 6px 0;
+    cursor: pointer;
     transition: color 0.2s ease;
   }
 
-  .mobile-tab:hover {
-    color: #2E2A23;
-  }
-
   .mobile-tab.active {
-    color: #A0815A;
+    color: #5A5048;
   }
 }
 </style>

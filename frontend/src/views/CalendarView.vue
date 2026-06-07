@@ -131,7 +131,7 @@ const message = useMessage()
 const router = useRouter()
 const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`
 
-const weekdays = ['一', '二', '三', '四', '五', '六', '日']
+const weekdays = ['日', '一', '二', '三', '四', '五', '六']
 const now = new Date()
 const year = ref(now.getFullYear())
 const month = ref(now.getMonth() + 1)
@@ -150,7 +150,8 @@ function updateCellSize() {
   const paddingTop = parseFloat(style.paddingTop) || 0
   const paddingBottom = parseFloat(style.paddingBottom) || 0
   const gap = parseFloat(style.gap) || parseFloat(style.gridRowGap) || 4
-  const rows = 6
+  // 动态读取实际行数，不再硬编码 6
+  const rows = Math.ceil(grid.children.length / 7) || 5
   const availableH = grid.clientHeight - paddingTop - paddingBottom - gap * (rows - 1)
   const cellSize = Math.floor(availableH / rows)
   // Set on calendar-page so both inline-weekdays and cal-grid inherit it
@@ -204,8 +205,7 @@ function getIllustrationUrl(url) {
 
 const calendarDays = computed(() => {
   const first = new Date(year.value, month.value - 1, 1)
-  let startDay = first.getDay() - 1
-  if (startDay < 0) startDay = 6
+  const startDay = first.getDay() // 周日起算：Sun=0, Mon=1, ..., Sat=6
   const daysInMonth = new Date(year.value, month.value, 0).getDate()
   const prevDays = new Date(year.value, month.value - 1, 0).getDate()
   const todayStr = new Date().toISOString().split('T')[0]
@@ -233,7 +233,11 @@ const calendarDays = computed(() => {
     })
   }
 
-  const remaining = 42 - days.length
+  // 动态行数：够用即可，不固定 6 行
+  const cols = 7
+  const totalRows = Math.ceil(days.length / cols)
+  const totalCells = totalRows * cols
+  const remaining = totalCells - days.length
   for (let d = 1; d <= remaining; d++) {
     days.push({ date: d, currentMonth: false, isToday: false, hasOutfit: false, isWeekend: false })
   }
@@ -323,7 +327,7 @@ async function generateIllustration() {
   gap: 4px;
   justify-content: center;
   flex-shrink: 0;
-  margin-bottom: 4px;
+  margin-bottom: 16px;
   height: 28px;
   align-items: center;
 }
@@ -357,9 +361,9 @@ async function generateIllustration() {
   text-align: center;
 }
 
-.weekday-cell:nth-child(6),
+.weekday-cell:nth-child(1),
 .weekday-cell:nth-child(7) {
-  color: #C27C4E;
+  color: #C8A09B;
 }
 
 .top-right {
@@ -395,8 +399,8 @@ async function generateIllustration() {
 }
 
 .month-nav-btn:hover {
-  color: #A0815A;
-  background: rgba(160, 129, 90, 0.06);
+  color: #5A5048;
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .month-label {
@@ -409,10 +413,11 @@ async function generateIllustration() {
 }
 
 .gen-today-btn {
-  background: #A0815A !important;
-  border-color: #A0815A !important;
+  background: rgba(80, 70, 65, 0.4) !important;
+  backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.2) !important;
   font-family: 'Noto Serif SC', serif;
-  border-radius: 6px !important;
+  border-radius: 8px !important;
 }
 
 /* ── Calendar wrapper: fills remaining space ── */
@@ -429,7 +434,7 @@ async function generateIllustration() {
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(7, var(--cell-size, 1fr));
-  grid-template-rows: repeat(6, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
   gap: 4px;
   justify-content: center;
 }
@@ -444,15 +449,18 @@ async function generateIllustration() {
   flex-direction: column;
   cursor: pointer;
   transition: all 0.18s ease;
-  background: #FFFDF8;
-  border: 1px solid #E0D8CC;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   position: relative;
   box-sizing: border-box;
 }
 
 .day-cell:hover:not(.other) {
-  background: rgba(160, 129, 90, 0.05);
-  border-color: #C8B99E;
+  background: rgba(255, 255, 255, 0.45);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .day-cell.other {
@@ -463,18 +471,18 @@ async function generateIllustration() {
 }
 
 .day-cell.today {
-  background: rgba(160, 129, 90, 0.06);
-  border-color: #A0815A;
+  background: rgba(255, 255, 255, 0.4);
+  border-color: #5A5048;
 }
 
 .day-cell.selected {
-  border: 1.5px solid #A0815A;
-  background: rgba(160, 129, 90, 0.08);
-  box-shadow: 0 1px 4px rgba(160, 129, 90, 0.12);
+  border: 1.5px solid #5A5048;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .day-cell.weekend:not(.other) {
-  background: rgba(194, 124, 78, 0.03);
+  background: rgba(200, 160, 155, 0.08);
 }
 
 .day-num {
@@ -486,7 +494,7 @@ async function generateIllustration() {
 }
 
 .day-cell.weekend:not(.other) .day-num {
-  color: #C27C4E;
+  color: #C8A09B;
 }
 
 .day-num-today {
@@ -496,8 +504,8 @@ async function generateIllustration() {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #A0815A;
-  color: #FFFDF8 !important;
+  background: rgba(80, 70, 65, 0.5);
+  color: #FFFFFF !important;
   font-size: 11px;
   font-weight: 700;
 }
@@ -517,14 +525,14 @@ async function generateIllustration() {
   max-height: 100%;
   border-radius: 6px;
   object-fit: cover;
-  border: 1px solid #E0D8CC;
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .day-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #C27C4E;
+  background: #C8A09B;
 }
 
 /* ── Floating detail drawer ── */
@@ -534,7 +542,7 @@ async function generateIllustration() {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(245, 240, 232, 0.4);
+  background: rgba(240, 235, 227, 0.3);
   z-index: 50;
   cursor: pointer;
 }
@@ -555,10 +563,10 @@ async function generateIllustration() {
   left: 50%;
   transform: translateX(-50%);
   width: min(90%, 700px);
-  background: rgba(245, 240, 232, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid #E0D8CC;
+  background: rgba(240, 235, 227, 0.7);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-bottom: none;
   border-radius: 12px 12px 0 0;
   padding: 8px 24px 16px;
@@ -577,7 +585,7 @@ async function generateIllustration() {
   width: 40px;
   height: 3px;
   border-radius: 2px;
-  background: #D0C8BC;
+  background: rgba(140, 132, 120, 0.3);
 }
 
 .drawer-close {
@@ -600,8 +608,8 @@ async function generateIllustration() {
 }
 
 .drawer-close:hover {
-  color: #A0815A;
-  background: rgba(160, 129, 90, 0.08);
+  color: #5A5048;
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .drawer-content {
@@ -629,13 +637,14 @@ async function generateIllustration() {
   height: 44px;
   border-radius: 6px;
   object-fit: cover;
-  border: 1px solid #E0D8CC;
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .drawer-weather {
   font-size: 12px;
   color: #8C8478;
-  background: #FFFDF8;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
   padding: 4px 10px;
   border-radius: 4px;
   flex-shrink: 0;
@@ -655,8 +664,9 @@ async function generateIllustration() {
 
 .record-btn {
   margin-left: auto;
-  background: #A0815A !important;
-  border-color: #A0815A !important;
+  background: rgba(80, 70, 65, 0.4) !important;
+  backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.2) !important;
   font-family: 'Noto Serif SC', serif;
 }
 
@@ -689,8 +699,9 @@ async function generateIllustration() {
 }
 
 .generate-btn {
-  background: #A0815A !important;
-  border-color: #A0815A !important;
+  background: rgba(80, 70, 65, 0.4) !important;
+  backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 .modal-garment-grid {
@@ -709,7 +720,7 @@ async function generateIllustration() {
   height: 56px;
   border-radius: 6px;
   object-fit: cover;
-  border: 1px solid #E0D8CC;
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .modal-garment-cat {
@@ -726,7 +737,8 @@ async function generateIllustration() {
 .weather-tag {
   font-size: 12px;
   color: #8C8478;
-  background: #F5F0E8;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
   padding: 4px 10px;
   border-radius: 4px;
 }

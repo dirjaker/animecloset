@@ -260,7 +260,7 @@ onMounted(() => loadGarments())
 .page-line {
   width: 100%;
   height: 1px;
-  background: #E0D8CC;
+  background: rgba(255, 255, 255, 0.4);
   margin-top: 8px;
 }
 
@@ -269,11 +269,13 @@ onMounted(() => loadGarments())
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: rgba(160, 129, 90, 0.06);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
   margin-bottom: 16px;
   font-size: 13px;
-  color: #A0815A;
+  color: #5A5048;
   font-weight: 500;
 }
 
@@ -282,7 +284,7 @@ onMounted(() => loadGarments())
   flex-wrap: wrap;
   gap: 0;
   margin-bottom: 16px;
-  border-bottom: 1px solid #E0D8CC;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .tab {
@@ -305,8 +307,8 @@ onMounted(() => loadGarments())
 }
 
 .tab.active {
-  color: #A0815A;
-  border-bottom-color: #A0815A;
+  color: #70645A;
+  border-bottom-color: #70645A;
 }
 
 .sort-bar {
@@ -340,22 +342,26 @@ onMounted(() => loadGarments())
 }
 
 .garment-card {
-  background: #FFFDF8;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #E0D8CC;
+  border: 1px solid rgba(255, 255, 255, 0.45);
   transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
 }
 
 .garment-card:hover {
-  border-left: 2px solid #A0815A;
-  box-shadow: 0 2px 12px rgba(46, 42, 37, 0.08);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  transform: translateY(-2px);
 }
 
 .card-img-wrap {
   position: relative;
   aspect-ratio: 1;
-  background: #F5F0E8;
+  background: rgba(240, 235, 227, 0.5);
   overflow: hidden;
 }
 
@@ -392,7 +398,7 @@ onMounted(() => loadGarments())
   top: 8px;
   left: 8px;
   background: rgba(255, 253, 248, 0.9);
-  color: #C27C4E;
+  color: #C8A09B;
   font-size: 11px;
   font-weight: 600;
   padding: 3px 8px;
@@ -432,7 +438,7 @@ onMounted(() => loadGarments())
 }
 
 .btn-delete:hover {
-  background: #A0815A;
+  background: rgba(80, 70, 65, 0.5);
   color: #FFFFFF;
 }
 
@@ -457,9 +463,11 @@ onMounted(() => loadGarments())
 .card-tag-chip {
   font-size: 11px;
   color: #8C8478;
-  background: rgba(160, 129, 90, 0.06);
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
   padding: 2px 8px;
   border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .empty-state {

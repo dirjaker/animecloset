@@ -226,17 +226,20 @@ async function saveOutfit() {
 .page-line {
   width: 100%;
   height: 1px;
-  background: #E0D8CC;
+  background: rgba(255, 255, 255, 0.4);
   margin-top: 8px;
 }
 
 /* ── Chat card ── */
 .chat-card {
-  background: #FFFDF8;
-  border: 1px solid #E0D8CC;
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 12px;
   padding: 28px 28px 24px;
   margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
 }
 
 .guide-text {
@@ -261,9 +264,9 @@ async function saveOutfit() {
   gap: 6px;
   height: 36px;
   padding: 0 14px;
-  border: 1px solid #E0D8CC;
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 18px;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.2);
   cursor: pointer;
   font-size: 13px;
   color: #8C8478;
@@ -272,14 +275,16 @@ async function saveOutfit() {
 }
 
 .scene-pill:hover {
-  border-color: #A0815A;
+  border-color: rgba(255, 255, 255, 0.6);
   color: #2E2A23;
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .scene-pill.active {
-  border-color: #A0815A;
-  color: #FFFDF8;
-  background: #A0815A;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  background: rgba(80, 70, 65, 0.45);
+  backdrop-filter: blur(12px);
 }
 
 /* ── Date row ── */
@@ -299,9 +304,10 @@ async function saveOutfit() {
 .chat-input {
   width: 100%;
   padding: 16px;
-  border: 1px solid #E0D8CC;
-  border-radius: 8px;
-  background: #FFFDF8;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(20px);
   font-size: 15px;
   color: #2E2A23;
   line-height: 1.6;
@@ -317,18 +323,20 @@ async function saveOutfit() {
 }
 
 .chat-input:focus {
-  border-color: #A0815A;
-  box-shadow: 0 0 0 3px rgba(160, 129, 90, 0.08);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 /* ── Recommend button ── */
 .recommend-btn {
   width: 100%;
   height: 46px;
-  background: #A0815A;
+  background: rgba(80, 70, 65, 0.4);
+  backdrop-filter: blur(12px);
   color: #FFFFFF;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
   font-family: 'Noto Serif SC', serif;
   font-size: 15px;
   font-weight: 600;
@@ -342,8 +350,8 @@ async function saveOutfit() {
 }
 
 .recommend-btn:hover {
-  background: #B8956E;
-  box-shadow: 0 4px 16px rgba(160, 129, 90, 0.2);
+  background: rgba(80, 70, 65, 0.55);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .recommend-btn:disabled {
@@ -365,11 +373,14 @@ async function saveOutfit() {
 
 /* ── Results ── */
 .result-section {
-  background: #FFFDF8;
-  border: 1px solid #E0D8CC;
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 12px;
   padding: 24px 28px;
   margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
 }
 
 .result-header {
@@ -401,21 +412,23 @@ async function saveOutfit() {
 
 .result-item-card {
   display: flex;
-  background: #FFFDF8;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(20px);
+  border-radius: 10px;
   overflow: hidden;
-  border: 1px solid #E0D8CC;
+  border: 1px solid rgba(255, 255, 255, 0.4);
   transition: all 0.3s ease;
 }
 
 .result-item-card:hover {
-  border-left: 2px solid #A0815A;
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
 .result-item-img-wrap {
   width: 50%;
   aspect-ratio: 1;
-  background: #F5F0E8;
+  background: rgba(240, 235, 227, 0.5);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -444,13 +457,13 @@ async function saveOutfit() {
 .result-cat {
   font-size: 13px;
   font-weight: 500;
-  color: #A0815A;
+  color: #5A5048;
 }
 
 .cold-wake {
   font-size: 11px;
-  color: #C27C4E;
-  background: rgba(194, 124, 78, 0.1);
+  color: #C8A09B;
+  background: rgba(200, 160, 155, 0.15);
   padding: 2px 8px;
   border-radius: 4px;
 }
@@ -466,10 +479,11 @@ async function saveOutfit() {
   width: 100%;
   margin-top: 20px;
   height: 44px;
-  background: #A0815A;
+  background: rgba(80, 70, 65, 0.4);
+  backdrop-filter: blur(12px);
   color: #FFFFFF;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
   font-family: 'Noto Serif SC', serif;
   font-size: 14px;
   font-weight: 600;
@@ -483,7 +497,7 @@ async function saveOutfit() {
 }
 
 .save-btn:hover {
-  background: #B8956E;
+  background: rgba(80, 70, 65, 0.55);
 }
 
 /* ── Cold palace ── */
@@ -512,15 +526,17 @@ async function saveOutfit() {
 }
 
 .cold-card {
-  background: #FFFDF8;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(20px);
+  border-radius: 10px;
   overflow: hidden;
-  border: 1px solid #E0D8CC;
+  border: 1px solid rgba(255, 255, 255, 0.4);
   transition: all 0.3s ease;
 }
 
 .cold-card:hover {
-  border-left: 2px solid #A0815A;
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .cold-img {
@@ -534,12 +550,12 @@ async function saveOutfit() {
   display: flex;
   align-items: center;
   gap: 6px;
-  border-top: 1px solid #E0D8CC;
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .cold-cat {
   font-size: 12px;
-  color: #A0815A;
+  color: #5A5048;
   font-weight: 500;
 }
 
@@ -560,7 +576,7 @@ async function saveOutfit() {
 
   .result-item-info {
     width: 100%;
-    border-top: 1px solid #E0D8CC;
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
   }
 
   .scene-pills {

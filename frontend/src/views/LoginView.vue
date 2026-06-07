@@ -268,7 +268,7 @@ async function handleSubmit() {
 }
 
 .line-input:focus {
-  border-bottom-color: #A0815A;
+  border-bottom-color: #70645A;
   border-bottom-width: 2px;
   padding-bottom: 9px;
   background: rgba(255, 255, 255, 0.35);
@@ -276,12 +276,12 @@ async function handleSubmit() {
 
 .error-msg {
   font-size: 13px;
-  color: #C27C4E;
+  color: #C8A09B;
   margin-bottom: 16px;
   padding: 8px 14px;
   background: rgba(194, 124, 78, 0.08);
   border-radius: 6px;
-  border-left: 2px solid #C27C4E;
+  border-left: 2px solid #C8A09B;
   backdrop-filter: blur(8px);
 }
 
@@ -335,7 +335,7 @@ async function handleSubmit() {
 
 .footer-link {
   font-size: 13px;
-  color: #A0815A;
+  color: #70645A;
   cursor: pointer;
   text-decoration: none;
   font-weight: 500;
@@ -343,7 +343,7 @@ async function handleSubmit() {
 }
 
 .footer-link:hover {
-  color: #C27C4E;
+  color: #C8A09B;
 }
 
 /* ── Mobile ── */
