@@ -217,13 +217,13 @@ async function handleSubmit() {
 .brand-seal {
   width: 48px;
   height: 48px;
-  background: rgba(180, 130, 100, 0.75);
+  background: rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(12px);
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 12px rgba(180, 130, 100, 0.25);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
 }
 
 .brand-name {
@@ -288,10 +288,10 @@ async function handleSubmit() {
 .login-btn {
   width: 100%;
   height: 46px;
-  background: rgba(180, 130, 100, 0.7);
+  background: rgba(80, 70, 65, 0.4);
   backdrop-filter: blur(12px);
   color: #FFFFFF;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
   font-family: 'Noto Serif SC', serif;
   font-size: 15px;
@@ -300,12 +300,12 @@ async function handleSubmit() {
   cursor: pointer;
   transition: all 0.25s ease;
   margin-top: 4px;
-  box-shadow: 0 2px 12px rgba(180, 130, 100, 0.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
 }
 
 .login-btn:hover {
-  background: rgba(180, 130, 100, 0.85);
-  box-shadow: 0 4px 20px rgba(180, 130, 100, 0.3);
+  background: rgba(80, 70, 65, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   transform: translateY(-1px);
 }
 
