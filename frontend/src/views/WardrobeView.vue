@@ -17,6 +17,40 @@
       <span>{{ uploadStatus }}</span>
     </div>
 
+    <!-- Wardrobe Selector -->
+    <div class="wardrobe-tabs">
+      <button
+        :class="['wtab', { active: activeWardrobe === '' }]"
+        @click="activeWardrobe = ''; loadGarments()"
+      >
+        全部
+      </button>
+      <button
+        v-for="w in wardrobes"
+        :key="w.id"
+        :class="['wtab', { active: activeWardrobe === w.id }]"
+        @click="activeWardrobe = w.id; loadGarments()"
+        @contextmenu.prevent="openWardrobeMenu(w)"
+      >
+        {{ w.icon || '📁' }} {{ w.name }}
+      </button>
+      <div v-if="showNewWardrobe" class="wardrobe-inline-input">
+        <n-input
+          v-model:value="newWardrobeName"
+          size="small"
+          placeholder="衣橱名称"
+          @keyup.enter="createWardrobe"
+          @keyup.esc="showNewWardrobe = false"
+          style="width: 120px"
+        />
+        <n-button size="tiny" @click="createWardrobe" :loading="wardrobeCreating">确定</n-button>
+      </div>
+      <button v-else class="wtab wtab-add" @click="showNewWardrobe = true">
+        <n-icon :component="AddOutline" :size="14" />
+      </button>
+    </div>
+
+    <!-- Category Tabs + Favorite Toggle -->
     <div class="category-tabs">
       <button
         v-for="cat in categories"
@@ -25,6 +59,13 @@
         @click="activeCategory = cat.value; loadGarments()"
       >
         {{ cat.label }}
+      </button>
+      <button
+        :class="['tab', 'fav-toggle', { active: onlyFavorites }]"
+        @click="onlyFavorites = !onlyFavorites; loadGarments()"
+        title="只看收藏"
+      >
+        <n-icon :component="onlyFavorites ? Star : StarOutline" :size="16" />
       </button>
     </div>
 
@@ -50,6 +91,10 @@
           <img :src="getImgUrl(g)" :alt="g.category" class="card-img" />
           <div v-if="g.wear_count" class="wear-count-badge">{{ g.wear_count }}次</div>
           <div v-if="isColdPalace(g)" class="cold-badge">冷宫</div>
+          <!-- Favorite heart -->
+          <button class="btn-fav" @click.stop="toggleFavorite(g)">
+            <n-icon :component="g.is_favorite ? Heart : HeartOutline" :size="18" :color="g.is_favorite ? '#C8A09B' : '#8C8478'" />
+          </button>
           <div class="card-overlay">
             <button class="btn-delete" @click.stop="deleteGarment(g.id)">
               <n-icon :component="CloseOutline" :size="18" />
@@ -60,6 +105,13 @@
           <span class="card-name">{{ categoryLabel(g.category) }}</span>
           <div v-if="g.tags" class="card-tags">
             <span v-for="t in parseTags(g.tags)" :key="t" class="card-tag-chip">{{ t }}</span>
+          </div>
+          <!-- Lifecycle info on hover -->
+          <div class="card-lifecycle">
+            <span v-if="g.purchase_date" class="lifecycle-item">购入 {{ g.purchase_date }}</span>
+            <span v-if="g.purchase_price && g.wear_count" class="lifecycle-item">
+              单次 ¥{{ (g.purchase_price / g.wear_count).toFixed(1) }}
+            </span>
           </div>
         </div>
       </div>
@@ -73,13 +125,22 @@
     <div v-if="hasMore" style="text-align: center; margin-top: 24px">
       <n-button quaternary @click="loadMore" size="large">加载更多</n-button>
     </div>
+
+    <!-- Wardrobe context menu -->
+    <n-modal v-model:show="showWardrobeMenu" preset="card" :title="`编辑「${editingWardrobe?.name}」`" style="max-width: 340px">
+      <n-input v-model:value="editWardrobeName" placeholder="新名称" />
+      <template #action>
+        <n-button type="error" @click="deleteWardrobe" :loading="wardrobeDeleting">删除</n-button>
+        <n-button type="primary" @click="updateWardrobe" :loading="wardrobeUpdating">保存</n-button>
+      </template>
+    </n-modal>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useMessage } from 'naive-ui'
-import { AddOutline, CloseOutline } from '@vicons/ionicons5'
+import { AddOutline, CloseOutline, HeartOutline, Heart, StarOutline, Star } from '@vicons/ionicons5'
 import api from '../api/index.js'
 
 const message = useMessage()
@@ -119,20 +180,18 @@ const parseTags = (tags) => {
 }
 
 function getCardSize(index) {
-  // Row 1: large, medium, medium
-  // Row 2: medium, medium, large (alternating)
   const row = Math.floor(index / 3)
   const col = index % 3
   if (row % 2 === 0) {
-    // even row: first is large
     return col === 0 ? 'card-large' : 'card-medium'
   } else {
-    // odd row: last is large
     return col === 2 ? 'card-large' : 'card-medium'
   }
 }
 
 const activeCategory = ref('')
+const activeWardrobe = ref('')
+const onlyFavorites = ref(false)
 const garments = ref([])
 const loading = ref(false)
 const page = ref(1)
@@ -142,11 +201,96 @@ const uploading = ref(false)
 const uploadStatus = ref('')
 const sortBy = ref('default')
 
+// Wardrobes
+const wardrobes = ref([])
+const showNewWardrobe = ref(false)
+const newWardrobeName = ref('')
+const wardrobeCreating = ref(false)
+const showWardrobeMenu = ref(false)
+const editingWardrobe = ref(null)
+const editWardrobeName = ref('')
+const wardrobeUpdating = ref(false)
+const wardrobeDeleting = ref(false)
+
+async function loadWardrobes() {
+  try {
+    const { data } = await api.get('/wardrobes')
+    wardrobes.value = data.items || data.wardrobes || data || []
+  } catch {
+    wardrobes.value = []
+  }
+}
+
+async function createWardrobe() {
+  if (!newWardrobeName.value.trim()) return
+  wardrobeCreating.value = true
+  try {
+    await api.post('/wardrobes', { name: newWardrobeName.value.trim() })
+    message.success('衣橱已创建')
+    newWardrobeName.value = ''
+    showNewWardrobe.value = false
+    await loadWardrobes()
+  } catch {
+    message.error('创建失败')
+  } finally {
+    wardrobeCreating.value = false
+  }
+}
+
+function openWardrobeMenu(w) {
+  editingWardrobe.value = w
+  editWardrobeName.value = w.name
+  showWardrobeMenu.value = true
+}
+
+async function updateWardrobe() {
+  if (!editWardrobeName.value.trim()) return
+  wardrobeUpdating.value = true
+  try {
+    await api.put(`/wardrobes/${editingWardrobe.value.id}`, { name: editWardrobeName.value.trim() })
+    message.success('已更新')
+    showWardrobeMenu.value = false
+    await loadWardrobes()
+  } catch {
+    message.error('更新失败')
+  } finally {
+    wardrobeUpdating.value = false
+  }
+}
+
+async function deleteWardrobe() {
+  wardrobeDeleting.value = true
+  try {
+    await api.delete(`/wardrobes/${editingWardrobe.value.id}`)
+    message.success('已删除')
+    showWardrobeMenu.value = false
+    if (activeWardrobe.value === editingWardrobe.value.id) activeWardrobe.value = ''
+    await loadWardrobes()
+    await loadGarments()
+  } catch {
+    message.error('删除失败')
+  } finally {
+    wardrobeDeleting.value = false
+  }
+}
+
+async function toggleFavorite(g) {
+  try {
+    const { data } = await api.put(`/garments/${g.id}/favorite`)
+    g.is_favorite = data.is_favorite ?? !g.is_favorite
+    message.success(g.is_favorite ? '已收藏' : '已取消收藏')
+  } catch {
+    message.error('操作失败')
+  }
+}
+
 async function loadGarments(append = false) {
   loading.value = true
   try {
     const params = { page: page.value, page_size: 20 }
     if (activeCategory.value) params.category = activeCategory.value
+    if (activeWardrobe.value) params.wardrobe_id = activeWardrobe.value
+    if (onlyFavorites.value) params.is_favorite = true
     const { data } = await api.get('/garments', { params })
     const items = data.items || data.garments || data || []
     garments.value = append ? [...garments.value, ...items] : items
@@ -229,7 +373,10 @@ function applySort() {
   }
 }
 
-onMounted(() => loadGarments())
+onMounted(async () => {
+  await loadWardrobes()
+  await loadGarments()
+})
 </script>
 
 <style scoped>
@@ -279,6 +426,59 @@ onMounted(() => loadGarments())
   font-weight: 500;
 }
 
+/* Wardrobe tabs */
+.wardrobe-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  align-items: center;
+}
+
+.wtab {
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #8C8478;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  outline: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.wtab:hover {
+  color: #2E2A23;
+}
+
+.wtab.active {
+  color: #70645A;
+  border-bottom-color: #70645A;
+}
+
+.wtab-add {
+  padding: 6px 10px;
+  border-bottom: none;
+  margin-bottom: 0;
+  border-radius: 4px;
+}
+
+.wtab-add:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.wardrobe-inline-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+/* Category tabs */
 .category-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -309,6 +509,12 @@ onMounted(() => loadGarments())
 .tab.active {
   color: #70645A;
   border-bottom-color: #70645A;
+}
+
+.fav-toggle {
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
 }
 
 .sort-bar {
@@ -406,6 +612,29 @@ onMounted(() => loadGarments())
   backdrop-filter: blur(4px);
 }
 
+.btn-fav {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 253, 248, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  z-index: 2;
+}
+
+.btn-fav:hover {
+  background: rgba(255, 253, 248, 1);
+  transform: scale(1.1);
+}
+
 .card-overlay {
   position: absolute;
   inset: 0;
@@ -414,6 +643,7 @@ onMounted(() => loadGarments())
   align-items: flex-start;
   justify-content: flex-end;
   padding: 8px;
+  padding-top: 44px;
   opacity: 0;
   transition: opacity 0.2s ease;
 }
@@ -468,6 +698,22 @@ onMounted(() => loadGarments())
   padding: 2px 8px;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.card-lifecycle {
+  display: none;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.garment-card:hover .card-lifecycle {
+  display: flex;
+}
+
+.lifecycle-item {
+  font-size: 11px;
+  color: #C8A09B;
+  font-weight: 500;
 }
 
 .empty-state {

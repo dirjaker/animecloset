@@ -78,6 +78,9 @@ import {
   CalendarOutline,
   SparklesOutline,
   PersonOutline,
+  ColorWandOutline,
+  BriefcaseOutline,
+  StatsChartOutline,
 } from '@vicons/ionicons5'
 
 const router = useRouter()
@@ -117,8 +120,11 @@ function renderIcon(icon) {
 
 const menuOptions = [
   { label: '衣橱', key: '/wardrobe', icon: renderIcon(ShirtOutline), iconComponent: ShirtOutline },
+  { label: '搭配', key: '/builder', icon: renderIcon(ColorWandOutline), iconComponent: ColorWandOutline },
   { label: '推荐', key: '/recommend', icon: renderIcon(SparklesOutline), iconComponent: SparklesOutline },
   { label: '日历', key: '/calendar', icon: renderIcon(CalendarOutline), iconComponent: CalendarOutline },
+  { label: '打包', key: '/packing', icon: renderIcon(BriefcaseOutline), iconComponent: BriefcaseOutline },
+  { label: '统计', key: '/stats', icon: renderIcon(StatsChartOutline), iconComponent: StatsChartOutline },
   { label: '我的', key: '/profile', icon: renderIcon(PersonOutline), iconComponent: PersonOutline },
 ]
 

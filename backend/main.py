@@ -23,6 +23,9 @@ from app.api.user import router as user_router
 from app.api.stats import router as stats_router
 from app.api.recommend import router as recommend_router
 from app.api.outfits import router as outfits_router
+from app.api.wardrobes import router as wardrobes_router
+from app.api.packing import router as packing_router
+from app.api.share import router as share_router
 
 
 @asynccontextmanager
@@ -60,6 +63,9 @@ app.include_router(user_router, prefix="/api")
 app.include_router(stats_router, prefix="/api")
 app.include_router(recommend_router, prefix="/api")
 app.include_router(outfits_router, prefix="/api")
+app.include_router(wardrobes_router, prefix="/api")
+app.include_router(packing_router, prefix="/api")
+app.include_router(share_router, prefix="/api")
 
 
 @app.get("/")

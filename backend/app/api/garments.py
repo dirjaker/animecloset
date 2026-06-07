@@ -94,6 +94,7 @@ async def get_task(task_id: str):
 @router.get("", response_model=GarmentListResponse)
 async def list_garments(
     category: str | None = None,
+    wardrobe_id: str | None = None,
     page: int = 1,
     page_size: int = 20,
     db: AsyncSession = Depends(get_db),
@@ -106,6 +107,9 @@ async def list_garments(
     if category:
         query = query.where(Garment.category == category)
         count_query = count_query.where(Garment.category == category)
+    if wardrobe_id:
+        query = query.where(Garment.wardrobe_id == wardrobe_id)
+        count_query = count_query.where(Garment.wardrobe_id == wardrobe_id)
 
     total = (await db.execute(count_query)).scalar()
     query = query.order_by(Garment.created_at.desc())
@@ -181,3 +185,52 @@ async def delete_garment(
 
     await db.delete(garment)
     return {"message": "已删除"}
+
+
+@router.put("/{garment_id}/favorite")
+async def toggle_favorite(
+    garment_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """切换衣物收藏状态"""
+    result = await db.execute(
+        select(Garment).where(Garment.id == garment_id, Garment.user_id == user.id)
+    )
+    garment = result.scalar_one_or_none()
+    if not garment:
+        raise HTTPException(status_code=404, detail="衣物不存在")
+
+    garment.is_favorite = not garment.is_favorite
+    await db.flush()
+    return {"id": garment.id, "is_favorite": garment.is_favorite}
+
+
+@router.put("/{garment_id}/lifecycle")
+async def update_lifecycle(
+    garment_id: str,
+    purchase_date: str | None = None,
+    purchase_price: float | None = None,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """更新衣物生命周期信息（购买日期、购买价格）"""
+    from datetime import date as date_type
+    result = await db.execute(
+        select(Garment).where(Garment.id == garment_id, Garment.user_id == user.id)
+    )
+    garment = result.scalar_one_or_none()
+    if not garment:
+        raise HTTPException(status_code=404, detail="衣物不存在")
+
+    if purchase_date is not None:
+        garment.purchase_date = date_type.fromisoformat(purchase_date)
+    if purchase_price is not None:
+        garment.purchase_price = purchase_price
+
+    await db.flush()
+    return {
+        "id": garment.id,
+        "purchase_date": str(garment.purchase_date) if garment.purchase_date else None,
+        "purchase_price": garment.purchase_price,
+    }

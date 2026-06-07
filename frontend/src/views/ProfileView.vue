@@ -54,6 +54,63 @@
       </div>
     </div>
 
+    <!-- 穿搭统计 Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <n-icon :component="StatsChartOutline" :size="18" />
+        <span>穿搭统计</span>
+      </div>
+      <div class="quick-stats-grid">
+        <div class="quick-stat-item">
+          <n-statistic label="本月穿着" :value="profileStats.month_wears || 0" />
+        </div>
+        <div class="quick-stat-item">
+          <n-statistic label="最爱分类" :value="profileStats.favorite_category || '-'" />
+        </div>
+        <div class="quick-stat-item">
+          <n-statistic label="平均单次成本">
+            <template #prefix>¥</template>
+            {{ profileStats.avg_cost_per_wear || '0.0' }}
+          </n-statistic>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 16px">
+        <n-button quaternary size="small" @click="$router.push('/stats')">
+          查看完整统计
+          <template #icon><n-icon :component="ChevronForwardOutline" /></template>
+        </n-button>
+      </div>
+    </div>
+
+    <!-- 每日提醒 Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <n-icon :component="NotificationsOutline" :size="18" />
+        <span>每日提醒</span>
+      </div>
+      <div class="reminder-content">
+        <div class="reminder-row">
+          <div class="reminder-info">
+            <p class="reminder-title">开启每日穿搭提醒</p>
+            <p class="reminder-desc">每天提醒你记录今日穿搭</p>
+          </div>
+          <n-switch
+            v-model:value="reminderEnabled"
+            @update:value="saveReminder"
+          />
+        </div>
+        <div v-if="reminderEnabled" class="reminder-time-row">
+          <span class="reminder-time-label">提醒时间</span>
+          <n-time-picker
+            v-model:formatted-value="reminderTime"
+            format="HH:mm"
+            style="width: 120px"
+            @update:formatted-value="saveReminder"
+          />
+        </div>
+      </div>
+    </div>
+
     <!-- Frequency + Favorites 2-col -->
     <div class="two-col-row">
       <!-- 穿着最多 -->
@@ -126,9 +183,16 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { SparklesOutline } from '@vicons/ionicons5'
+import {
+  SparklesOutline,
+  StatsChartOutline,
+  ChevronForwardOutline,
+  NotificationsOutline,
+} from '@vicons/ionicons5'
+import { NStatistic, NSwitch, NTimePicker } from 'naive-ui'
 import { getWardrobeStats, getWearRanking, getColdPalace } from '../api/index.js'
 import { authStore } from '../stores/auth.js'
+import api from '../api/index.js'
 
 const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`
 
@@ -139,6 +203,17 @@ const ranking = ref([])
 const rankingLoading = ref(false)
 const coldItems = ref([])
 const coldLoading = ref(false)
+
+// Profile stats
+const profileStats = ref({
+  month_wears: 0,
+  favorite_category: '-',
+  avg_cost_per_wear: '0.0',
+})
+
+// Reminder settings
+const reminderEnabled = ref(false)
+const reminderTime = ref('08:00')
 
 function getImgUrl(item) {
   const url = item.image_url || item.thumbnail_url || item.processed_url
@@ -154,6 +229,15 @@ function getColdSize(index) {
   } else {
     return col === 2 ? 'cold-large' : 'cold-medium'
   }
+}
+
+async function saveReminder() {
+  try {
+    await api.put('/user/me', {
+      daily_reminder: reminderEnabled.value,
+      reminder_time: reminderTime.value,
+    })
+  } catch {}
 }
 
 async function loadAll() {
@@ -176,6 +260,27 @@ async function loadAll() {
     const { data } = await getColdPalace(30)
     coldItems.value = data.items || []
   } catch {} finally { coldLoading.value = false }
+
+  // Load profile stats
+  try {
+    const { data } = await api.get('/stats/monthly')
+    profileStats.value.month_wears = data.month_wears || data.total_wears || 0
+    profileStats.value.favorite_category = data.favorite_category || '-'
+    profileStats.value.avg_cost_per_wear = data.avg_cost_per_wear
+      ? Number(data.avg_cost_per_wear).toFixed(1)
+      : '0.0'
+  } catch {}
+
+  // Load user reminder settings
+  try {
+    const { data } = await api.get('/user/me')
+    if (data.daily_reminder !== undefined) {
+      reminderEnabled.value = !!data.daily_reminder
+    }
+    if (data.reminder_time) {
+      reminderTime.value = data.reminder_time
+    }
+  } catch {}
 }
 
 onMounted(() => loadAll())
@@ -330,6 +435,60 @@ onMounted(() => loadAll())
   font-size: 13px;
   color: rgba(255, 255, 255, 0.8);
   line-height: 1.6;
+}
+
+/* Quick stats */
+.quick-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.quick-stat-item {
+  text-align: center;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+}
+
+/* Reminder */
+.reminder-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.reminder-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reminder-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2E2A23;
+}
+
+.reminder-desc {
+  font-size: 12px;
+  color: #8C8478;
+  margin-top: 2px;
+}
+
+.reminder-time-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+}
+
+.reminder-time-label {
+  font-size: 13px;
+  color: #5A5048;
+  font-weight: 500;
 }
 
 /* Two col row */
@@ -537,6 +696,10 @@ onMounted(() => loadAll())
 
   .stat-num {
     font-size: 22px;
+  }
+
+  .quick-stats-grid {
+    grid-template-columns: 1fr;
   }
 
   .cold-grid {

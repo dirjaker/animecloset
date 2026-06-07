@@ -8,6 +8,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import date, timedelta
+import json
+from collections import defaultdict
 
 from ..core.database import get_db
 from ..core.security import get_current_user
@@ -126,3 +128,144 @@ async def wear_ranking(
         })
 
     return {"items": items}
+
+
+@router.get("/monthly")
+async def monthly_stats(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """最近12个月每月穿着统计"""
+    from ..models.outfit import Outfit
+
+    today = date.today()
+    months = []
+    for i in range(11, -1, -1):
+        # 计算每个月的第一天
+        year = today.year
+        month = today.month - i
+        while month <= 0:
+            month += 12
+            year -= 1
+        first_day = date(year, month, 1)
+        # 下个月第一天
+        if month == 12:
+            next_first = date(year + 1, 1, 1)
+        else:
+            next_first = date(year, month + 1, 1)
+
+        result = await db.execute(
+            select(func.count()).select_from(Outfit).where(
+                Outfit.user_id == user.id,
+                Outfit.date >= first_day,
+                Outfit.date < next_first,
+            )
+        )
+        count = result.scalar() or 0
+        months.append({
+            "month": f"{year}-{month:02d}",
+            "count": count,
+        })
+
+    return {"months": months}
+
+
+@router.get("/category-distribution")
+async def category_distribution(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """衣物类别分布统计"""
+    result = await db.execute(
+        select(Garment.category, func.count())
+        .where(Garment.user_id == user.id)
+        .group_by(Garment.category)
+    )
+    distribution = [{"category": row[0], "count": row[1]} for row in result.all()]
+    return {"distribution": distribution}
+
+
+@router.get("/cost-per-wear")
+async def cost_per_wear(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """每次穿着成本（仅含购买价格的衣物）"""
+    result = await db.execute(
+        select(Garment)
+        .where(
+            Garment.user_id == user.id,
+            Garment.purchase_price.isnot(None),
+            Garment.purchase_price > 0,
+        )
+        .order_by(Garment.purchase_price / func.greatest(Garment.wear_count, 1))
+    )
+    garments = result.scalars().all()
+
+    items = []
+    for g in garments:
+        cpw = round(g.purchase_price / max(g.wear_count, 1), 2)
+        tags = GarmentTags.model_validate_json(g.tags) if g.tags else GarmentTags()
+        items.append({
+            "id": g.id,
+            "category": g.category,
+            "tags": tags.model_dump(),
+            "purchase_price": g.purchase_price,
+            "wear_count": g.wear_count,
+            "cost_per_wear": cpw,
+        })
+
+    return {"items": items}
+
+
+@router.get("/season-distribution")
+async def season_distribution(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """按季节标签统计衣物分布"""
+    result = await db.execute(
+        select(Garment).where(Garment.user_id == user.id)
+    )
+    garments = result.scalars().all()
+
+    season_counts: dict[str, int] = defaultdict(int)
+    for g in garments:
+        tags = GarmentTags.model_validate_json(g.tags) if g.tags else GarmentTags()
+        if tags.season:
+            for s in tags.season:
+                season_counts[s] += 1
+        else:
+            season_counts["未分类"] += 1
+
+    return {"distribution": [{"season": k, "count": v} for k, v in season_counts.items()]}
+
+
+@router.get("/wear-trend")
+async def wear_trend(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """最近30天每日穿着次数"""
+    from ..models.outfit import Outfit
+
+    today = date.today()
+    start = today - timedelta(days=29)
+
+    result = await db.execute(
+        select(Outfit.date, func.count())
+        .where(Outfit.user_id == user.id, Outfit.date >= start, Outfit.date <= today)
+        .group_by(Outfit.date)
+        .order_by(Outfit.date)
+    )
+    existing = {str(row[0]): row[1] for row in result.all()}
+
+    days = []
+    for i in range(30):
+        d = start + timedelta(days=i)
+        days.append({
+            "date": str(d),
+            "count": existing.get(str(d), 0),
+        })
+
+    return {"days": days}

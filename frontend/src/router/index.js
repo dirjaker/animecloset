@@ -9,6 +9,9 @@ const routes = [
   { path: '/recommend', component: () => import('../views/RecommendView.vue'), meta: { auth: true } },
   { path: '/calendar', component: () => import('../views/CalendarView.vue'), meta: { auth: true } },
   { path: '/profile', component: () => import('../views/ProfileView.vue'), meta: { auth: true } },
+  { path: '/builder', component: () => import('../views/OutfitBuilder.vue'), meta: { auth: true } },
+  { path: '/packing', component: () => import('../views/PackingView.vue'), meta: { auth: true } },
+  { path: '/stats', component: () => import('../views/StatsView.vue'), meta: { auth: true } },
 ]
 
 const router = createRouter({
