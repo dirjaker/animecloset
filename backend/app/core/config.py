@@ -13,12 +13,12 @@ class Settings(BaseSettings):
     """应用配置项"""
 
     # ---- 应用基础 ----
-    APP_NAME: str = "AnimeCloset"
+    APP_NAME: str = "Vestio"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = True
 
     # ---- 数据库 ----
-    DATABASE_URL: str = "sqlite+aiosqlite:///./animecloset.db"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./vestio.db"
 
     # ---- JWT 认证 ----
     SECRET_KEY: str = "dev-secret-change-in-production"

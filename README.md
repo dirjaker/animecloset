@@ -1,8 +1,8 @@
 <div align="center">
 
-# 👗 衫 间
+# 👗 Vestio
 
-### 新中式 AI 穿搭助手
+### 智能穿搭助手
 
 [![功能](https://img.shields.io/badge/功能-6-blue?style=flat-square)]()
 [![AI](https://img.shields.io/badge/AI-生成-green?style=flat-square)]()
@@ -15,7 +15,7 @@
 
 ---
 
-> 基于 AI 视觉识别与大模型能力的智能衣柜管理与穿搭推荐系统，以新中式暖木风格呈现。
+> 基于 AI 视觉识别与大模型能力的智能衣柜管理与穿搭推荐系统。
 
 ---
 
@@ -23,8 +23,8 @@
 
 | 项目信息 | 说明 |
 |---|---|
-| 项目名称 | 衫间（AnimeCloset） |
-| 项目定位 | 新中式 AI 穿搭助手 |
+| 项目名称 | Vestio |
+| 项目定位 | AI 穿搭助手 |
 | 核心理念 | 将 AI 视觉理解、天气数据、日程管理与动漫插画生成融为一体，打造个性化穿搭体验 |
 | 前端框架 | Vue 3 + Vite + Naive UI |
 | 后端框架 | FastAPI + SQLAlchemy (async) + SQLite |
@@ -183,7 +183,7 @@ pnpm dev
 ## 项目结构
 
 ```
-animecloset/
+vestio/
 ├── backend/
 │   ├── app/
 │   │   ├── api/                    # API 路由

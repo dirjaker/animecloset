@@ -10,9 +10,9 @@
           <div class="brand-seal">
             <n-icon :component="ShirtOutline" :size="26" color="#FFFFFF" />
           </div>
-          <h1 class="brand-name">衫 间</h1>
+          <h1 class="brand-name">Vestio</h1>
         </div>
-        <p class="brand-sub">{{ isRegister ? '创建你的穿搭衣橱' : '衣衫之间，自有天地' }}</p>
+        <p class="brand-sub">{{ isRegister ? '创建你的穿搭衣橱' : '穿衣有道，风格自成' }}</p>
 
         <n-form ref="formRef" :model="form" :rules="rules" @submit.prevent="handleSubmit">
           <div v-if="isRegister" class="form-field">
