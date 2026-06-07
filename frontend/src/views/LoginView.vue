@@ -1,9 +1,14 @@
 <template>
   <div class="login-page">
-    <!-- Warm gradient background (simulates a landscape photo) -->
-    <div class="login-bg"></div>
+    <!-- Animated floating orbs background -->
+    <div class="login-bg">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+      <div class="orb orb-4"></div>
+    </div>
 
-    <!-- Centered glass card -->
+    <!-- Glass card -->
     <div class="login-center">
       <div class="login-card">
         <div class="brand-row">
@@ -92,6 +97,7 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
+/* ── Page ── */
 .login-page {
   width: 100vw;
   height: 100vh;
@@ -100,69 +106,103 @@ async function handleSubmit() {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  animation: loginFadeIn 0.5s ease-out;
+  background: #F0EBE3;
 }
 
-@keyframes loginFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Card slide-up */
-.login-center {
-  position: relative;
-  z-index: 10;
-  animation: cardSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes cardSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ── Background gradient (warm landscape simulation) ── */
+/* ── Floating orbs background ── */
 .login-bg {
   position: absolute;
   inset: 0;
-  background:
-    /* Mountain silhouette in back */
-    radial-gradient(ellipse 120% 60% at 50% 100%, #8B7355 0%, transparent 70%),
-    /* Warm horizon glow */
-    radial-gradient(ellipse 80% 40% at 50% 70%, #C4A882 0%, transparent 60%),
-    /* Sky gradient */
-    linear-gradient(175deg, #E8DFD0 0%, #D4C5A9 30%, #C4A882 55%, #A0815A 85%, #6B5535 100%);
-  z-index: 0;
+  overflow: hidden;
 }
 
-/* Subtle grain / texture overlay */
-.login-bg::after {
-  content: '';
+.orb {
   position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle 2px at 20% 30%, rgba(255, 255, 255, 0.03) 0%, transparent 100%),
-    radial-gradient(circle 1px at 80% 70%, rgba(255, 255, 255, 0.05) 0%, transparent 100%),
-    radial-gradient(circle 3px at 50% 50%, rgba(160, 129, 90, 0.04) 0%, transparent 100%);
-  z-index: 1;
-  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.6;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
 }
 
-/* ── Card ── */
+/* 玫瑰粉 — 左上 */
+.orb-1 {
+  width: 500px;
+  height: 500px;
+  background: #D4A0A0;
+  top: -10%;
+  left: -5%;
+  animation: float1 18s infinite alternate;
+}
+
+/* 香槟金 — 右上 */
+.orb-2 {
+  width: 400px;
+  height: 400px;
+  background: #D4C5A0;
+  top: -5%;
+  right: -8%;
+  animation: float2 22s infinite alternate;
+}
+
+/* 暖杏色 — 右下 */
+.orb-3 {
+  width: 450px;
+  height: 450px;
+  background: #D9B896;
+  bottom: -10%;
+  right: 5%;
+  animation: float3 20s infinite alternate;
+}
+
+/* 淡紫灰 — 左下 */
+.orb-4 {
+  width: 350px;
+  height: 350px;
+  background: #C5B8D4;
+  bottom: 5%;
+  left: 10%;
+  animation: float4 25s infinite alternate;
+}
+
+@keyframes float1 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(80px, 60px) scale(1.1); }
+}
+
+@keyframes float2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-60px, 80px) scale(1.15); }
+}
+
+@keyframes float3 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-50px, -70px) scale(1.08); }
+}
+
+@keyframes float4 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(70px, -40px) scale(1.12); }
+}
+
+/* ── Glass card ── */
+.login-center {
+  position: relative;
+  z-index: 10;
+}
+
 .login-card {
   width: 400px;
-  background: rgba(255, 253, 248, 0.55);
-  backdrop-filter: blur(24px) saturate(140%);
-  -webkit-backdrop-filter: blur(24px) saturate(140%);
-  border: 1px solid rgba(255, 253, 248, 0.5);
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
   padding: 44px 40px 36px;
-  box-shadow: 0 8px 40px rgba(46, 42, 35, 0.12), 0 2px 8px rgba(46, 42, 35, 0.06);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.6) inset;
 }
 
 /* ── Brand ── */
@@ -177,12 +217,13 @@ async function handleSubmit() {
 .brand-seal {
   width: 48px;
   height: 48px;
-  background: #A0815A;
-  border-radius: 8px;
+  background: rgba(180, 130, 100, 0.75);
+  backdrop-filter: blur(12px);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(160, 129, 90, 0.3);
+  box-shadow: 0 2px 12px rgba(180, 130, 100, 0.25);
 }
 
 .brand-name {
@@ -210,14 +251,15 @@ async function handleSubmit() {
 .line-input {
   width: 100%;
   border: none;
-  border-bottom: 1px solid rgba(160, 129, 90, 0.25);
-  background: transparent;
-  padding: 10px 4px;
+  border-bottom: 1px solid rgba(160, 140, 120, 0.2);
+  background: rgba(255, 255, 255, 0.25);
+  padding: 10px 12px;
   font-size: 15px;
   color: #2E2A23;
   outline: none;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
   font-family: inherit;
+  border-radius: 6px 6px 0 0;
 }
 
 .line-input::placeholder {
@@ -229,6 +271,7 @@ async function handleSubmit() {
   border-bottom-color: #A0815A;
   border-bottom-width: 2px;
   padding-bottom: 9px;
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .error-msg {
@@ -236,35 +279,44 @@ async function handleSubmit() {
   color: #C27C4E;
   margin-bottom: 16px;
   padding: 8px 14px;
-  background: rgba(194, 124, 78, 0.1);
+  background: rgba(194, 124, 78, 0.08);
   border-radius: 6px;
   border-left: 2px solid #C27C4E;
+  backdrop-filter: blur(8px);
 }
 
 .login-btn {
   width: 100%;
   height: 46px;
-  background: #A0815A;
+  background: rgba(180, 130, 100, 0.7);
+  backdrop-filter: blur(12px);
   color: #FFFFFF;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
   font-family: 'Noto Serif SC', serif;
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 4px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   margin-top: 4px;
+  box-shadow: 0 2px 12px rgba(180, 130, 100, 0.2);
 }
 
 .login-btn:hover {
-  background: #B8956E;
-  box-shadow: 0 4px 16px rgba(160, 129, 90, 0.25);
+  background: rgba(180, 130, 100, 0.85);
+  box-shadow: 0 4px 20px rgba(180, 130, 100, 0.3);
+  transform: translateY(-1px);
+}
+
+.login-btn:active {
+  transform: translateY(0);
 }
 
 .login-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 .login-footer {
@@ -287,6 +339,7 @@ async function handleSubmit() {
   cursor: pointer;
   text-decoration: none;
   font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 .footer-link:hover {
@@ -303,6 +356,11 @@ async function handleSubmit() {
   .brand-name {
     font-size: 24px;
     letter-spacing: 4px;
+  }
+
+  .orb {
+    filter: blur(60px);
+    opacity: 0.5;
   }
 }
 </style>
