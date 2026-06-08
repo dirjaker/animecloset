@@ -111,7 +111,7 @@
           </n-form-item>
 
           <n-form-item label="邮箱">
-            <n-input :value="user?.email" disabled />
+            <n-input :value="user?.email" disabled placeholder="未绑定邮箱" />
           </n-form-item>
 
           <n-form-item label="性别" path="gender">
@@ -426,7 +426,13 @@ function formatDate(dateStr) {
 }
 
 // 打开编辑弹窗
-function openProfileModal() {
+async function openProfileModal() {
+  // 从 API 获取最新用户信息
+  try {
+    const { data } = await api.get('/user/me')
+    user.value = { ...user.value, ...data }
+  } catch {}
+  
   editForm.nickname = user.value?.nickname || ''
   editForm.gender = user.value?.gender || null
   editForm.avatar_url = user.value?.avatar_url || ''
