@@ -12,6 +12,8 @@ const routes = [
   { path: '/builder', component: () => import('../views/OutfitBuilder.vue'), meta: { auth: true } },
   { path: '/packing', component: () => import('../views/PackingView.vue'), meta: { auth: true } },
   { path: '/stats', component: () => import('../views/StatsView.vue'), meta: { auth: true } },
+  { path: '/weather', component: () => import('../views/WeatherView.vue'), meta: { auth: true } },
+  { path: '/ai', component: () => import('../views/AIView.vue'), meta: { auth: true } },
 ]
 
 const router = createRouter({

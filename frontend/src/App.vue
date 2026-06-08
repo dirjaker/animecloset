@@ -134,6 +134,7 @@ import {
   StatsChartOutline,
   ColorPaletteOutline,
   ImageOutline,
+  PartlySunnyOutline,
 } from '@vicons/ionicons5'
 import { themes as allThemes, themeKeys } from './themes.js'
 
@@ -233,6 +234,8 @@ const menuOptions = [
   { label: '搭配', key: '/builder', icon: renderIcon(ColorWandOutline), iconComponent: ColorWandOutline },
   { label: '推荐', key: '/recommend', icon: renderIcon(SparklesOutline), iconComponent: SparklesOutline },
   { label: '日历', key: '/calendar', icon: renderIcon(CalendarOutline), iconComponent: CalendarOutline },
+  { label: '天气', key: '/weather', icon: renderIcon(PartlySunnyOutline), iconComponent: PartlySunnyOutline },
+  { label: 'AI', key: '/ai', icon: renderIcon(SparklesOutline), iconComponent: SparklesOutline },
   { label: '打包', key: '/packing', icon: renderIcon(BriefcaseOutline), iconComponent: BriefcaseOutline },
   { label: '统计', key: '/stats', icon: renderIcon(StatsChartOutline), iconComponent: StatsChartOutline },
   { label: '我的', key: '/profile', icon: renderIcon(PersonOutline), iconComponent: PersonOutline },
