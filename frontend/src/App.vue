@@ -50,13 +50,32 @@
                           :class="['theme-option', { active: selectedTheme === key }]"
                           @click="previewTheme(key)"
                         >
-                          <div class="theme-preview" :style="{ background: allThemes[key].bg }">
-                            <div class="theme-orb" v-for="(orb, i) in allThemes[key].orbs.slice(0, 2)" :key="i" :style="{ background: orb }"></div>
+                          <div class="theme-preview" :style="getPreviewStyle(key)">
+                            <div v-if="key === 'custom'" class="custom-upload-hint">
+                              <n-icon :component="ImageOutline" :size="16" />
+                            </div>
+                            <div v-else class="theme-orb" v-for="(orb, i) in allThemes[key].orbs.slice(0, 2)" :key="i" :style="{ background: orb }"></div>
                           </div>
                           <span class="theme-emoji">{{ allThemes[key].emoji }}</span>
                           <span class="theme-name">{{ allThemes[key].name }}</span>
                           <div v-if="selectedTheme === key" class="theme-check">✓</div>
                         </div>
+                      </div>
+                      <!-- 自定义图片上传区域 -->
+                      <div v-if="selectedTheme === 'custom'" class="custom-image-section">
+                        <input
+                          ref="fileInput"
+                          type="file"
+                          accept="image/*"
+                          style="display: none"
+                          @change="handleImageUpload"
+                        />
+                        <n-button size="small" @click="$refs.fileInput.click()">
+                          {{ themeStore.customImageUrl ? '更换照片' : '选择照片' }}
+                        </n-button>
+                        <n-button v-if="themeStore.customImageUrl" size="small" @click="clearCustomImage">
+                          清除
+                        </n-button>
                       </div>
                       <div class="theme-picker-actions">
                         <n-button size="small" @click="cancelTheme">取消</n-button>
@@ -114,6 +133,7 @@ import {
   BriefcaseOutline,
   StatsChartOutline,
   ColorPaletteOutline,
+  ImageOutline,
 } from '@vicons/ionicons5'
 import { themes as allThemes, themeKeys } from './themes.js'
 
@@ -127,21 +147,55 @@ const isLoginPage = computed(() => route.path === '/login')
 const showThemePicker = ref(false)
 const selectedTheme = ref(themeStore.currentKey)
 const originalTheme = ref(themeStore.currentKey)
+const fileInput = ref(null)
+
+function getPreviewStyle(key) {
+  if (key === 'custom') {
+    if (themeStore.customImageUrl) {
+      return {
+        backgroundImage: `url(${themeStore.customImageUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }
+    }
+    return { background: '#E0E0E0' }
+  }
+  return { background: allThemes[key].bg }
+}
 
 function previewTheme(key) {
   selectedTheme.value = key
-  themeStore.setTheme(key)
+  themeStore.previewOnly(key)  // 只预览，不保存
 }
 
 function cancelTheme() {
   selectedTheme.value = originalTheme.value
-  themeStore.setTheme(originalTheme.value)
+  themeStore.setTheme(originalTheme.value)  // 取消时恢复并保存原主题
   showThemePicker.value = false
 }
 
 function applyTheme() {
   originalTheme.value = selectedTheme.value
+  themeStore.setTheme(selectedTheme.value)  // 确定时才保存
   showThemePicker.value = false
+}
+
+function handleImageUpload(event) {
+  const file = event.target.files[0]
+  if (!file) return
+  
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    themeStore.setCustomImage(e.target.result)
+    if (selectedTheme.value === 'custom') {
+      themeStore.previewOnly('custom')  // 预览自定义图片，不保存主题
+    }
+  }
+  reader.readAsDataURL(file)
+}
+
+function clearCustomImage() {
+  themeStore.setCustomImage('')
 }
 
 // Naive UI 主题跟随当前主题色
@@ -216,6 +270,11 @@ body {
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  background-color: var(--theme-bg, #F5F0E8);
+  background-image: var(--theme-custom-bg, none);
+  background-size: cover;
+  background-position: center;
+  transition: background-color 0.5s ease, background-image 0.3s ease;
 }
 
 .app-orb {
@@ -501,6 +560,26 @@ body {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+.custom-upload-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+  color: #999;
+}
+
+.custom-image-section {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.2));
+  border-radius: 8px;
 }
 
 /* ── Main area ── */

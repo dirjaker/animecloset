@@ -3,9 +3,11 @@ import { themes, themeKeys } from '../themes.js'
 
 const savedKey = localStorage.getItem('vestio-theme') || 'warm'
 const validKey = themeKeys.includes(savedKey) ? savedKey : 'warm'
+const savedCustomImage = localStorage.getItem('vestio-theme-custom-image') || ''
 
 export const themeStore = reactive({
   currentKey: validKey,
+  customImageUrl: savedCustomImage,
 
   get theme() {
     return themes[this.currentKey]
@@ -16,6 +18,25 @@ export const themeStore = reactive({
     this.currentKey = key
     localStorage.setItem('vestio-theme', key)
     this._apply()
+  },
+
+  /** 仅预览主题，不保存到 localStorage */
+  previewOnly(key) {
+    if (!themes[key]) return
+    this.currentKey = key
+    this._apply()
+  },
+
+  setCustomImage(imageUrl) {
+    this.customImageUrl = imageUrl
+    if (imageUrl) {
+      localStorage.setItem('vestio-theme-custom-image', imageUrl)
+    } else {
+      localStorage.removeItem('vestio-theme-custom-image')
+    }
+    if (this.currentKey === 'custom') {
+      this._apply()
+    }
   },
 
   /** 把主题变量写到 :root CSS 变量，供全局使用 */
@@ -41,6 +62,14 @@ export const themeStore = reactive({
     root.setProperty('--theme-placeholder', t.placeholder)
     root.setProperty('--theme-orb-opacity', t.orbOpacity)
     root.setProperty('--theme-card-shadow', t.cardShadow)
+    
+    // 自定义图片背景
+    if (t.isCustom && this.customImageUrl) {
+      root.setProperty('--theme-custom-bg', `url(${this.customImageUrl})`)
+    } else {
+      root.removeProperty('--theme-custom-bg')
+    }
+    
     // 4 个光斑
     t.orbs.forEach((c, i) => root.setProperty(`--theme-orb-${i + 1}`, c))
   },
