@@ -34,6 +34,37 @@
                 </div>
 
                 <div class="nav-right">
+                  <!-- 主题选择按钮 -->
+                  <n-popover trigger="click" placement="bottom-end" :show="showThemePicker" @update:show="showThemePicker = $event">
+                    <template #trigger>
+                      <a class="theme-btn" @click="showThemePicker = true">
+                        <n-icon :component="ColorPaletteOutline" :size="18" />
+                      </a>
+                    </template>
+                    <div class="theme-picker-popup">
+                      <div class="theme-picker-title">主题配色</div>
+                      <div class="theme-picker-grid">
+                        <div
+                          v-for="key in themeKeys"
+                          :key="key"
+                          :class="['theme-option', { active: selectedTheme === key }]"
+                          @click="previewTheme(key)"
+                        >
+                          <div class="theme-preview" :style="{ background: allThemes[key].bg }">
+                            <div class="theme-orb" v-for="(orb, i) in allThemes[key].orbs.slice(0, 2)" :key="i" :style="{ background: orb }"></div>
+                          </div>
+                          <span class="theme-emoji">{{ allThemes[key].emoji }}</span>
+                          <span class="theme-name">{{ allThemes[key].name }}</span>
+                          <div v-if="selectedTheme === key" class="theme-check">✓</div>
+                        </div>
+                      </div>
+                      <div class="theme-picker-actions">
+                        <n-button size="small" @click="cancelTheme">取消</n-button>
+                        <n-button size="small" type="primary" @click="applyTheme">确定</n-button>
+                      </div>
+                    </div>
+                  </n-popover>
+
                   <a class="logout-link" @click="logout">退出</a>
                 </div>
               </div>
@@ -69,7 +100,7 @@
 </template>
 
 <script setup>
-import { h, computed, watch } from 'vue'
+import { h, computed, watch, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { NIcon } from 'naive-ui'
 import { authStore } from './stores/auth.js'
@@ -82,13 +113,36 @@ import {
   ColorWandOutline,
   BriefcaseOutline,
   StatsChartOutline,
+  ColorPaletteOutline,
 } from '@vicons/ionicons5'
+import { themes as allThemes, themeKeys } from './themes.js'
 
 const router = useRouter()
 const route = useRoute()
 
 const currentRoute = computed(() => route.path)
 const isLoginPage = computed(() => route.path === '/login')
+
+// 主题选择器状态
+const showThemePicker = ref(false)
+const selectedTheme = ref(themeStore.currentKey)
+const originalTheme = ref(themeStore.currentKey)
+
+function previewTheme(key) {
+  selectedTheme.value = key
+  themeStore.setTheme(key)
+}
+
+function cancelTheme() {
+  selectedTheme.value = originalTheme.value
+  themeStore.setTheme(originalTheme.value)
+  showThemePicker.value = false
+}
+
+function applyTheme() {
+  originalTheme.value = selectedTheme.value
+  showThemePicker.value = false
+}
 
 // Naive UI 主题跟随当前主题色
 const themeOverrides = computed(() => ({
@@ -317,6 +371,24 @@ body {
 .nav-right {
   display: flex;
   align-items: center;
+  gap: 16px;
+}
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--theme-text-secondary, #8C8478);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-btn:hover {
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
+  color: var(--theme-text, #2E2A23);
 }
 
 .logout-link {
@@ -329,6 +401,106 @@ body {
 
 .logout-link:hover {
   color: var(--theme-text, #2E2A23);
+}
+
+/* ── Theme Picker Popup ── */
+.theme-picker-popup {
+  width: 280px;
+  padding: 4px;
+}
+
+.theme-picker-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--theme-text, #2E2A23);
+  margin-bottom: 12px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.theme-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.theme-option {
+  position: relative;
+  padding: 8px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.theme-option:hover {
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
+}
+
+.theme-option.active {
+  border-color: var(--theme-primary, #A0815A);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
+}
+
+.theme-preview {
+  width: 100%;
+  height: 40px;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.theme-orb {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  filter: blur(8px);
+  opacity: 0.6;
+}
+
+.theme-orb:first-child {
+  top: -5px;
+  left: -5px;
+}
+
+.theme-orb:last-child {
+  bottom: -5px;
+  right: -5px;
+}
+
+.theme-emoji {
+  font-size: 12px;
+}
+
+.theme-name {
+  display: block;
+  font-size: 11px;
+  color: var(--theme-text-secondary, #8C8478);
+  margin-top: 2px;
+}
+
+.theme-check {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--theme-primary, #A0815A);
+  color: white;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-picker-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 /* ── Main area ── */

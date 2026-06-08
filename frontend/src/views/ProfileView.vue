@@ -54,44 +54,6 @@
       </div>
     </div>
 
-    <!-- 主题切换 Section -->
-    <div class="section-card">
-      <div class="section-header">
-        <n-icon :component="ColorPaletteOutline" :size="18" />
-        <span>主题配色</span>
-      </div>
-      <div class="theme-grid">
-        <div
-          v-for="key in themeKeys"
-          :key="key"
-          :class="['theme-swatch', { active: themeStore.currentKey === key }]"
-          @click="themeStore.setTheme(key)"
-        >
-          <div class="swatch-preview">
-            <div class="swatch-bg" :style="{ background: allThemes[key].bg }">
-              <div
-                v-for="(orb, i) in allThemes[key].orbs"
-                :key="i"
-                class="swatch-orb"
-                :style="{
-                  background: orb,
-                  top: i < 2 ? '-2px' : 'auto',
-                  bottom: i >= 2 ? '-2px' : 'auto',
-                  left: i % 2 === 0 ? '-2px' : 'auto',
-                  right: i % 2 === 1 ? '-2px' : 'auto',
-                }"
-              ></div>
-            </div>
-          </div>
-          <div class="swatch-label">
-            <span class="swatch-emoji">{{ allThemes[key].emoji }}</span>
-            <span class="swatch-name">{{ allThemes[key].name }}</span>
-          </div>
-          <div v-if="themeStore.currentKey === key" class="swatch-check">✓</div>
-        </div>
-      </div>
-    </div>
-
     <!-- 穿搭统计 Section -->
     <div class="section-card">
       <div class="section-header">
@@ -224,13 +186,10 @@ import {
   StatsChartOutline,
   ChevronForwardOutline,
   NotificationsOutline,
-  ColorPaletteOutline,
 } from '@vicons/ionicons5'
 import { NStatistic, NSwitch, NTimePicker } from 'naive-ui'
 import { getWardrobeStats, getWearRanking, getColdPalace } from '../api/index.js'
 import { authStore } from '../stores/auth.js'
-import { themeStore } from '../stores/theme.js'
-import { themes as allThemes, themeKeys } from '../themes.js'
 import api from '../api/index.js'
 
 const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`
@@ -473,92 +432,6 @@ onMounted(() => loadAll())
   font-size: 13px;
   color: rgba(255, 255, 255, 0.8);
   line-height: 1.6;
-}
-
-/* ── Theme picker ── */
-.theme-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-}
-
-.theme-swatch {
-  position: relative;
-  cursor: pointer;
-  border-radius: 12px;
-  padding: 12px;
-  border: 2px solid transparent;
-  transition: all 0.25s ease;
-  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.2));
-}
-
-.theme-swatch:hover {
-  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-.theme-swatch.active {
-  border-color: var(--theme-primary, #70645A);
-  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.4));
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-}
-
-.swatch-preview {
-  width: 100%;
-  aspect-ratio: 16/9;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 10px;
-}
-
-.swatch-bg {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  border-radius: 8px;
-}
-
-.swatch-orb {
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  filter: blur(6px);
-  opacity: 0.6;
-}
-
-.swatch-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  justify-content: center;
-}
-
-.swatch-emoji {
-  font-size: 16px;
-}
-
-.swatch-name {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--theme-text, #2E2A23);
-}
-
-.swatch-check {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--theme-primary, #70645A);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* Quick stats */
@@ -843,10 +716,6 @@ onMounted(() => loadAll())
   .ai-card-inner {
     flex-direction: column;
     text-align: center;
-  }
-
-  .theme-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
 </style>

@@ -73,8 +73,9 @@ async def _process_garment(
     try:
         _tasks[task_id]["status"] = "processing"
 
-        # 1. 缩放（减少处理时间）
-        file_bytes = resize_image(file_bytes, max_size=1024)
+        # 1. 缩放（用线程池避免阻塞事件循环）
+        loop = asyncio.get_event_loop()
+        file_bytes = await loop.run_in_executor(None, resize_image, file_bytes, 1024)
 
         # 2. 保存原图
         ext = Path(filename).suffix or ".jpg"
@@ -84,9 +85,10 @@ async def _process_garment(
         original_url = f"/static/uploads/{original_name}"
         logger.info(f"[{task_id[:8]}] 原图已保存: {original_name}")
 
-        # 3. 抠图
+        # 3. 抠图（用线程池避免阻塞事件循环）
         _tasks[task_id]["status"] = "removing_bg"
-        processed_bytes = remove_background(file_bytes)
+        loop = asyncio.get_event_loop()
+        processed_bytes = await loop.run_in_executor(None, remove_background, file_bytes)
 
         processed_name = f"{uuid.uuid4()}.png"
         processed_path = Path(settings.UPLOAD_DIR) / processed_name
