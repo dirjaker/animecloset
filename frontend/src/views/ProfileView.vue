@@ -13,12 +13,43 @@
         <div class="user-card-inner">
           <div class="avatar-wrap">
             <n-avatar :size="56" round :style="{ background: 'var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.45))', backdropFilter: 'blur(12px)', fontSize: '24px', fontWeight: '600', fontFamily: 'Noto Serif SC, serif' }">
-              {{ user?.nickname?.charAt(0) || '?' }}
+              {{ editingNickname ? editingNickname.charAt(0) : (user?.nickname?.charAt(0) || '?') }}
             </n-avatar>
           </div>
           <div class="user-info">
-            <p class="user-name">{{ user?.nickname || user?.email || '用户' }}</p>
-            <p class="user-email">{{ user?.email }}</p>
+            <!-- 显示模式 -->
+            <div v-if="!isEditing" class="user-info-display">
+              <p class="user-name">
+                {{ user?.nickname || user?.email || '用户' }}
+                <n-button text type="primary" size="tiny" @click="startEdit" style="margin-left: 8px;">
+                  <template #icon><n-icon :component="CreateOutline" /></template>
+                  编辑
+                </n-button>
+              </p>
+              <p class="user-email">{{ user?.email }}</p>
+              <p class="user-join-date" v-if="user?.created_at">
+                加入于 {{ formatDate(user.created_at) }}
+              </p>
+            </div>
+            <!-- 编辑模式 -->
+            <div v-else class="user-info-edit">
+              <div class="edit-row">
+                <n-input
+                  v-model:value="editingNickname"
+                  placeholder="请输入昵称"
+                  :maxlength="50"
+                  size="small"
+                  style="flex: 1;"
+                />
+                <n-button type="primary" size="small" @click="saveNickname" :loading="savingNickname">
+                  保存
+                </n-button>
+                <n-button size="small" @click="cancelEdit">
+                  取消
+                </n-button>
+              </div>
+              <p class="user-email">{{ user?.email }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -37,6 +68,26 @@
             <p class="stat-num">{{ stats?.total_wears || 0 }}</p>
             <p class="stat-label">总穿着次数</p>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account actions section -->
+    <div class="section-card">
+      <div class="section-header">
+        <n-icon :component="PersonOutline" :size="18" />
+        <span>账户安全</span>
+      </div>
+      <div class="account-actions">
+        <div class="action-item" @click="showPasswordModal = true">
+          <div class="action-icon">
+            <n-icon :component="LockClosedOutline" :size="20" />
+          </div>
+          <div class="action-text">
+            <p class="action-title">修改密码</p>
+            <p class="action-desc">定期更换密码，保护账户安全</p>
+          </div>
+          <n-icon :component="ChevronForwardOutline" :size="16" class="action-arrow" />
         </div>
       </div>
     </div>
@@ -176,23 +227,78 @@
         </div>
       </n-spin>
     </div>
+
+    <!-- 修改密码弹窗 -->
+    <n-modal
+      v-model:show="showPasswordModal"
+      preset="card"
+      title="修改密码"
+      :style="{ maxWidth: '420px' }"
+      :bordered="false"
+      :mask-closable="false"
+    >
+      <n-form
+        ref="passwordFormRef"
+        :model="passwordForm"
+        :rules="passwordRules"
+        label-placement="left"
+        label-width="80"
+      >
+        <n-form-item label="当前密码" path="old_password">
+          <n-input
+            v-model:value="passwordForm.old_password"
+            type="password"
+            show-password-on="click"
+            placeholder="请输入当前密码"
+          />
+        </n-form-item>
+        <n-form-item label="新密码" path="new_password">
+          <n-input
+            v-model:value="passwordForm.new_password"
+            type="password"
+            show-password-on="click"
+            placeholder="请输入新密码（至少6位）"
+          />
+        </n-form-item>
+        <n-form-item label="确认密码" path="confirm_password">
+          <n-input
+            v-model:value="passwordForm.confirm_password"
+            type="password"
+            show-password-on="click"
+            placeholder="请再次输入新密码"
+          />
+        </n-form-item>
+      </n-form>
+      <template #footer>
+        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+          <n-button @click="showPasswordModal = false">取消</n-button>
+          <n-button type="primary" @click="handleChangePassword" :loading="changingPassword">
+            确认修改
+          </n-button>
+        </div>
+      </template>
+    </n-modal>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import {
   SparklesOutline,
   StatsChartOutline,
   ChevronForwardOutline,
   NotificationsOutline,
+  PersonOutline,
+  LockClosedOutline,
+  CreateOutline,
 } from '@vicons/ionicons5'
-import { NStatistic, NSwitch, NTimePicker } from 'naive-ui'
+import { NStatistic, NSwitch, NTimePicker, NInput, NForm, NFormItem, NModal, useMessage } from 'naive-ui'
 import { getWardrobeStats, getWearRanking, getColdPalace } from '../api/index.js'
 import { authStore } from '../stores/auth.js'
 import api from '../api/index.js'
 
 const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`
+const message = useMessage()
 
 const user = ref(null)
 const stats = ref(null)
@@ -211,6 +317,55 @@ const profileStats = ref({
 const reminderEnabled = ref(false)
 const reminderTime = ref('08:00')
 
+// 编辑昵称相关
+const isEditing = ref(false)
+const editingNickname = ref('')
+const savingNickname = ref(false)
+
+// 修改密码相关
+const showPasswordModal = ref(false)
+const changingPassword = ref(false)
+const passwordFormRef = ref(null)
+const passwordForm = reactive({
+  old_password: '',
+  new_password: '',
+  confirm_password: '',
+})
+
+// 密码表单校验规则
+const passwordRules = {
+  old_password: {
+    required: true,
+    message: '请输入当前密码',
+    trigger: 'blur',
+  },
+  new_password: [
+    {
+      required: true,
+      message: '请输入新密码',
+      trigger: 'blur',
+    },
+    {
+      min: 6,
+      message: '密码至少6位',
+      trigger: 'blur',
+    },
+  ],
+  confirm_password: [
+    {
+      required: true,
+      message: '请确认新密码',
+      trigger: 'blur',
+    },
+    {
+      validator: (rule, value) => {
+        return value === passwordForm.new_password || new Error('两次密码不一致')
+      },
+      trigger: 'blur',
+    },
+  ],
+}
+
 function getImgUrl(item) {
   const url = item.image_url || item.thumbnail_url || item.processed_url
   if (url && url.startsWith('/')) return API_BASE + url
@@ -224,6 +379,90 @@ function getColdSize(index) {
     return col === 0 ? 'cold-large' : 'cold-medium'
   } else {
     return col === 2 ? 'cold-large' : 'cold-medium'
+  }
+}
+
+// 格式化日期
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}年${month}月${day}日`
+}
+
+// 编辑昵称
+function startEdit() {
+  editingNickname.value = user.value?.nickname || ''
+  isEditing.value = true
+}
+
+function cancelEdit() {
+  isEditing.value = false
+  editingNickname.value = ''
+}
+
+async function saveNickname() {
+  if (!editingNickname.value.trim()) {
+    message.warning('昵称不能为空')
+    return
+  }
+  if (editingNickname.value.trim().length < 2) {
+    message.warning('昵称至少2个字符')
+    return
+  }
+
+  savingNickname.value = true
+  try {
+    const { data } = await api.put('/user/me', {
+      nickname: editingNickname.value.trim(),
+    })
+    // 更新本地用户数据
+    user.value.nickname = data.nickname
+    authStore.user.nickname = data.nickname
+    localStorage.setItem('nickname', data.nickname)
+    isEditing.value = false
+    message.success('昵称修改成功')
+  } catch (err) {
+    message.error(err.response?.data?.detail || '修改失败，请重试')
+  } finally {
+    savingNickname.value = false
+  }
+}
+
+// 修改密码
+async function handleChangePassword() {
+  // 表单验证
+  if (!passwordForm.old_password) {
+    message.warning('请输入当前密码')
+    return
+  }
+  if (!passwordForm.new_password || passwordForm.new_password.length < 6) {
+    message.warning('新密码至少6位')
+    return
+  }
+  if (passwordForm.new_password !== passwordForm.confirm_password) {
+    message.warning('两次密码不一致')
+    return
+  }
+
+  changingPassword.value = true
+  try {
+    await api.put('/user/password', {
+      old_password: passwordForm.old_password,
+      new_password: passwordForm.new_password,
+    })
+    message.success('密码修改成功')
+    showPasswordModal.value = false
+    // 清空表单
+    passwordForm.old_password = ''
+    passwordForm.new_password = ''
+    passwordForm.confirm_password = ''
+  } catch (err) {
+    message.error(err.response?.data?.detail || '修改失败，请重试')
+  } finally {
+    changingPassword.value = false
   }
 }
 
@@ -343,12 +582,88 @@ onMounted(() => loadAll())
   font-size: 18px;
   font-weight: 600;
   color: var(--theme-text, #2E2A23);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .user-email {
   font-size: 13px;
   color: var(--theme-text-secondary, #8C8478);
   margin-top: 4px;
+}
+
+.user-join-date {
+  font-size: 12px;
+  color: var(--theme-text-secondary, #8C8478);
+  margin-top: 2px;
+}
+
+/* Edit mode styles */
+.user-info-edit {
+  flex: 1;
+}
+
+.edit-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+/* Account actions */
+.account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.2));
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-item:hover {
+  background: var(--theme-input-focus-bg, rgba(255, 255, 255, 0.35));
+  transform: translateX(4px);
+}
+
+.action-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.4));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.action-text {
+  flex: 1;
+}
+
+.action-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--theme-text, #2E2A23);
+}
+
+.action-desc {
+  font-size: 12px;
+  color: var(--theme-text-secondary, #8C8478);
+  margin-top: 2px;
+}
+
+.action-arrow {
+  color: var(--theme-text-secondary, #8C8478);
 }
 
 .stats-card {
