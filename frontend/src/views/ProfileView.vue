@@ -111,7 +111,7 @@
           </n-form-item>
 
           <n-form-item label="邮箱">
-            <n-input :value="user?.email" disabled placeholder="未绑定邮箱" />
+            <n-input :value="user?.email || ''" disabled placeholder="未绑定邮箱" />
           </n-form-item>
 
           <n-form-item label="性别" path="gender">
@@ -430,9 +430,11 @@ async function openProfileModal() {
   // 从 API 获取最新用户信息
   try {
     const { data } = await api.get('/user/me')
+    console.log('User API response:', data)
     // 更新用户信息
     user.value = data
     authStore.user = { ...authStore.user, ...data }
+    console.log('Updated user.value:', user.value)
   } catch (err) {
     console.error('Failed to fetch user info:', err)
   }
