@@ -430,8 +430,12 @@ async function openProfileModal() {
   // 从 API 获取最新用户信息
   try {
     const { data } = await api.get('/user/me')
-    user.value = { ...user.value, ...data }
-  } catch {}
+    // 更新用户信息
+    user.value = data
+    authStore.user = { ...authStore.user, ...data }
+  } catch (err) {
+    console.error('Failed to fetch user info:', err)
+  }
   
   editForm.nickname = user.value?.nickname || ''
   editForm.gender = user.value?.gender || null
