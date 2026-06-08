@@ -35,7 +35,7 @@
 
                 <div class="nav-right">
                   <!-- 主题选择按钮 -->
-                  <n-popover trigger="click" placement="bottom-end" :show="showThemePicker" @update:show="showThemePicker = $event">
+                  <n-popover trigger="click" placement="bottom-end" :show="showThemePicker" @update:show="onThemePickerClose">
                     <template #trigger>
                       <a class="theme-btn" @click="showThemePicker = true">
                         <n-icon :component="ColorPaletteOutline" :size="18" />
@@ -178,6 +178,15 @@ function applyTheme() {
   originalTheme.value = selectedTheme.value
   themeStore.setTheme(selectedTheme.value)  // 确定时才保存
   showThemePicker.value = false
+}
+
+function onThemePickerClose(visible) {
+  if (!visible) {
+    // 弹窗关闭时（点击空白处或取消），恢复原主题
+    selectedTheme.value = originalTheme.value
+    themeStore.previewOnly(originalTheme.value)
+  }
+  showThemePicker.value = visible
 }
 
 function handleImageUpload(event) {

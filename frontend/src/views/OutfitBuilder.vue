@@ -38,7 +38,7 @@
           </div>
         </div>
         <div v-else class="empty-inline">
-          <n-empty description="暂无衣物" :size="40" />
+          <n-empty description="暂无衣物" size="40" />
         </div>
       </div>
 

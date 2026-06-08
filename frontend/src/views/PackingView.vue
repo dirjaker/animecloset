@@ -17,7 +17,7 @@
     </div>
 
     <div v-else-if="!trips.length" class="empty-state glass-card">
-      <n-empty description="暂无行程" :size="48">
+      <n-empty description="暂无行程" size="48">
         <template #extra>
           <n-button size="small" @click="showCreate = true">创建第一个行程</n-button>
         </template>
