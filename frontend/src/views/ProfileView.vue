@@ -549,7 +549,14 @@ async function saveReminder() {
 }
 
 async function loadAll() {
-  user.value = authStore.user
+  // 从 API 获取完整用户信息
+  try {
+    const { data } = await api.get('/user/me')
+    user.value = data
+    authStore.user = { ...authStore.user, ...data }
+  } catch {
+    user.value = authStore.user
+  }
 
   statsLoading.value = true
   try {
