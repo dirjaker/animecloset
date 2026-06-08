@@ -31,6 +31,10 @@ class User(Base):
     nickname: Mapped[str] = mapped_column(String(100), nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
 
+    # 个人信息
+    gender: Mapped[str | None] = mapped_column(String(10), nullable=True, default=None)  # male/female/other
+    avatar_url: Mapped[str | None] = mapped_column(String(500), nullable=True, default=None)  # 头像URL
+
     # 捏人配置：JSON 字符串，存储发型/肤色/体型 ID
     avatar_config: Mapped[str | None] = mapped_column(Text, nullable=True, default=None)
 

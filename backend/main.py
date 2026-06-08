@@ -56,6 +56,11 @@ import os
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# 上传文件静态服务
+uploads_dir = os.path.join(os.path.dirname(__file__), "uploads")
+os.makedirs(uploads_dir, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+
 # 注册路由
 app.include_router(auth_router, prefix="/api")
 app.include_router(garments_router, prefix="/api")

@@ -19,6 +19,8 @@ class UserResponse(BaseModel):
     id: str
     email: str
     nickname: str
+    gender: str | None = None
+    avatar_url: str | None = None
     avatar_config: AvatarConfig | None = None
     created_at: datetime | None = None  # 注册时间
 
@@ -28,6 +30,8 @@ class UserResponse(BaseModel):
 class UpdateProfileRequest(BaseModel):
     """更新个人信息请求"""
     nickname: str | None = Field(None, min_length=2, max_length=50, description="昵称，2-50个字符")
+    gender: str | None = Field(None, description="性别: male/female/other")
+    avatar_url: str | None = Field(None, description="头像URL")
     daily_reminder: bool | None = None
     reminder_time: str | None = None
 
