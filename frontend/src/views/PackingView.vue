@@ -266,24 +266,24 @@ onMounted(() => loadTrips())
   font-family: 'Noto Serif SC', serif;
   font-size: 22px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   letter-spacing: 1px;
 }
 
 .page-line {
   width: 100%;
   height: 1px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.4));
   margin-top: 8px;
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
   backdrop-filter: blur(40px) saturate(160%);
   -webkit-backdrop-filter: blur(40px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.45));
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  box-shadow: var(--theme-card-shadow, 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset);
 }
 
 .loading-area {
@@ -317,14 +317,14 @@ onMounted(() => loadTrips())
 }
 
 .trip-header:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.15));
 }
 
 .trip-name {
   font-family: 'Noto Serif SC', serif;
   font-size: 16px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 .trip-meta {
@@ -332,14 +332,14 @@ onMounted(() => loadTrips())
   gap: 12px;
   margin-top: 4px;
   font-size: 13px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
 }
 
 .trip-actions {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
 }
 
 .trip-count {
@@ -368,7 +368,7 @@ onMounted(() => loadTrips())
 }
 
 .day-block {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.25));
   border-radius: 8px;
   padding: 12px;
 }
@@ -376,7 +376,7 @@ onMounted(() => loadTrips())
 .day-label {
   font-size: 13px;
   font-weight: 600;
-  color: #5A5048;
+  color: var(--theme-primary-pressed, #5A5048);
   margin-bottom: 8px;
 }
 
@@ -391,7 +391,7 @@ onMounted(() => loadTrips())
   height: 52px;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
 }
 
 .day-garment-thumb img {
@@ -402,7 +402,7 @@ onMounted(() => loadTrips())
 
 .day-empty {
   font-size: 12px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   padding: 8px 0;
 }
 
@@ -414,13 +414,13 @@ onMounted(() => loadTrips())
 .empty-inline-text {
   font-family: 'Noto Serif SC', serif;
   font-size: 14px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   font-weight: 500;
 }
 
 .empty-inline-sub {
   font-size: 12px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   margin-top: 4px;
 }
 

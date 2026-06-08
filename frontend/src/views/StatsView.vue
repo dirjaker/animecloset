@@ -247,24 +247,24 @@ onMounted(() => loadAll())
   font-family: 'Noto Serif SC', serif;
   font-size: 22px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   letter-spacing: 1px;
 }
 
 .page-line {
   width: 100%;
   height: 1px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.4));
   margin-top: 8px;
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
   backdrop-filter: blur(40px) saturate(160%);
   -webkit-backdrop-filter: blur(40px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.45));
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  box-shadow: var(--theme-card-shadow, 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset);
 }
 
 /* Metrics */
@@ -290,7 +290,7 @@ onMounted(() => loadAll())
   font-family: 'Noto Serif SC', serif;
   font-size: 16px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   margin-bottom: 20px;
 }
 
@@ -307,7 +307,7 @@ onMounted(() => loadAll())
 .empty-inline-text {
   font-family: 'Noto Serif SC', serif;
   font-size: 14px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   font-weight: 500;
 }
 
@@ -343,13 +343,13 @@ onMounted(() => loadAll())
   position: absolute;
   top: 0;
   font-size: 10px;
-  color: #5A5048;
+  color: var(--theme-primary-pressed, #5A5048);
   font-weight: 600;
 }
 
 .bar-label {
   font-size: 10px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   margin-top: 6px;
   white-space: nowrap;
 }
@@ -402,13 +402,13 @@ onMounted(() => loadAll())
   font-family: 'Noto Serif SC', serif;
   font-size: 20px;
   font-weight: 700;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   line-height: 1;
 }
 
 .pie-label {
   font-size: 11px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
 }
 
 .pie-legend {
@@ -432,14 +432,14 @@ onMounted(() => loadAll())
 
 .legend-text {
   font-size: 13px;
-  color: #5A5048;
+  color: var(--theme-primary-pressed, #5A5048);
   flex: 1;
 }
 
 .legend-count {
   font-size: 13px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 /* Season bars */
@@ -458,7 +458,7 @@ onMounted(() => loadAll())
 .season-name {
   width: 40px;
   font-size: 13px;
-  color: #5A5048;
+  color: var(--theme-primary-pressed, #5A5048);
   font-weight: 500;
   flex-shrink: 0;
 }
@@ -466,7 +466,7 @@ onMounted(() => loadAll())
 .season-bar-track {
   flex: 1;
   height: 20px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
   border-radius: 4px;
   overflow: hidden;
 }
@@ -483,7 +483,7 @@ onMounted(() => loadAll())
   text-align: right;
   font-size: 13px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 /* Cost table */
@@ -499,7 +499,7 @@ onMounted(() => loadAll())
   gap: 8px;
   padding: 8px 12px;
   font-size: 12px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   font-weight: 600;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
@@ -515,40 +515,40 @@ onMounted(() => loadAll())
 }
 
 .cost-row:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.2));
 }
 
 .cost-rank {
   font-size: 14px;
   font-weight: 700;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   text-align: center;
 }
 
 .cost-rank.rank-0 {
-  color: #5A5048;
+  color: var(--theme-primary-pressed, #5A5048);
 }
 
 .cost-rank.rank-1 {
-  color: #C8A09B;
+  color: var(--theme-accent, #C8A09B);
 }
 
 .cost-cat {
   font-size: 13px;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 .cost-price,
 .cost-wears,
 .cost-cpw {
   font-size: 13px;
-  color: #5A5048;
+  color: var(--theme-primary-pressed, #5A5048);
   text-align: right;
 }
 
 .cost-cpw {
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 @media (max-width: 768px) {

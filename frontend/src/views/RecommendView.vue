@@ -219,33 +219,33 @@ async function saveOutfit() {
   font-family: 'Noto Serif SC', serif;
   font-size: 22px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   letter-spacing: 1px;
 }
 
 .page-line {
   width: 100%;
   height: 1px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.4));
   margin-top: 8px;
 }
 
 /* ── Chat card ── */
 .chat-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
   backdrop-filter: blur(40px) saturate(160%);
   -webkit-backdrop-filter: blur(40px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.45));
   border-radius: 12px;
   padding: 28px 28px 24px;
   margin-bottom: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  box-shadow: var(--theme-card-shadow, 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset);
 }
 
 .guide-text {
   font-family: 'Noto Serif SC', serif;
   font-size: 15px;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   margin-bottom: 16px;
   letter-spacing: 1px;
 }
@@ -264,26 +264,26 @@ async function saveOutfit() {
   gap: 6px;
   height: 36px;
   padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.2));
   cursor: pointer;
   font-size: 13px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   transition: all 0.2s ease;
   font-family: inherit;
 }
 
 .scene-pill:hover {
-  border-color: rgba(255, 255, 255, 0.6);
-  color: #2E2A23;
-  background: rgba(255, 255, 255, 0.35);
+  border-color: var(--theme-glass-border, rgba(255, 255, 255, 0.6));
+  color: var(--theme-text, #2E2A23);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
 }
 
 .scene-pill.active {
   border-color: rgba(255, 255, 255, 0.2);
   color: #FFFFFF;
-  background: rgba(80, 70, 65, 0.45);
+  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.45));
   backdrop-filter: blur(12px);
 }
 
@@ -304,12 +304,12 @@ async function saveOutfit() {
 .chat-input {
   width: 100%;
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
   backdrop-filter: blur(20px);
   font-size: 15px;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   line-height: 1.6;
   outline: none;
   resize: vertical;
@@ -323,16 +323,16 @@ async function saveOutfit() {
 }
 
 .chat-input:focus {
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: var(--theme-glass-border, rgba(255, 255, 255, 0.6));
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.4));
 }
 
 /* ── Recommend button ── */
 .recommend-btn {
   width: 100%;
   height: 46px;
-  background: rgba(80, 70, 65, 0.4);
+  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.4));
   backdrop-filter: blur(12px);
   color: #FFFFFF;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -367,20 +367,20 @@ async function saveOutfit() {
 
 .loading-text {
   font-size: 13px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   margin-top: 12px;
 }
 
 /* ── Results ── */
 .result-section {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
   backdrop-filter: blur(40px) saturate(160%);
   -webkit-backdrop-filter: blur(40px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.45));
   border-radius: 12px;
   padding: 24px 28px;
   margin-bottom: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  box-shadow: var(--theme-card-shadow, 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset);
 }
 
 .result-header {
@@ -394,13 +394,13 @@ async function saveOutfit() {
   font-family: 'Noto Serif SC', serif;
   font-size: 18px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 .result-reason {
   font-size: 14px;
   line-height: 1.7;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   margin-bottom: 20px;
 }
 
@@ -412,23 +412,23 @@ async function saveOutfit() {
 
 .result-item-card {
   display: flex;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
   backdrop-filter: blur(20px);
   border-radius: 10px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
   transition: all 0.3s ease;
 }
 
 .result-item-card:hover {
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: var(--theme-glass-border, rgba(255, 255, 255, 0.6));
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
 .result-item-img-wrap {
   width: 50%;
   aspect-ratio: 1;
-  background: rgba(240, 235, 227, 0.5);
+  background: var(--theme-surface-bg, rgba(240, 235, 227, 0.5));
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -457,12 +457,12 @@ async function saveOutfit() {
 .result-cat {
   font-size: 13px;
   font-weight: 500;
-  color: #5A5048;
+  color: var(--theme-primary-pressed, #5A5048);
 }
 
 .cold-wake {
   font-size: 11px;
-  color: #C8A09B;
+  color: var(--theme-accent, #C8A09B);
   background: rgba(200, 160, 155, 0.15);
   padding: 2px 8px;
   border-radius: 4px;
@@ -470,7 +470,7 @@ async function saveOutfit() {
 
 .result-item-reason {
   font-size: 12px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   margin-top: 8px;
   line-height: 1.5;
 }
@@ -479,7 +479,7 @@ async function saveOutfit() {
   width: 100%;
   margin-top: 20px;
   height: 44px;
-  background: rgba(80, 70, 65, 0.4);
+  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.4));
   backdrop-filter: blur(12px);
   color: #FFFFFF;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -516,7 +516,7 @@ async function saveOutfit() {
   font-family: 'Noto Serif SC', serif;
   font-size: 16px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 .cold-grid {
@@ -526,16 +526,16 @@ async function saveOutfit() {
 }
 
 .cold-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
   backdrop-filter: blur(20px);
   border-radius: 10px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
   transition: all 0.3s ease;
 }
 
 .cold-card:hover {
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: var(--theme-glass-border, rgba(255, 255, 255, 0.6));
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
@@ -550,18 +550,18 @@ async function saveOutfit() {
   display: flex;
   align-items: center;
   gap: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  border-top: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
 }
 
 .cold-cat {
   font-size: 12px;
-  color: #5A5048;
+  color: var(--theme-primary-pressed, #5A5048);
   font-weight: 500;
 }
 
 .cold-days {
   font-size: 11px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
 }
 
 @media (max-width: 768px) {
@@ -576,7 +576,7 @@ async function saveOutfit() {
 
   .result-item-info {
     width: 100%;
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    border-top: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
   }
 
   .scene-pills {

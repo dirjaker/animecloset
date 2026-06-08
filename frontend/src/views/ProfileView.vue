@@ -12,7 +12,7 @@
       <div class="user-card">
         <div class="user-card-inner">
           <div class="avatar-wrap">
-            <n-avatar :size="56" round :style="{ background: 'rgba(80, 70, 65, 0.45)', backdropFilter: 'blur(12px)', fontSize: '24px', fontWeight: '600', fontFamily: 'Noto Serif SC, serif' }">
+            <n-avatar :size="56" round :style="{ background: 'var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.45))', backdropFilter: 'blur(12px)', fontSize: '24px', fontWeight: '600', fontFamily: 'Noto Serif SC, serif' }">
               {{ user?.nickname?.charAt(0) || '?' }}
             </n-avatar>
           </div>
@@ -50,6 +50,44 @@
         <div class="ai-text">
           <p class="ai-title">AI 穿搭插画</p>
           <p class="ai-desc">保存穿搭后，在日历页面点击「生成 AI 穿搭插画」即可生成动漫风格形象</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主题切换 Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <n-icon :component="ColorPaletteOutline" :size="18" />
+        <span>主题配色</span>
+      </div>
+      <div class="theme-grid">
+        <div
+          v-for="key in themeKeys"
+          :key="key"
+          :class="['theme-swatch', { active: themeStore.currentKey === key }]"
+          @click="themeStore.setTheme(key)"
+        >
+          <div class="swatch-preview">
+            <div class="swatch-bg" :style="{ background: allThemes[key].bg }">
+              <div
+                v-for="(orb, i) in allThemes[key].orbs"
+                :key="i"
+                class="swatch-orb"
+                :style="{
+                  background: orb,
+                  top: i < 2 ? '-2px' : 'auto',
+                  bottom: i >= 2 ? '-2px' : 'auto',
+                  left: i % 2 === 0 ? '-2px' : 'auto',
+                  right: i % 2 === 1 ? '-2px' : 'auto',
+                }"
+              ></div>
+            </div>
+          </div>
+          <div class="swatch-label">
+            <span class="swatch-emoji">{{ allThemes[key].emoji }}</span>
+            <span class="swatch-name">{{ allThemes[key].name }}</span>
+          </div>
+          <div v-if="themeStore.currentKey === key" class="swatch-check">✓</div>
         </div>
       </div>
     </div>
@@ -113,7 +151,6 @@
 
     <!-- Frequency + Favorites 2-col -->
     <div class="two-col-row">
-      <!-- 穿着最多 -->
       <div class="section-card">
         <div class="section-header">
           <span>穿着最多</span>
@@ -138,7 +175,6 @@
         </n-spin>
       </div>
 
-      <!-- AI 插画说明 / favorites placeholder -->
       <div class="section-card">
         <div class="section-header">
           <span>收藏场景</span>
@@ -188,10 +224,13 @@ import {
   StatsChartOutline,
   ChevronForwardOutline,
   NotificationsOutline,
+  ColorPaletteOutline,
 } from '@vicons/ionicons5'
 import { NStatistic, NSwitch, NTimePicker } from 'naive-ui'
 import { getWardrobeStats, getWearRanking, getColdPalace } from '../api/index.js'
 import { authStore } from '../stores/auth.js'
+import { themeStore } from '../stores/theme.js'
+import { themes as allThemes, themeKeys } from '../themes.js'
 import api from '../api/index.js'
 
 const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`
@@ -204,14 +243,12 @@ const rankingLoading = ref(false)
 const coldItems = ref([])
 const coldLoading = ref(false)
 
-// Profile stats
 const profileStats = ref({
   month_wears: 0,
   favorite_category: '-',
   avg_cost_per_wear: '0.0',
 })
 
-// Reminder settings
 const reminderEnabled = ref(false)
 const reminderTime = ref('08:00')
 
@@ -261,7 +298,6 @@ async function loadAll() {
     coldItems.value = data.items || []
   } catch {} finally { coldLoading.value = false }
 
-  // Load profile stats
   try {
     const { data } = await api.get('/stats/monthly')
     profileStats.value.month_wears = data.month_wears || data.total_wears || 0
@@ -271,7 +307,6 @@ async function loadAll() {
       : '0.0'
   } catch {}
 
-  // Load user reminder settings
   try {
     const { data } = await api.get('/user/me')
     if (data.daily_reminder !== undefined) {
@@ -304,14 +339,14 @@ onMounted(() => loadAll())
   font-family: 'Noto Serif SC', serif;
   font-size: 22px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   letter-spacing: 1px;
 }
 
 .page-line {
   width: 100%;
   height: 1px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--theme-glass-border, rgba(255, 255, 255, 0.4));
   margin-top: 8px;
 }
 
@@ -324,13 +359,14 @@ onMounted(() => loadAll())
 }
 
 .user-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
   backdrop-filter: blur(40px) saturate(160%);
   -webkit-backdrop-filter: blur(40px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.45));
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  box-shadow: var(--theme-card-shadow, 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset);
+  transition: background 0.4s ease, border-color 0.4s ease;
 }
 
 .user-card-inner {
@@ -347,25 +383,26 @@ onMounted(() => loadAll())
   font-family: 'Noto Serif SC', serif;
   font-size: 18px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 .user-email {
   font-size: 13px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   margin-top: 4px;
 }
 
 .stats-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
   backdrop-filter: blur(40px) saturate(160%);
   -webkit-backdrop-filter: blur(40px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.45));
   border-radius: 12px;
   padding: 24px;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  box-shadow: var(--theme-card-shadow, 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset);
+  transition: background 0.4s ease, border-color 0.4s ease;
 }
 
 .stats-grid {
@@ -383,20 +420,20 @@ onMounted(() => loadAll())
   font-family: 'Noto Serif SC', serif;
   font-size: 28px;
   font-weight: 700;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   line-height: 1.1;
 }
 
 .stat-label {
   font-size: 13px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   margin-top: 6px;
   font-weight: 500;
 }
 
 /* AI card */
 .ai-card {
-  background: rgba(80, 70, 65, 0.45);
+  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.45));
   backdrop-filter: blur(40px) saturate(160%);
   -webkit-backdrop-filter: blur(40px) saturate(160%);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -404,6 +441,7 @@ onMounted(() => loadAll())
   margin-bottom: 24px;
   padding: 24px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: background 0.4s ease;
 }
 
 .ai-card-inner {
@@ -437,6 +475,92 @@ onMounted(() => loadAll())
   line-height: 1.6;
 }
 
+/* ── Theme picker ── */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.theme-swatch {
+  position: relative;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 12px;
+  border: 2px solid transparent;
+  transition: all 0.25s ease;
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.2));
+}
+
+.theme-swatch:hover {
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.theme-swatch.active {
+  border-color: var(--theme-primary, #70645A);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.4));
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.swatch-preview {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.swatch-bg {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: 8px;
+}
+
+.swatch-orb {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  filter: blur(6px);
+  opacity: 0.6;
+}
+
+.swatch-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+
+.swatch-emoji {
+  font-size: 16px;
+}
+
+.swatch-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--theme-text, #2E2A23);
+}
+
+.swatch-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--theme-primary, #70645A);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Quick stats */
 .quick-stats-grid {
   display: grid;
@@ -447,8 +571,9 @@ onMounted(() => loadAll())
 .quick-stat-item {
   text-align: center;
   padding: 8px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.2));
   border-radius: 8px;
+  transition: background 0.3s ease;
 }
 
 /* Reminder */
@@ -467,12 +592,12 @@ onMounted(() => loadAll())
 .reminder-title {
   font-size: 14px;
   font-weight: 500;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 .reminder-desc {
   font-size: 12px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   margin-top: 2px;
 }
 
@@ -481,13 +606,13 @@ onMounted(() => loadAll())
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.2));
   border-radius: 8px;
 }
 
 .reminder-time-label {
   font-size: 13px;
-  color: #5A5048;
+  color: var(--theme-primary-pressed, #5A5048);
   font-weight: 500;
 }
 
@@ -501,14 +626,15 @@ onMounted(() => loadAll())
 
 /* Section cards */
 .section-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
   backdrop-filter: blur(40px) saturate(160%);
   -webkit-backdrop-filter: blur(40px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.45));
   border-radius: 12px;
   padding: 20px 24px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  box-shadow: var(--theme-card-shadow, 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset);
+  transition: background 0.4s ease, border-color 0.4s ease;
 }
 
 .section-header {
@@ -518,7 +644,7 @@ onMounted(() => loadAll())
   font-family: 'Noto Serif SC', serif;
   font-size: 16px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   margin-bottom: 16px;
 }
 
@@ -534,14 +660,14 @@ onMounted(() => loadAll())
   align-items: center;
   gap: 14px;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.25));
   backdrop-filter: blur(12px);
   border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .ranking-item:hover {
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--theme-input-focus-bg, rgba(255, 255, 255, 0.4));
 }
 
 .rank-badge {
@@ -553,24 +679,24 @@ onMounted(() => loadAll())
   justify-content: center;
   font-size: 14px;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.3);
-  color: #8C8478;
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
+  color: var(--theme-text-secondary, #8C8478);
   flex-shrink: 0;
 }
 
 .rank-0 {
-  background: rgba(80, 70, 65, 0.5);
+  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.5));
   color: #FFFFFF;
 }
 
 .rank-1 {
-  background: rgba(200, 160, 155, 0.5);
+  background: var(--theme-accent, rgba(200, 160, 155, 0.5));
   color: #FFFFFF;
 }
 
 .rank-2 {
-  background: rgba(255, 255, 255, 0.25);
-  color: #8C8478;
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.25));
+  color: var(--theme-text-secondary, #8C8478);
 }
 
 .ranking-img {
@@ -579,7 +705,7 @@ onMounted(() => loadAll())
   border-radius: 6px;
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
 }
 
 .ranking-info {
@@ -589,17 +715,17 @@ onMounted(() => loadAll())
 .ranking-cat {
   font-size: 14px;
   font-weight: 500;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 .ranking-count {
   font-family: 'Noto Serif SC', serif;
   font-size: 15px;
   font-weight: 700;
-  color: #5A5048;
+  color: var(--theme-primary-pressed, #5A5048);
 }
 
-/* Cold items - alternating grid like wardrobe */
+/* Cold items */
 .cold-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -608,14 +734,14 @@ onMounted(() => loadAll())
 }
 
 .cold-item {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
   backdrop-filter: blur(40px) saturate(160%);
   -webkit-backdrop-filter: blur(40px) saturate(160%);
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.45));
+  box-shadow: var(--theme-card-shadow, 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset);
 }
 
 .cold-item.cold-large {
@@ -648,18 +774,18 @@ onMounted(() => loadAll())
   display: flex;
   align-items: center;
   gap: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  border-top: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
 }
 
 .cold-cat {
   font-size: 12px;
-  color: #5A5048;
+  color: var(--theme-primary-pressed, #5A5048);
   font-weight: 500;
 }
 
 .cold-days {
   font-size: 12px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
 }
 
 /* Empty state */
@@ -671,13 +797,13 @@ onMounted(() => loadAll())
 .empty-inline-text {
   font-family: 'Noto Serif SC', serif;
   font-size: 14px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   font-weight: 500;
 }
 
 .empty-inline-sub {
   font-size: 12px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   margin-top: 4px;
 }
 
@@ -717,6 +843,10 @@ onMounted(() => loadAll())
   .ai-card-inner {
     flex-direction: column;
     text-align: center;
+  }
+
+  .theme-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 </style>

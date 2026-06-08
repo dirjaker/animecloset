@@ -206,24 +206,24 @@ onMounted(() => loadGarments())
   font-family: 'Noto Serif SC', serif;
   font-size: 22px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   letter-spacing: 1px;
 }
 
 .page-line {
   width: 100%;
   height: 1px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.4));
   margin-top: 8px;
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
   backdrop-filter: blur(40px) saturate(160%);
   -webkit-backdrop-filter: blur(40px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.45));
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  box-shadow: var(--theme-card-shadow, 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset);
 }
 
 .builder-layout {
@@ -255,7 +255,7 @@ onMounted(() => loadGarments())
   font-family: 'Noto Serif SC', serif;
   font-size: 16px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 .filter-tabs {
@@ -272,7 +272,7 @@ onMounted(() => loadGarments())
   background: none;
   font-size: 13px;
   font-weight: 500;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -282,12 +282,12 @@ onMounted(() => loadGarments())
 }
 
 .tab:hover {
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 .tab.active {
-  color: #70645A;
-  border-bottom-color: #70645A;
+  color: var(--theme-primary, #70645A);
+  border-bottom-color: var(--theme-primary, #70645A);
 }
 
 .loading-area {
@@ -310,7 +310,7 @@ onMounted(() => loadGarments())
   cursor: pointer;
   border: 2px solid transparent;
   transition: all 0.2s ease;
-  background: rgba(240, 235, 227, 0.5);
+  background: var(--theme-surface-bg, rgba(240, 235, 227, 0.5));
 }
 
 .garment-thumb:hover {
@@ -319,7 +319,7 @@ onMounted(() => loadGarments())
 }
 
 .garment-thumb.selected {
-  border-color: #C8A09B;
+  border-color: var(--theme-accent, #C8A09B);
   opacity: 0.5;
   pointer-events: none;
 }
@@ -335,7 +335,7 @@ onMounted(() => loadGarments())
   display: block;
   text-align: center;
   font-size: 11px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   padding: 4px;
 }
 
@@ -361,7 +361,7 @@ onMounted(() => loadGarments())
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.2));
   overflow: hidden;
 }
 
@@ -379,7 +379,7 @@ onMounted(() => loadGarments())
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
 }
 
 .slot-empty span {
@@ -414,7 +414,7 @@ onMounted(() => loadGarments())
 }
 
 .save-btn {
-  background: rgba(80, 70, 65, 0.4) !important;
+  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.4)) !important;
   backdrop-filter: blur(12px) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   font-family: 'Noto Serif SC', serif !important;

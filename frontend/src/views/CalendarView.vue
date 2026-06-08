@@ -342,7 +342,7 @@ async function generateIllustration() {
   font-family: 'Noto Serif SC', serif;
   font-size: 14px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   letter-spacing: 1px;
   white-space: nowrap;
   z-index: 2;
@@ -355,7 +355,7 @@ async function generateIllustration() {
 .weekday-cell {
   font-size: 11px;
   font-weight: 500;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   letter-spacing: 1px;
   line-height: 28px;
   text-align: center;
@@ -363,7 +363,7 @@ async function generateIllustration() {
 
 .weekday-cell:nth-child(1),
 .weekday-cell:nth-child(7) {
-  color: #C8A09B;
+  color: var(--theme-accent, #C8A09B);
 }
 
 .top-right {
@@ -386,7 +386,7 @@ async function generateIllustration() {
 
 .month-nav-btn {
   font-size: 12px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   cursor: pointer;
   width: 24px;
   height: 24px;
@@ -399,21 +399,21 @@ async function generateIllustration() {
 }
 
 .month-nav-btn:hover {
-  color: #5A5048;
-  background: rgba(255, 255, 255, 0.3);
+  color: var(--theme-primary-pressed, #5A5048);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
 }
 
 .month-label {
   font-family: 'Noto Serif SC', serif;
   font-size: 14px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   min-width: 80px;
   text-align: center;
 }
 
 .gen-today-btn {
-  background: rgba(80, 70, 65, 0.4) !important;
+  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.4)) !important;
   backdrop-filter: blur(12px);
   border-color: rgba(255, 255, 255, 0.2) !important;
   font-family: 'Noto Serif SC', serif;
@@ -449,17 +449,17 @@ async function generateIllustration() {
   flex-direction: column;
   cursor: pointer;
   transition: all 0.18s ease;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
   position: relative;
   box-sizing: border-box;
 }
 
 .day-cell:hover:not(.other) {
   background: rgba(255, 255, 255, 0.45);
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: var(--theme-glass-border, rgba(255, 255, 255, 0.6));
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
@@ -471,8 +471,8 @@ async function generateIllustration() {
 }
 
 .day-cell.today {
-  background: rgba(255, 255, 255, 0.4);
-  border-color: #5A5048;
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.4));
+  border-color: var(--theme-primary-pressed, #5A5048);
 }
 
 .day-cell.selected {
@@ -488,13 +488,13 @@ async function generateIllustration() {
 .day-num {
   font-size: 13px;
   font-weight: 500;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   line-height: 1;
   margin-bottom: auto;
 }
 
 .day-cell.weekend:not(.other) .day-num {
-  color: #C8A09B;
+  color: var(--theme-accent, #C8A09B);
 }
 
 .day-num-today {
@@ -504,7 +504,7 @@ async function generateIllustration() {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: rgba(80, 70, 65, 0.5);
+  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.5));
   color: #FFFFFF !important;
   font-size: 11px;
   font-weight: 700;
@@ -525,7 +525,7 @@ async function generateIllustration() {
   max-height: 100%;
   border-radius: 6px;
   object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
 }
 
 .day-dot {
@@ -566,7 +566,7 @@ async function generateIllustration() {
   background: rgba(240, 235, 227, 0.7);
   backdrop-filter: blur(40px) saturate(160%);
   -webkit-backdrop-filter: blur(40px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
   border-bottom: none;
   border-radius: 12px 12px 0 0;
   padding: 8px 24px 16px;
@@ -596,7 +596,7 @@ async function generateIllustration() {
   height: 28px;
   border: none;
   background: transparent;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
@@ -608,8 +608,8 @@ async function generateIllustration() {
 }
 
 .drawer-close:hover {
-  color: #5A5048;
-  background: rgba(255, 255, 255, 0.3);
+  color: var(--theme-primary-pressed, #5A5048);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
 }
 
 .drawer-content {
@@ -622,7 +622,7 @@ async function generateIllustration() {
   font-family: 'Noto Serif SC', serif;
   font-size: 14px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   flex-shrink: 0;
 }
 
@@ -637,13 +637,13 @@ async function generateIllustration() {
   height: 44px;
   border-radius: 6px;
   object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
 }
 
 .drawer-weather {
   font-size: 12px;
-  color: #8C8478;
-  background: rgba(255, 255, 255, 0.3);
+  color: var(--theme-text-secondary, #8C8478);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
   backdrop-filter: blur(8px);
   padding: 4px 10px;
   border-radius: 4px;
@@ -659,12 +659,12 @@ async function generateIllustration() {
 .drawer-empty-text {
   font-family: 'Noto Serif SC', serif;
   font-size: 13px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
 }
 
 .record-btn {
   margin-left: auto;
-  background: rgba(80, 70, 65, 0.4) !important;
+  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.4)) !important;
   backdrop-filter: blur(12px);
   border-color: rgba(255, 255, 255, 0.2) !important;
   font-family: 'Noto Serif SC', serif;
@@ -699,7 +699,7 @@ async function generateIllustration() {
 }
 
 .generate-btn {
-  background: rgba(80, 70, 65, 0.4) !important;
+  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.4)) !important;
   backdrop-filter: blur(12px);
   border-color: rgba(255, 255, 255, 0.2) !important;
 }
@@ -720,13 +720,13 @@ async function generateIllustration() {
   height: 56px;
   border-radius: 6px;
   object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
 }
 
 .modal-garment-cat {
   display: block;
   font-size: 11px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   margin-top: 4px;
 }
 
@@ -736,8 +736,8 @@ async function generateIllustration() {
 
 .weather-tag {
   font-size: 12px;
-  color: #8C8478;
-  background: rgba(255, 255, 255, 0.3);
+  color: var(--theme-text-secondary, #8C8478);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
   backdrop-filter: blur(8px);
   padding: 4px 10px;
   border-radius: 4px;
@@ -745,7 +745,7 @@ async function generateIllustration() {
 
 .outfit-reason {
   font-size: 13px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   line-height: 1.6;
 }
 
@@ -756,7 +756,7 @@ async function generateIllustration() {
 
 .modal-empty-text {
   font-family: 'Noto Serif SC', serif;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
 }
 
 /* ── Mobile ── */

@@ -4,7 +4,7 @@
       <n-notification-provider>
         <n-dialog-provider>
           <div class="app-root">
-            <!-- Floating orbs background (shared across all internal pages) -->
+            <!-- Floating orbs background -->
             <div v-show="!isLoginPage" class="app-bg">
               <div class="app-orb app-orb-1"></div>
               <div class="app-orb app-orb-2"></div>
@@ -12,7 +12,7 @@
               <div class="app-orb app-orb-4"></div>
             </div>
 
-            <!-- Nav: always mounted, hidden on login -->
+            <!-- Nav -->
             <nav v-show="!isLoginPage" class="top-nav">
               <div class="nav-inner">
                 <div class="nav-logo">
@@ -39,7 +39,7 @@
               </div>
             </nav>
 
-            <!-- Main: always mounted, router-view is the single source of truth -->
+            <!-- Main -->
             <main v-show="!isLoginPage" class="main-area">
               <div class="main-content">
                 <router-view />
@@ -59,7 +59,7 @@
               </a>
             </nav>
 
-            <!-- Login page: rendered by router, overlays everything (position: fixed in LoginView) -->
+            <!-- Login page overlays everything -->
             <router-view v-if="isLoginPage" />
           </div>
         </n-dialog-provider>
@@ -69,10 +69,11 @@
 </template>
 
 <script setup>
-import { h, computed } from 'vue'
+import { h, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { NIcon } from 'naive-ui'
 import { authStore } from './stores/auth.js'
+import { themeStore } from './stores/theme.js'
 import {
   ShirtOutline,
   CalendarOutline,
@@ -89,30 +90,22 @@ const route = useRoute()
 const currentRoute = computed(() => route.path)
 const isLoginPage = computed(() => route.path === '/login')
 
-const themeOverrides = {
+// Naive UI 主题跟随当前主题色
+const themeOverrides = computed(() => ({
   common: {
-    primaryColor: '#70645A',
-    primaryColorHover: '#8A7A6E',
-    primaryColorPressed: '#5A5048',
-    primaryColorSuppl: '#C8A09B',
+    primaryColor: themeStore.theme.primary,
+    primaryColorHover: themeStore.theme.primaryHover,
+    primaryColorPressed: themeStore.theme.primaryPressed,
+    primaryColorSuppl: themeStore.theme.accent,
     borderRadius: '8px',
     borderRadiusSmall: '6px',
     fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif",
   },
-  Button: {
-    borderRadiusMedium: '8px',
-    borderRadiusSmall: '6px',
-  },
-  Card: {
-    borderRadius: '8px',
-  },
-  Input: {
-    borderRadius: '8px',
-  },
-  Tag: {
-    borderRadius: '6px',
-  },
-}
+  Button: { borderRadiusMedium: '8px', borderRadiusSmall: '6px' },
+  Card: { borderRadius: '8px' },
+  Input: { borderRadius: '8px' },
+  Tag: { borderRadius: '6px' },
+}))
 
 function renderIcon(icon) {
   return () => h(NIcon, null, { default: () => h(icon) })
@@ -147,31 +140,14 @@ function logout() {
   box-sizing: border-box;
 }
 
-:root {
-  --color-primary: #70645A;
-  --color-primary-hover: #8A7A6E;
-  --color-primary-pressed: #5A5048;
-  --color-accent: #C8A09B;
-  --color-bg: #F0EBE3;
-  --color-surface: rgba(255, 255, 255, 0.35);
-  --color-text: #2E2A23;
-  --color-text-secondary: #8C8478;
-  --color-border: rgba(255, 255, 255, 0.45);
-  --glass-blur: blur(40px) saturate(160%);
-  --glass-bg: rgba(255, 255, 255, 0.35);
-  --glass-border: 1px solid rgba(255, 255, 255, 0.45);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 1px 0 rgba(255, 255, 255, 0.6) inset;
-  --dark-glass-bg: rgba(80, 70, 65, 0.4);
-  --dark-glass-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
-}
-
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background: var(--color-bg);
-  color: #2E2A23;
+  background: var(--theme-bg, #F5F0E8);
+  color: var(--theme-text, #2E2A23);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background 0.5s ease, color 0.3s ease;
 }
 
 .app-root {
@@ -192,16 +168,17 @@ body {
   position: absolute;
   border-radius: 50%;
   filter: blur(100px);
-  opacity: 0.35;
+  opacity: var(--theme-orb-opacity, 0.35);
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
   animation-direction: alternate;
+  transition: background 0.8s ease, opacity 0.5s ease;
 }
 
 .app-orb-1 {
   width: 500px;
   height: 500px;
-  background: #D4A0A0;
+  background: var(--theme-orb-1, #D4A0A0);
   top: -8%;
   left: -5%;
   animation: orbFloat1 20s infinite alternate;
@@ -210,7 +187,7 @@ body {
 .app-orb-2 {
   width: 400px;
   height: 400px;
-  background: #D4C5A0;
+  background: var(--theme-orb-2, #D4C5A0);
   top: -3%;
   right: -8%;
   animation: orbFloat2 24s infinite alternate;
@@ -219,7 +196,7 @@ body {
 .app-orb-3 {
   width: 450px;
   height: 450px;
-  background: #D9B896;
+  background: var(--theme-orb-3, #D9B896);
   bottom: -8%;
   right: 5%;
   animation: orbFloat3 22s infinite alternate;
@@ -228,7 +205,7 @@ body {
 .app-orb-4 {
   width: 350px;
   height: 350px;
-  background: #C5B8D4;
+  background: var(--theme-orb-4, #C5B8D4);
   bottom: 5%;
   left: 10%;
   animation: orbFloat4 26s infinite alternate;
@@ -261,14 +238,15 @@ body {
   left: 0;
   right: 0;
   height: 56px;
-  background: rgba(240, 235, 227, 0.65);
+  background: var(--theme-nav-glass-bg, rgba(240, 235, 227, 0.65));
   backdrop-filter: blur(40px) saturate(160%);
   -webkit-backdrop-filter: blur(40px) saturate(160%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  border-bottom: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
   z-index: 200;
   display: flex;
   align-items: center;
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+  transition: background 0.4s ease, border-color 0.4s ease;
 }
 
 .nav-inner {
@@ -291,21 +269,23 @@ body {
 .logo-seal {
   width: 36px;
   height: 36px;
-  background: rgba(80, 70, 65, 0.4);
+  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.4));
   backdrop-filter: blur(12px);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background 0.4s ease;
 }
 
 .logo-text {
   font-family: 'Noto Serif SC', serif;
   font-size: 18px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   letter-spacing: 2px;
+  transition: color 0.3s ease;
 }
 
 .nav-links {
@@ -316,7 +296,7 @@ body {
 
 .nav-link {
   font-size: 14px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
@@ -326,12 +306,12 @@ body {
 }
 
 .nav-link:hover {
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 .nav-link.active {
-  color: #5A5048;
-  border-bottom-color: #5A5048;
+  color: var(--theme-primary-pressed, #5A5048);
+  border-bottom-color: var(--theme-primary-pressed, #5A5048);
 }
 
 .nav-right {
@@ -341,14 +321,14 @@ body {
 
 .logout-link {
   font-size: 13px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   cursor: pointer;
   transition: color 0.2s ease;
   text-decoration: none;
 }
 
 .logout-link:hover {
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 /* ── Main area ── */
@@ -393,13 +373,14 @@ body {
     left: 0;
     right: 0;
     height: 56px;
-    background: rgba(240, 235, 227, 0.65);
+    background: var(--theme-nav-glass-bg, rgba(240, 235, 227, 0.65));
     backdrop-filter: blur(40px) saturate(160%);
     -webkit-backdrop-filter: blur(40px) saturate(160%);
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    border-top: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
     z-index: 200;
     align-items: center;
     justify-content: space-around;
+    transition: background 0.4s ease;
   }
 
   .mobile-tab {
@@ -408,14 +389,14 @@ body {
     align-items: center;
     gap: 2px;
     font-size: 11px;
-    color: #8C8478;
+    color: var(--theme-text-secondary, #8C8478);
     text-decoration: none;
     cursor: pointer;
     transition: color 0.2s ease;
   }
 
   .mobile-tab.active {
-    color: #5A5048;
+    color: var(--theme-primary-pressed, #5A5048);
   }
 }
 </style>

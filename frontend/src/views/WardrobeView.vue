@@ -400,14 +400,14 @@ onMounted(async () => {
   font-family: 'Noto Serif SC', serif;
   font-size: 22px;
   font-weight: 600;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
   letter-spacing: 1px;
 }
 
 .page-line {
   width: 100%;
   height: 1px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.4));
   margin-top: 8px;
 }
 
@@ -416,13 +416,13 @@ onMounted(async () => {
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.4));
   border-radius: 10px;
   margin-bottom: 16px;
   font-size: 13px;
-  color: #5A5048;
+  color: var(--theme-primary-pressed, #5A5048);
   font-weight: 500;
 }
 
@@ -442,7 +442,7 @@ onMounted(async () => {
   background: none;
   font-size: 13px;
   font-weight: 500;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -452,12 +452,12 @@ onMounted(async () => {
 }
 
 .wtab:hover {
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 .wtab.active {
-  color: #70645A;
-  border-bottom-color: #70645A;
+  color: var(--theme-primary, #70645A);
+  border-bottom-color: var(--theme-primary, #70645A);
 }
 
 .wtab-add {
@@ -468,7 +468,7 @@ onMounted(async () => {
 }
 
 .wtab-add:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
 }
 
 .wardrobe-inline-input {
@@ -493,7 +493,7 @@ onMounted(async () => {
   background: none;
   font-size: 14px;
   font-weight: 500;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -503,12 +503,12 @@ onMounted(async () => {
 }
 
 .tab:hover {
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 .tab.active {
-  color: #70645A;
-  border-bottom-color: #70645A;
+  color: var(--theme-primary, #70645A);
+  border-bottom-color: var(--theme-primary, #70645A);
 }
 
 .fav-toggle {
@@ -526,7 +526,7 @@ onMounted(async () => {
 
 .sort-label {
   font-size: 13px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   font-weight: 500;
 }
 
@@ -548,18 +548,18 @@ onMounted(async () => {
 }
 
 .garment-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.35));
   backdrop-filter: blur(40px) saturate(160%);
   -webkit-backdrop-filter: blur(40px) saturate(160%);
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.45));
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  box-shadow: var(--theme-card-shadow, 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset);
 }
 
 .garment-card:hover {
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: var(--theme-glass-border, rgba(255, 255, 255, 0.6));
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255, 255, 255, 0.6) inset;
   transform: translateY(-2px);
 }
@@ -567,7 +567,7 @@ onMounted(async () => {
 .card-img-wrap {
   position: relative;
   aspect-ratio: 1;
-  background: rgba(240, 235, 227, 0.5);
+  background: var(--theme-surface-bg, rgba(240, 235, 227, 0.5));
   overflow: hidden;
 }
 
@@ -604,7 +604,7 @@ onMounted(async () => {
   top: 8px;
   left: 8px;
   background: rgba(255, 253, 248, 0.9);
-  color: #C8A09B;
+  color: var(--theme-accent, #C8A09B);
   font-size: 11px;
   font-weight: 600;
   padding: 3px 8px;
@@ -658,7 +658,7 @@ onMounted(async () => {
   border-radius: 6px;
   border: none;
   background: rgba(255, 253, 248, 0.9);
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -668,7 +668,7 @@ onMounted(async () => {
 }
 
 .btn-delete:hover {
-  background: rgba(80, 70, 65, 0.5);
+  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.5));
   color: #FFFFFF;
 }
 
@@ -680,7 +680,7 @@ onMounted(async () => {
   font-family: 'Noto Serif SC', serif;
   font-size: 14px;
   font-weight: 500;
-  color: #2E2A23;
+  color: var(--theme-text, #2E2A23);
 }
 
 .card-tags {
@@ -692,8 +692,8 @@ onMounted(async () => {
 
 .card-tag-chip {
   font-size: 11px;
-  color: #8C8478;
-  background: rgba(255, 255, 255, 0.3);
+  color: var(--theme-text-secondary, #8C8478);
+  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
   backdrop-filter: blur(8px);
   padding: 2px 8px;
   border-radius: 4px;
@@ -712,7 +712,7 @@ onMounted(async () => {
 
 .lifecycle-item {
   font-size: 11px;
-  color: #C8A09B;
+  color: var(--theme-accent, #C8A09B);
   font-weight: 500;
 }
 
@@ -725,13 +725,13 @@ onMounted(async () => {
   font-family: 'Noto Serif SC', serif;
   font-size: 16px;
   font-weight: 600;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
   margin-bottom: 6px;
 }
 
 .empty-desc {
   font-size: 13px;
-  color: #8C8478;
+  color: var(--theme-text-secondary, #8C8478);
 }
 
 @media (max-width: 768px) {
