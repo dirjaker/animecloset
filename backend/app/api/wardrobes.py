@@ -4,7 +4,6 @@ api/wardrobes.py — 多衣橱管理接口
 提供衣橱的增删改查、衣物分配功能。
 """
 
-import json
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,27 +31,48 @@ def _wardrobe_to_response(w: Wardrobe, garment_count: int = 0) -> WardrobeRespon
     )
 
 
+async def _find_default_wardrobe(db: AsyncSession, user_id: str) -> Wardrobe | None:
+    """查找用户的默认衣橱（sort_order 最小的那个）"""
+    result = await db.execute(
+        select(Wardrobe)
+        .where(Wardrobe.user_id == user_id)
+        .order_by(Wardrobe.sort_order, Wardrobe.created_at)
+        .limit(1)
+    )
+    return result.scalar_one_or_none()
+
+
+async def _ensure_default_wardrobe(db: AsyncSession, user_id: str) -> Wardrobe:
+    """确保用户有默认衣橱，没有则创建"""
+    default = await _find_default_wardrobe(db, user_id)
+    if not default:
+        default = Wardrobe(user_id=user_id, name="默认", icon="👔", sort_order=0)
+        db.add(default)
+        await db.flush()
+    return default
+
+
 @router.get("", response_model=list[WardrobeResponse])
 async def list_wardrobes(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
     """获取用户所有衣橱"""
+    # 使用子查询一次性获取所有衣橱的衣物数量，避免 N+1 查询
+    count_subq = (
+        select(Garment.wardrobe_id, func.count().label("cnt"))
+        .where(Garment.wardrobe_id.isnot(None))
+        .group_by(Garment.wardrobe_id)
+        .subquery()
+    )
     result = await db.execute(
-        select(Wardrobe)
+        select(Wardrobe, func.coalesce(count_subq.c.cnt, 0).label("garment_count"))
+        .outerjoin(count_subq, Wardrobe.id == count_subq.c.wardrobe_id)
         .where(Wardrobe.user_id == user.id)
         .order_by(Wardrobe.sort_order, Wardrobe.created_at)
     )
-    wardrobes = result.scalars().all()
-
-    resp = []
-    for w in wardrobes:
-        count_result = await db.execute(
-            select(func.count()).select_from(Garment).where(Garment.wardrobe_id == w.id)
-        )
-        count = count_result.scalar() or 0
-        resp.append(_wardrobe_to_response(w, count))
-    return resp
+    rows = result.all()
+    return [_wardrobe_to_response(w, count) for w, count in rows]
 
 
 @router.post("", response_model=WardrobeResponse)
@@ -62,10 +82,18 @@ async def create_wardrobe(
     user: User = Depends(get_current_user),
 ):
     """创建新衣橱"""
+    # 自动计算 sort_order：取当前最大值 + 1
+    max_result = await db.execute(
+        select(func.max(Wardrobe.sort_order))
+        .where(Wardrobe.user_id == user.id)
+    )
+    next_sort = (max_result.scalar() or -1) + 1
+
     wardrobe = Wardrobe(
         user_id=user.id,
         name=data.name,
         icon=data.icon,
+        sort_order=next_sort,
     )
     db.add(wardrobe)
     await db.flush()
@@ -117,29 +145,40 @@ async def delete_wardrobe(
     if not wardrobe:
         raise HTTPException(status_code=404, detail="衣橱不存在")
 
-    # 找到或创建默认衣橱
-    default_result = await db.execute(
-        select(Wardrobe).where(
-            Wardrobe.user_id == user.id,
-            Wardrobe.name == "默认",
-            Wardrobe.id != wardrobe_id,
-        )
+    # 检查是否是最后一个衣橱
+    count_result = await db.execute(
+        select(func.count()).select_from(Wardrobe).where(Wardrobe.user_id == user.id)
     )
-    default_wardrobe = default_result.scalar_one_or_none()
-    if not default_wardrobe:
-        default_wardrobe = Wardrobe(user_id=user.id, name="默认", icon="👔")
-        db.add(default_wardrobe)
-        await db.flush()
+    if (count_result.scalar() or 0) <= 1:
+        raise HTTPException(status_code=400, detail="不能删除最后一个衣橱")
+
+    # 找到目标衣橱（sort_order 最小的非当前衣橱）
+    target_result = await db.execute(
+        select(Wardrobe)
+        .where(Wardrobe.user_id == user.id, Wardrobe.id != wardrobe_id)
+        .order_by(Wardrobe.sort_order, Wardrobe.created_at)
+        .limit(1)
+    )
+    target_wardrobe = target_result.scalar_one_or_none()
+    if not target_wardrobe:
+        raise HTTPException(status_code=500, detail="无法找到目标衣橱")
 
     # 把衣物移到默认衣橱
     garments_result = await db.execute(
         select(Garment).where(Garment.wardrobe_id == wardrobe_id)
     )
+    moved_count = 0
     for g in garments_result.scalars().all():
-        g.wardrobe_id = default_wardrobe.id
+        g.wardrobe_id = target_wardrobe.id
+        moved_count += 1
 
+    await db.flush()  # 先 flush 确保衣物移动完成
     await db.delete(wardrobe)
-    return {"message": "已删除，衣物已移至默认衣橱"}
+    return {
+        "message": "已删除",
+        "moved_garments": moved_count,
+        "target_wardrobe_id": target_wardrobe.id,
+    }
 
 
 @router.post("/{wardrobe_id}/garments")
@@ -168,3 +207,37 @@ async def assign_garment(
     garment.wardrobe_id = wardrobe_id
     await db.flush()
     return {"message": "已分配", "garment_id": garment.id, "wardrobe_id": wardrobe_id}
+
+
+@router.delete("/{wardrobe_id}/garments/{garment_id}")
+async def remove_garment(
+    wardrobe_id: str,
+    garment_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """将衣物从指定衣橱移除（移至默认衣橱）"""
+    # 验证衣橱存在
+    w_result = await db.execute(
+        select(Wardrobe).where(Wardrobe.id == wardrobe_id, Wardrobe.user_id == user.id)
+    )
+    if not w_result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="衣橱不存在")
+
+    # 验证衣物存在且属于该衣橱
+    g_result = await db.execute(
+        select(Garment).where(
+            Garment.id == garment_id,
+            Garment.user_id == user.id,
+            Garment.wardrobe_id == wardrobe_id,
+        )
+    )
+    garment = g_result.scalar_one_or_none()
+    if not garment:
+        raise HTTPException(status_code=404, detail="衣物不存在或不属于该衣橱")
+
+    # 移至默认衣橱
+    default = await _ensure_default_wardrobe(db, user.id)
+    garment.wardrobe_id = default.id
+    await db.flush()
+    return {"message": "已移除", "garment_id": garment.id, "target_wardrobe_id": default.id}

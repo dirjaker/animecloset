@@ -81,11 +81,13 @@
       <n-spin size="large" />
     </div>
 
+    <!-- 固定4列网格 -->
     <div v-else-if="garments.length" class="garment-grid">
       <div
-        v-for="(g, i) in garments"
+        v-for="g in garments"
         :key="g.id"
-        :class="['garment-card', getCardSize(i)]"
+        class="garment-card"
+        @click="openDetail(g)"
       >
         <div class="card-img-wrap">
           <img :src="getImgUrl(g)" :alt="g.category" class="card-img" />
@@ -95,24 +97,9 @@
           <button class="btn-fav" @click.stop="toggleFavorite(g)">
             <n-icon :component="g.is_favorite ? Heart : HeartOutline" :size="18" :color="g.is_favorite ? '#C8A09B' : '#8C8478'" />
           </button>
-          <div class="card-overlay">
-            <button class="btn-delete" @click.stop="deleteGarment(g.id)">
-              <n-icon :component="CloseOutline" :size="18" />
-            </button>
-          </div>
         </div>
         <div class="card-info">
           <span class="card-name">{{ g.category }}</span>
-          <div v-if="g.tags" class="card-tags">
-            <span v-for="t in parseTags(g.tags)" :key="t" class="card-tag-chip">{{ t }}</span>
-          </div>
-          <!-- Lifecycle info on hover -->
-          <div class="card-lifecycle">
-            <span v-if="g.purchase_date" class="lifecycle-item">购入 {{ g.purchase_date }}</span>
-            <span v-if="g.purchase_price && g.wear_count" class="lifecycle-item">
-              单次 ¥{{ (g.purchase_price / g.wear_count).toFixed(1) }}
-            </span>
-          </div>
         </div>
       </div>
     </div>
@@ -126,6 +113,81 @@
       <n-button quaternary @click="loadMore" size="large">加载更多</n-button>
     </div>
 
+    <!-- 衣物详情弹窗 -->
+    <n-modal v-model:show="showDetail" preset="card" style="max-width: 700px; border-radius: 12px" :bordered="false">
+      <div class="detail-layout" v-if="detailGarment">
+        <!-- 左侧图片 -->
+        <div class="detail-left">
+          <img :src="getImgUrl(detailGarment)" :alt="detailGarment.category" class="detail-img" />
+        </div>
+        <!-- 右侧信息 -->
+        <div class="detail-right">
+          <h3 class="detail-title">衣物详情</h3>
+          
+          <!-- 分类 -->
+          <div class="detail-field">
+            <label>分类</label>
+            <n-select
+              v-model:value="editForm.category"
+              :options="categoryOptions"
+              size="small"
+            />
+          </div>
+
+          <!-- 颜色 -->
+          <div class="detail-field">
+            <label>颜色</label>
+            <n-input v-model:value="editForm.tags.color" size="small" placeholder="如：黑色、白色" />
+          </div>
+
+          <!-- 材质 -->
+          <div class="detail-field">
+            <label>材质</label>
+            <n-input v-model:value="editForm.tags.material" size="small" placeholder="如：棉、涤纶" />
+          </div>
+
+          <!-- 风格 -->
+          <div class="detail-field">
+            <label>风格</label>
+            <n-select
+              v-model:value="editForm.tags.style"
+              :options="styleOptions"
+              multiple
+              size="small"
+            />
+          </div>
+
+          <!-- 季节 -->
+          <div class="detail-field">
+            <label>季节</label>
+            <n-select
+              v-model:value="editForm.tags.season"
+              :options="seasonOptions"
+              multiple
+              size="small"
+            />
+          </div>
+
+          <!-- 所属衣橱 -->
+          <div class="detail-field">
+            <label>所属衣橱</label>
+            <n-select
+              v-model:value="editForm.wardrobe_id"
+              :options="wardrobeOptions"
+              size="small"
+              clearable
+            />
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="detail-actions">
+            <n-button type="primary" @click="saveDetail" :loading="saving">保存修改</n-button>
+            <n-button @click="showDetail = false">取消</n-button>
+          </div>
+        </div>
+      </div>
+    </n-modal>
+
     <!-- Wardrobe context menu -->
     <n-modal v-model:show="showWardrobeMenu" preset="card" :title="`编辑「${editingWardrobe?.name}」`" style="max-width: 340px">
       <n-input v-model:value="editWardrobeName" placeholder="新名称" />
@@ -138,9 +200,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useMessage } from 'naive-ui'
-import { AddOutline, CloseOutline, HeartOutline, Heart, StarOutline, Star } from '@vicons/ionicons5'
+import { AddOutline, HeartOutline, Heart, StarOutline, Star } from '@vicons/ionicons5'
 import api from '../api/index.js'
 
 const message = useMessage()
@@ -156,35 +218,24 @@ const categories = [
   { label: '配饰', value: '配饰' },
 ]
 
-const COLD_PALACE_DAYS = 30
+// 冷宫标签：60天未穿
+const COLD_PALACE_DAYS = 60
 const isColdPalace = (g) => {
-  if (!g.last_wear_date) return true
-  return (Date.now() - new Date(g.last_wear_date).getTime()) / 86400000 > COLD_PALACE_DAYS
+  // 有穿着记录且超过60天
+  if (g.last_wear_date) {
+    return (Date.now() - new Date(g.last_wear_date).getTime()) / 86400000 > COLD_PALACE_DAYS
+  }
+  // 无穿着记录，检查上传时间（created_at）
+  if (g.created_at) {
+    return (Date.now() - new Date(g.created_at).getTime()) / 86400000 > COLD_PALACE_DAYS
+  }
+  return false
 }
 
 const getImgUrl = (g) => {
   const url = g.image_url || g.thumbnail_url || g.processed_url
   if (url && url.startsWith('/')) return `${API_BASE}${url}`
   return url || ''
-}
-
-const parseTags = (tags) => {
-  if (Array.isArray(tags)) return tags
-  if (typeof tags === 'string') {
-    try { return JSON.parse(tags) } catch { return [] }
-  }
-  if (tags?.color) return [tags.color, tags.material, ...(tags.style || [])].filter(Boolean)
-  return []
-}
-
-function getCardSize(index) {
-  const row = Math.floor(index / 3)
-  const col = index % 3
-  if (row % 2 === 0) {
-    return col === 0 ? 'card-large' : 'card-medium'
-  } else {
-    return col === 2 ? 'card-large' : 'card-medium'
-  }
 }
 
 const activeCategory = ref('')
@@ -209,6 +260,53 @@ const editingWardrobe = ref(null)
 const editWardrobeName = ref('')
 const wardrobeUpdating = ref(false)
 const wardrobeDeleting = ref(false)
+
+// Detail modal
+const showDetail = ref(false)
+const detailGarment = ref(null)
+const saving = ref(false)
+const editForm = reactive({
+  category: '',
+  wardrobe_id: null,
+  tags: {
+    color: '',
+    material: '',
+    style: [],
+    season: [],
+    occasion: []
+  }
+})
+
+// Options for selects
+const categoryOptions = [
+  { label: '上衣', value: '上衣' },
+  { label: '下装', value: '下装' },
+  { label: '外套', value: '外套' },
+  { label: '鞋', value: '鞋' },
+  { label: '配饰', value: '配饰' },
+]
+
+const styleOptions = [
+  { label: '休闲', value: '休闲' },
+  { label: '商务', value: '商务' },
+  { label: '运动', value: '运动' },
+  { label: '正式', value: '正式' },
+  { label: '街头', value: '街头' },
+  { label: '复古', value: '复古' },
+  { label: '简约', value: '简约' },
+  { label: '甜美', value: '甜美' },
+]
+
+const seasonOptions = [
+  { label: '春', value: '春' },
+  { label: '夏', value: '夏' },
+  { label: '秋', value: '秋' },
+  { label: '冬', value: '冬' },
+]
+
+const wardrobeOptions = computed(() => {
+  return wardrobes.value.map(w => ({ label: w.name, value: w.id }))
+})
 
 async function loadWardrobes() {
   try {
@@ -275,7 +373,6 @@ async function deleteWardrobe() {
 async function toggleFavorite(g) {
   try {
     const { data } = await api.put(`/garments/${g.id}/favorite`)
-    // 强制更新 garments 数组中的对应项
     const index = garments.value.findIndex(item => item.id === g.id)
     if (index !== -1) {
       garments.value[index] = { ...garments.value[index], is_favorite: data.is_favorite }
@@ -289,7 +386,7 @@ async function toggleFavorite(g) {
 async function loadGarments(append = false) {
   loading.value = true
   try {
-    const params = { page: page.value, page_size: 20 }
+    const params = { page: page.value, page_size: 100 }
     if (activeCategory.value) params.category = activeCategory.value
     if (activeWardrobe.value) params.wardrobe_id = activeWardrobe.value
     if (onlyFavorites.value) params.is_favorite = true
@@ -297,7 +394,7 @@ async function loadGarments(append = false) {
     const items = data.items || data.garments || data || []
     garments.value = append ? [...garments.value, ...items] : items
     applySort()
-    hasMore.value = data.has_more || (items.length === 20)
+    hasMore.value = data.has_more || (items.length === 100)
   } catch {
     garments.value = []
   } finally {
@@ -357,21 +454,47 @@ function pollStatus(taskId) {
   })
 }
 
-async function deleteGarment(id) {
-  try {
-    await api.delete(`/garments/${id}`)
-    garments.value = garments.value.filter(g => g.id !== id)
-    message.success('已删除')
-  } catch {
-    message.error('删除失败')
-  }
-}
-
 function applySort() {
   if (sortBy.value === 'wear_count') {
     garments.value = [...garments.value].sort((a, b) => (b.wear_count || 0) - (a.wear_count || 0))
   } else {
     garments.value = [...garments.value]
+  }
+}
+
+// 打开详情弹窗
+function openDetail(g) {
+  detailGarment.value = g
+  // 初始化编辑表单
+  editForm.category = g.category
+  editForm.wardrobe_id = g.wardrobe_id || null
+  editForm.tags = {
+    color: g.tags?.color || '',
+    material: g.tags?.material || '',
+    style: g.tags?.style || [],
+    season: g.tags?.season || [],
+    occasion: g.tags?.occasion || []
+  }
+  showDetail.value = true
+}
+
+// 保存详情修改
+async function saveDetail() {
+  saving.value = true
+  try {
+    await api.put(`/garments/${detailGarment.value.id}`, {
+      category: editForm.category,
+      wardrobe_id: editForm.wardrobe_id,
+      tags: editForm.tags
+    })
+    message.success('保存成功')
+    showDetail.value = false
+    // 刷新列表
+    await loadGarments()
+  } catch {
+    message.error('保存失败')
+  } finally {
+    saving.value = false
   }
 }
 
@@ -537,16 +660,11 @@ onMounted(async () => {
   padding: 80px 0;
 }
 
-/* Alternating grid */
+/* 固定4列网格 */
 .garment-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  grid-auto-flow: dense;
-}
-
-.garment-card.card-large {
-  grid-column: span 2;
 }
 
 .garment-card {
@@ -558,6 +676,7 @@ onMounted(async () => {
   border: 1px solid var(--theme-glass-border, rgba(255, 255, 255, 0.45));
   transition: all 0.3s ease;
   box-shadow: var(--theme-card-shadow, 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.5) inset);
+  cursor: pointer;
 }
 
 .garment-card:hover {
@@ -571,21 +690,20 @@ onMounted(async () => {
   aspect-ratio: 1;
   background: var(--theme-surface-bg, rgba(240, 235, 227, 0.5));
   overflow: hidden;
-}
-
-.card-large .card-img-wrap {
-  aspect-ratio: 16/10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 80%;
+  height: 80%;
+  object-fit: contain; /* 抠图居中显示 */
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .garment-card:hover .card-img {
-  transform: scale(1.03);
+  transform: scale(1.05);
 }
 
 .wear-count-badge {
@@ -637,45 +755,9 @@ onMounted(async () => {
   transform: scale(1.1);
 }
 
-.card-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(46, 42, 37, 0.1);
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 8px;
-  padding-top: 44px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.garment-card:hover .card-overlay {
-  opacity: 1;
-}
-
-.btn-delete {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  border: none;
-  background: rgba(255, 253, 248, 0.9);
-  color: var(--theme-text-secondary, #8C8478);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(4px);
-}
-
-.btn-delete:hover {
-  background: var(--theme-dark-glass-bg, rgba(80, 70, 65, 0.5));
-  color: #FFFFFF;
-}
-
 .card-info {
   padding: 12px;
+  text-align: center;
 }
 
 .card-name {
@@ -683,39 +765,6 @@ onMounted(async () => {
   font-size: 14px;
   font-weight: 500;
   color: var(--theme-text, #2E2A23);
-}
-
-.card-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 6px;
-}
-
-.card-tag-chip {
-  font-size: 11px;
-  color: var(--theme-text-secondary, #8C8478);
-  background: var(--theme-glass-bg, rgba(255, 255, 255, 0.3));
-  backdrop-filter: blur(8px);
-  padding: 2px 8px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.card-lifecycle {
-  display: none;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.garment-card:hover .card-lifecycle {
-  display: flex;
-}
-
-.lifecycle-item {
-  font-size: 11px;
-  color: var(--theme-accent, #C8A09B);
-  font-weight: 500;
 }
 
 .empty-state {
@@ -736,18 +785,75 @@ onMounted(async () => {
   color: var(--theme-text-secondary, #8C8478);
 }
 
+/* 详情弹窗布局 */
+.detail-layout {
+  display: flex;
+  gap: 24px;
+}
+
+.detail-left {
+  flex: 0 0 280px;
+  background: var(--theme-surface-bg, rgba(240, 235, 227, 0.5));
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.detail-img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+
+.detail-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--theme-text, #2E2A23);
+  margin-bottom: 8px;
+}
+
+.detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--theme-text-secondary, #8C8478);
+}
+
+.detail-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
 @media (max-width: 768px) {
   .garment-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 
-  .garment-card.card-large {
-    grid-column: span 1;
+  .detail-layout {
+    flex-direction: column;
   }
 
-  .card-large .card-img-wrap {
-    aspect-ratio: 1;
+  .detail-left {
+    flex: none;
+    height: 200px;
   }
 }
 </style>

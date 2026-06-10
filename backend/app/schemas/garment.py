@@ -20,6 +20,7 @@ class GarmentUpdate(BaseModel):
     tags: GarmentTags | None = None
     temp_min: int | None = None
     temp_max: int | None = None
+    wardrobe_id: str | None = None  # 新增：所属衣橱
 
 
 class GarmentResponse(BaseModel):

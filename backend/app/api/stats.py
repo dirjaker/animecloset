@@ -20,6 +20,49 @@ from ..schemas.garment import GarmentResponse, GarmentTags
 router = APIRouter(prefix="/stats", tags=["统计"])
 
 
+@router.get("/summary")
+async def stats_summary(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """
+    综合统计摘要
+
+    返回：衣物总数、穿搭记录数、总穿着次数、各类别数量
+    """
+    from ..models.outfit import Outfit
+    
+    # 衣物总数
+    garment_count = (await db.execute(
+        select(func.count()).select_from(Garment).where(Garment.user_id == user.id)
+    )).scalar() or 0
+    
+    # 穿搭记录数
+    outfit_count = (await db.execute(
+        select(func.count()).select_from(Outfit).where(Outfit.user_id == user.id)
+    )).scalar() or 0
+    
+    # 总穿着次数
+    total_wears = (await db.execute(
+        select(func.sum(Garment.wear_count)).where(Garment.user_id == user.id)
+    )).scalar() or 0
+    
+    # 各类别计数
+    cat_result = await db.execute(
+        select(Garment.category, func.count())
+        .where(Garment.user_id == user.id)
+        .group_by(Garment.category)
+    )
+    category_counts = {row[0]: row[1] for row in cat_result.all()}
+    
+    return {
+        "total_garments": garment_count,
+        "total_outfits": outfit_count,
+        "total_wears": total_wears,
+        "category_counts": category_counts,
+    }
+
+
 @router.get("/wardrobe")
 async def wardrobe_stats(
     db: AsyncSession = Depends(get_db),

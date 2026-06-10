@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..core.database import get_db
 from ..core.security import hash_password, verify_password, create_access_token
 from ..models.user import User
+from ..models.wardrobe import Wardrobe
 from ..schemas.auth import RegisterRequest, LoginRequest, TokenResponse
 
 router = APIRouter(prefix="/auth", tags=["认证"])
@@ -38,6 +39,13 @@ async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
     )
     db.add(user)
     await db.flush()  # 获取生成的 ID
+
+    # 创建默认衣橱
+    default_wardrobe = Wardrobe(
+        user_id=user.id, name="默认", icon="👔", sort_order=0
+    )
+    db.add(default_wardrobe)
+    await db.flush()
 
     # 生成令牌
     token = create_access_token(user.id)

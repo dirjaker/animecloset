@@ -157,7 +157,7 @@ async def update_garment(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """更新衣物信息（标签、类别、温度范围）"""
+    """更新衣物信息（标签、类别、衣橱）"""
     result = await db.execute(
         select(Garment).where(Garment.id == garment_id, Garment.user_id == user.id)
     )
@@ -174,6 +174,8 @@ async def update_garment(
         garment.temp_min = update.temp_min
     if update.temp_max is not None:
         garment.temp_max = update.temp_max
+    if update.wardrobe_id is not None:
+        garment.wardrobe_id = update.wardrobe_id if update.wardrobe_id else None
 
     await db.flush()
     return _garment_to_response(garment)
