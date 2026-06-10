@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..core.config import settings
 from ..core.database import get_db
 from ..core.security import get_current_user
+from ..core.categories import normalize_category, validate_category
 from ..models.user import User
 from ..models.garment import Garment
 from ..schemas.garment import (
@@ -33,7 +34,7 @@ def _garment_to_response(g: Garment) -> GarmentResponse:
         id=g.id,
         original_url=g.original_url,
         processed_url=g.processed_url,
-        category=g.category,
+        category=normalize_category(g.category),  # 标准化分类名（兼容旧数据）
         tags=tags,
         temp_min=g.temp_min,
         temp_max=g.temp_max,
@@ -105,8 +106,10 @@ async def list_garments(
     count_query = select(func.count()).select_from(Garment).where(Garment.user_id == user.id)
 
     if category:
-        query = query.where(Garment.category == category)
-        count_query = count_query.where(Garment.category == category)
+        # 标准化分类名（兼容旧数据）
+        std_category = normalize_category(category)
+        query = query.where(Garment.category == std_category)
+        count_query = count_query.where(Garment.category == std_category)
     if wardrobe_id:
         query = query.where(Garment.wardrobe_id == wardrobe_id)
         count_query = count_query.where(Garment.wardrobe_id == wardrobe_id)
@@ -157,7 +160,8 @@ async def update_garment(
         raise HTTPException(status_code=404, detail="衣物不存在")
 
     if update.category is not None:
-        garment.category = update.category
+        # 标准化分类名
+        garment.category = normalize_category(update.category)
     if update.tags is not None:
         garment.tags = update.tags.model_dump_json()
     if update.temp_min is not None:

@@ -34,7 +34,7 @@
             @click="addToSlot(g)"
           >
             <img :src="getImgUrl(g)" :alt="g.category" />
-            <span class="thumb-label">{{ categoryLabel(g.category) }}</span>
+            <span class="thumb-label">{{ g.category }}</span>
           </div>
         </div>
         <div v-else class="empty-inline">
@@ -98,16 +98,15 @@ const message = useMessage()
 
 const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`
 
+// 标准分类 — 与后端 categories.py 保持一致
 const categories = [
   { label: '全部', value: '' },
-  { label: '上衣', value: 'top' },
-  { label: '下装', value: 'bottom' },
-  { label: '外套', value: 'outer' },
-  { label: '鞋', value: 'shoes' },
-  { label: '配饰', value: 'accessory' },
+  { label: '上衣', value: '上衣' },
+  { label: '下装', value: '下装' },
+  { label: '外套', value: '外套' },
+  { label: '鞋', value: '鞋' },
+  { label: '配饰', value: '配饰' },
 ]
-const categoryMap = { top: '上衣', bottom: '下装', outer: '外套', shoes: '鞋', accessory: '配饰' }
-const categoryLabel = (c) => categoryMap[c] || c
 
 const getImgUrl = (g) => {
   const url = g.image_url || g.thumbnail_url || g.processed_url
@@ -120,12 +119,13 @@ const garments = ref([])
 const garmentLoading = ref(false)
 const saving = ref(false)
 
+// 搭配槽位 — 使用标准分类名
 const outfitSlots = reactive([
-  { category: 'top', label: '上衣', garment: null },
-  { category: 'bottom', label: '下装', garment: null },
-  { category: 'outer', label: '外套', garment: null },
-  { category: 'shoes', label: '鞋', garment: null },
-  { category: 'accessory', label: '配饰', garment: null },
+  { category: '上衣', label: '上衣', garment: null, required: true },
+  { category: '下装', label: '下装', garment: null, required: true },
+  { category: '外套', label: '外套', garment: null, required: false },
+  { category: '鞋', label: '鞋', garment: null, required: false },
+  { category: '配饰', label: '配饰', garment: null, required: false },
 ])
 
 const hasAnyGarment = computed(() => outfitSlots.some((s) => s.garment))
@@ -148,20 +148,38 @@ async function loadGarments() {
   }
 }
 
+/**
+ * 将衣物添加到搭配槽位
+ *
+ * 规则：
+ * 1. 同一件衣物不能重复添加
+ * 2. 只能放入对应分类的槽位（上衣→上衣位，鞋→鞋位）
+ * 3. 如果该分类已满，提示用户先移除
+ * 4. 不再回退到其他分类的空位
+ */
 function addToSlot(garment) {
+  // 规则1：已存在则跳过
   if (isInOutfit(garment.id)) return
-  // Find matching slot first, then next empty
-  const matchSlot = outfitSlots.find((s) => s.category === garment.category && !s.garment)
-  if (matchSlot) {
-    matchSlot.garment = garment
+
+  // 规则2：找对应分类的槽位
+  const matchSlot = outfitSlots.find((s) => s.category === garment.category)
+
+  if (!matchSlot) {
+    // 分类不在搭配槽位中（不应该发生，但防御性处理）
+    message.warning(`"${garment.category}" 不是有效的搭配分类`)
     return
   }
-  const emptySlot = outfitSlots.find((s) => !s.garment)
-  if (emptySlot) {
-    emptySlot.garment = garment
-  } else {
-    message.warning('所有搭配位已满')
+
+  if (matchSlot.garment) {
+    // 规则3：该分类已满，替换已有衣物
+    const oldName = matchSlot.garment.category
+    matchSlot.garment = garment
+    message.info(`已替换${oldName}`)
+    return
   }
+
+  // 放入对应槽位
+  matchSlot.garment = garment
 }
 
 function removeFromSlot(category) {
@@ -172,8 +190,16 @@ function removeFromSlot(category) {
 }
 
 async function saveOutfit() {
+  // 检查必填槽位
+  const emptyRequired = outfitSlots.filter((s) => s.required && !s.garment)
+  if (emptyRequired.length > 0) {
+    message.warning(`请先选择${emptyRequired.map((s) => s.label).join('和')}`)
+    return
+  }
+
   const garmentIds = outfitSlots.filter((s) => s.garment).map((s) => s.garment.id)
   if (!garmentIds.length) return
+
   saving.value = true
   try {
     await api.post('/outfits', { garment_ids: garmentIds })

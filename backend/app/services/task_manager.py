@@ -22,6 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.config import settings
 from ..core.database import async_session
+from ..core.categories import normalize_category
 from ..models.garment import Garment
 from ..schemas.garment import GarmentTags
 from .bg_remove import remove_background, resize_image
@@ -96,10 +97,15 @@ async def _process_garment(
         processed_url = f"/static/uploads/{processed_name}"
         logger.info(f"[{task_id[:8]}] 抠图完成: {processed_name}")
 
-        # 4. LLM 打标
+        # 4. 打标（从文件名推断分类）
         _tasks[task_id]["status"] = "tagging"
-        tags = await tag_garment(processed_bytes)
-        logger.info(f"[{task_id[:8]}] 打标完成: {tags.color} {tags.material}")
+
+        # 从文件名推断分类（用于测试）
+        hint_category = _infer_category_from_filename(filename)
+        logger.info(f"[{task_id[:8]}] 从文件名推断分类: {hint_category}")
+
+        category, tags = await tag_garment(processed_bytes, hint_category=hint_category)
+        logger.info(f"[{task_id[:8]}] 打标完成: 分类={category} 颜色={tags.color} 材质={tags.material}")
 
         # 5. 保存到数据库
         _tasks[task_id]["status"] = "saving"
@@ -108,9 +114,9 @@ async def _process_garment(
                 user_id=user_id,
                 original_url=original_url,
                 processed_url=processed_url,
-                category=_guess_category(tags),
+                category=category,
                 tags=tags.model_dump_json(),
-                temp_min=-30,  # 默认值，用户可修改
+                temp_min=-30,
                 temp_max=50,
             )
             db.add(garment)
@@ -126,17 +132,28 @@ async def _process_garment(
         _tasks[task_id]["error"] = str(e)
 
 
-def _guess_category(tags: GarmentTags) -> str:
-    """根据标签猜测衣物类别（简单规则）"""
-    # 基于风格和材质的简单启发式
-    text = f"{tags.material} {' '.join(tags.style)}".lower()
+def _infer_category_from_filename(filename: str) -> str:
+    """
+    从文件名推断衣物分类
 
-    if any(k in text for k in ["鞋", "靴", "sneaker", "shoe"]):
-        return "鞋"
-    if any(k in text for k in ["帽", "包", "围巾", "手套", "项链", "戒指", "耳环"]):
-        return "配饰"
-    if any(k in text for k in ["外套", "夹克", "大衣", "风衣", "羽绒服"]):
-        return "外套"
-    if any(k in text for k in ["裤", "裙", "短裤", "半裙"]):
-        return "下装"
-    return "上衣"  # 默认
+    文件名格式：{category}_{description}.jpg
+    例如：top_white_tshirt.jpg → 上衣
+    """
+    filename_lower = filename.lower()
+
+    # 分类关键词映射
+    category_keywords = {
+        "上衣": ["top", "shirt", "tshirt", "t-shirt", "sweater", "blouse", "polo"],
+        "下装": ["bottom", "pants", "jeans", "trousers", "shorts", "skirt", "chinos"],
+        "外套": ["outer", "jacket", "coat", "blazer", "hoodie", "cardigan", "vest"],
+        "鞋": ["shoes", "shoe", "sneaker", "boot", "sandal", "heel", "loafer"],
+        "配饰": ["accessory", "watch", "bag", "hat", "scarf", "belt", "jewelry", "necklace", "bracelet"],
+    }
+
+    for category, keywords in category_keywords.items():
+        for keyword in keywords:
+            if keyword in filename_lower:
+                return category
+
+    # 默认返回上衣
+    return "上衣"

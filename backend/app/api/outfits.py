@@ -167,12 +167,12 @@ async def get_calendar(
         year, mon = int(parts[0]), int(parts[1])
 
     # 查询该月所有穿搭
+    month_prefix = f"{year}-{mon:02d}"
     result = await db.execute(
         select(Outfit).where(
             and_(
                 Outfit.user_id == user.id,
-                extract("year", Outfit.date) == year,
-                extract("month", Outfit.date) == mon,
+                func.strftime("%Y-%m", Outfit.date) == month_prefix,
             )
         )
     )

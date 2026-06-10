@@ -102,7 +102,7 @@
           </div>
         </div>
         <div class="card-info">
-          <span class="card-name">{{ categoryLabel(g.category) }}</span>
+          <span class="card-name">{{ g.category }}</span>
           <div v-if="g.tags" class="card-tags">
             <span v-for="t in parseTags(g.tags)" :key="t" class="card-tag-chip">{{ t }}</span>
           </div>
@@ -149,14 +149,12 @@ const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`
 
 const categories = [
   { label: '全部', value: '' },
-  { label: '上衣', value: 'top' },
-  { label: '下装', value: 'bottom' },
-  { label: '外套', value: 'outer' },
-  { label: '鞋', value: 'shoes' },
-  { label: '配饰', value: 'accessory' },
+  { label: '上衣', value: '上衣' },
+  { label: '下装', value: '下装' },
+  { label: '外套', value: '外套' },
+  { label: '鞋', value: '鞋' },
+  { label: '配饰', value: '配饰' },
 ]
-const categoryMap = { top: '上衣', bottom: '下装', outer: '外套', shoes: '鞋', accessory: '配饰' }
-const categoryLabel = (c) => categoryMap[c] || c
 
 const COLD_PALACE_DAYS = 30
 const isColdPalace = (g) => {

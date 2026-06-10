@@ -52,7 +52,7 @@
           <span class="drawer-handle-bar"></span>
         </div>
         <button class="drawer-close" @click="selectedDay = null" title="关闭">×</button>
-        <div v-if="selectedDay?.outfit" class="drawer-content">
+        <div v-if="selectedDay?.outfit" class="drawer-content" @click="showModal = true" style="cursor: pointer;">
           <span class="drawer-date">{{ selectedDay.fullDate }}</span>
           <div class="drawer-items">
             <img

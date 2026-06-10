@@ -23,16 +23,16 @@ import httpx
 
 from ..core.config import settings
 from ..core.database import async_session
+from ..core.categories import (
+    REQUIRED_CATEGORIES, OPTIONAL_CATEGORIES, ALL_CATEGORIES,
+    normalize_category, OUTFIT_SLOTS,
+)
 from ..models.garment import Garment
 from ..schemas.garment import GarmentTags
 from .weather import get_weather
 from sqlalchemy import select
 
 logger = logging.getLogger(__name__)
-
-# 必要类别（至少要有上衣和下装）
-REQUIRED_CATEGORIES = ["上衣", "下装"]
-OPTIONAL_CATEGORIES = ["外套", "鞋", "配饰"]
 
 
 async def recommend_outfit(
@@ -103,7 +103,7 @@ async def recommend_outfit(
     # 5. 冷宫唤醒：标记30天未穿的衣物
     cold_palace_ids = _get_cold_palace_ids(occasion_filtered)
 
-    # 6. 按类别分组
+    # 6. 按类别分组（使用标准分类）
     by_category = _group_by_category(occasion_filtered)
 
     # 7. 检查必要类别
@@ -158,10 +158,16 @@ def _get_cold_palace_ids(garments: list[Garment]) -> set[str]:
 
 
 def _group_by_category(garments: list[Garment]) -> dict[str, list[Garment]]:
-    """按类别分组"""
+    """
+    按标准类别分组
+
+    使用 normalize_category 确保所有分类名都映射到标准值。
+    """
     groups = defaultdict(list)
     for g in garments:
-        groups[g.category].append(g)
+        # 标准化分类名（处理旧数据中的非标准分类）
+        std_cat = normalize_category(g.category)
+        groups[std_cat].append(g)
     return dict(groups)
 
 
@@ -201,7 +207,7 @@ async def _call_llm_recommend(
 
 请返回JSON格式：
 {{
-  "selected_ids": ["上衣ID", "下装ID", "外套ID(可选)", "鞋子ID(可选)"],
+  "selected_ids": ["上衣ID", "下装ID", "外套ID(可选)", "鞋ID(可选)", "配饰ID(可选)"],
   "reason": "推荐理由（简短，50字以内）"
 }}
 
@@ -226,7 +232,7 @@ async def _call_llm_recommend(
         "Content-Type": "application/json",
     }
 
-    async with httpx.AsyncClient(timeout=10) as client:
+    async with httpx.AsyncClient(timeout=30) as client:
         resp = await client.post(url, json=payload, headers=headers)
         resp.raise_for_status()
         content = resp.json()["choices"][0]["message"]["content"]
@@ -254,7 +260,7 @@ async def _call_llm_recommend(
         tags = GarmentTags.model_validate_json(g.tags) if g.tags else GarmentTags()
         selected_garments.append({
             "id": g.id,
-            "category": g.category,
+            "category": normalize_category(g.category),  # 确保返回标准分类
             "tags": tags.model_dump(),
             "processed_url": g.processed_url,
             "is_cold_palace": gid in cold_palace_ids,
@@ -269,14 +275,14 @@ def _fallback_recommend(
     """降级推荐：随机选择"""
     selected = []
 
-    for cat in REQUIRED_CATEGORIES + OPTIONAL_CATEGORIES:
+    for cat in ALL_CATEGORIES:
         garments = by_category.get(cat, [])
         if garments:
             g = random.choice(garments)
             tags = GarmentTags.model_validate_json(g.tags) if g.tags else GarmentTags()
             selected.append({
                 "id": g.id,
-                "category": g.category,
+                "category": normalize_category(g.category),
                 "tags": tags.model_dump(),
                 "processed_url": g.processed_url,
                 "is_cold_palace": False,
