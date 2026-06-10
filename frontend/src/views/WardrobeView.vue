@@ -275,8 +275,12 @@ async function deleteWardrobe() {
 async function toggleFavorite(g) {
   try {
     const { data } = await api.put(`/garments/${g.id}/favorite`)
-    g.is_favorite = data.is_favorite ?? !g.is_favorite
-    message.success(g.is_favorite ? '已收藏' : '已取消收藏')
+    // 强制更新 garments 数组中的对应项
+    const index = garments.value.findIndex(item => item.id === g.id)
+    if (index !== -1) {
+      garments.value[index] = { ...garments.value[index], is_favorite: data.is_favorite }
+    }
+    message.success(data.is_favorite ? '已收藏' : '已取消收藏')
   } catch {
     message.error('操作失败')
   }

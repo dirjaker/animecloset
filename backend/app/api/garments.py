@@ -211,7 +211,7 @@ async def toggle_favorite(
         raise HTTPException(status_code=404, detail="衣物不存在")
 
     garment.is_favorite = not garment.is_favorite
-    await db.flush()
+    await db.commit()  # 使用 commit 而不是 flush，确保持久化
     return {"id": garment.id, "is_favorite": garment.is_favorite}
 
 
