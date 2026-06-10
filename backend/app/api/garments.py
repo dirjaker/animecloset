@@ -96,12 +96,13 @@ async def get_task(task_id: str):
 async def list_garments(
     category: str | None = None,
     wardrobe_id: str | None = None,
+    is_favorite: bool | None = None,  # 新增：收藏筛选
     page: int = 1,
     page_size: int = 20,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """获取衣橱列表（分页 + 类别筛选）"""
+    """获取衣橱列表（分页 + 类别筛选 + 收藏筛选）"""
     query = select(Garment).where(Garment.user_id == user.id)
     count_query = select(func.count()).select_from(Garment).where(Garment.user_id == user.id)
 
@@ -113,6 +114,10 @@ async def list_garments(
     if wardrobe_id:
         query = query.where(Garment.wardrobe_id == wardrobe_id)
         count_query = count_query.where(Garment.wardrobe_id == wardrobe_id)
+    if is_favorite is not None:
+        # 收藏筛选
+        query = query.where(Garment.is_favorite == is_favorite)
+        count_query = count_query.where(Garment.is_favorite == is_favorite)
 
     total = (await db.execute(count_query)).scalar()
     query = query.order_by(Garment.created_at.desc())
