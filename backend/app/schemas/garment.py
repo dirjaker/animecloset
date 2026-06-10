@@ -33,6 +33,7 @@ class GarmentResponse(BaseModel):
     temp_max: int
     wear_count: int
     last_wear_date: str | None
+    is_favorite: bool = False  # 新增：收藏状态
     created_at: str
 
     model_config = {"from_attributes": True}

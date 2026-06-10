@@ -40,6 +40,7 @@ def _garment_to_response(g: Garment) -> GarmentResponse:
         temp_max=g.temp_max,
         wear_count=g.wear_count,
         last_wear_date=str(g.last_wear_date) if g.last_wear_date else None,
+        is_favorite=g.is_favorite,  # 新增：收藏状态
         created_at=g.created_at.isoformat(),
     )
 
