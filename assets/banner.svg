@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400">
+  <defs>
+    <!-- 渐变背景 -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0a"/>
+      <stop offset="50%" style="stop-color:#111111"/>
+      <stop offset="100%" style="stop-color:#0d0d0d"/>
+    </linearGradient>
+    <!-- 点阵渐变遮罩 -->
+    <radialGradient id="dotGlow" cx="30%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:white;stop-opacity:0.9"/>
+      <stop offset="60%" style="stop-color:white;stop-opacity:0.4"/>
+      <stop offset="100%" style="stop-color:white;stop-opacity:0"/>
+    </radialGradient>
+    <!-- 左侧装饰光晕 -->
+    <radialGradient id="accentGlow" cx="20%" cy="60%" r="35%">
+      <stop offset="0%" style="stop-color:#4FC08D;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#4FC08D;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="accentGlow2" cx="35%" cy="30%" r="25%">
+      <stop offset="0%" style="stop-color:#009688;stop-opacity:0.1"/>
+      <stop offset="100%" style="stop-color:#009688;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1200" height="400" fill="url(#bg)"/>
+
+  <!-- 装饰光晕 -->
+  <rect width="1200" height="400" fill="url(#accentGlow)"/>
+  <rect width="1200" height="400" fill="url(#accentGlow2)"/>
+
+  <!-- 科技点阵图案（左侧） -->
+  <!-- 大点 -->
+  <circle cx="80" cy="80" r="3" fill="white" opacity="0.7"/>
+  <circle cx="120" cy="120" r="3.5" fill="white" opacity="0.8"/>
+  <circle cx="160" cy="60" r="2.5" fill="white" opacity="0.6"/>
+  <circle cx="200" cy="140" r="4" fill="white" opacity="0.9"/>
+  <circle cx="140" cy="180" r="3" fill="white" opacity="0.7"/>
+  <circle cx="100" cy="200" r="2" fill="white" opacity="0.5"/>
+  <circle cx="180" cy="240" r="3.5" fill="white" opacity="0.8"/>
+  <circle cx="60" cy="160" r="2.5" fill="white" opacity="0.6"/>
+  <circle cx="240" cy="80" r="3" fill="white" opacity="0.7"/>
+  <circle cx="260" cy="160" r="4" fill="white" opacity="0.85"/>
+  <circle cx="220" cy="200" r="2.5" fill="white" opacity="0.6"/>
+  <circle cx="280" cy="240" r="3" fill="white" opacity="0.7"/>
+  <circle cx="300" cy="120" r="3.5" fill="white" opacity="0.8"/>
+  <circle cx="320" cy="280" r="4" fill="white" opacity="0.9"/>
+  <circle cx="340" cy="180" r="2.5" fill="white" opacity="0.6"/>
+  <circle cx="360" cy="320" r="3" fill="white" opacity="0.7"/>
+  <circle cx="380" cy="100" r="3.5" fill="white" opacity="0.8"/>
+  <circle cx="400" cy="260" r="4" fill="white" opacity="0.85"/>
+  <circle cx="420" cy="140" r="2" fill="white" opacity="0.5"/>
+  <circle cx="440" cy="300" r="3" fill="white" opacity="0.7"/>
+  <circle cx="460" cy="80" r="3.5" fill="white" opacity="0.8"/>
+  <circle cx="480" cy="200" r="4" fill="white" opacity="0.9"/>
+  <circle cx="500" cy="340" r="2.5" fill="white" opacity="0.6"/>
+  <circle cx="520" cy="120" r="3" fill="white" opacity="0.7"/>
+  <circle cx="540" cy="280" r="3.5" fill="white" opacity="0.8"/>
+  <circle cx="560" cy="60" r="4" fill="white" opacity="0.85"/>
+  <circle cx="580" cy="240" r="2.5" fill="white" opacity="0.6"/>
+  <circle cx="600" cy="160" r="3" fill="white" opacity="0.7"/>
+
+  <!-- 中点 -->
+  <circle cx="90" cy="110" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="130" cy="150" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="170" cy="90" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="210" cy="170" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="150" cy="210" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="110" cy="230" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="190" cy="270" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="70" cy="190" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="250" cy="110" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="270" cy="190" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="230" cy="230" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="290" cy="270" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="310" cy="150" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="330" cy="310" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="350" cy="210" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="370" cy="350" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="390" cy="130" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="410" cy="290" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="430" cy="170" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="450" cy="330" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="470" cy="110" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="490" cy="230" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="510" cy="370" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="530" cy="150" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="550" cy="310" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="570" cy="90" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="590" cy="270" r="1.5" fill="white" opacity="0.5"/>
+
+  <!-- 小点 -->
+  <circle cx="95" cy="95" r="1" fill="white" opacity="0.3"/>
+  <circle cx="135" cy="135" r="1" fill="white" opacity="0.25"/>
+  <circle cx="175" cy="75" r="1" fill="white" opacity="0.3"/>
+  <circle cx="215" cy="155" r="1" fill="white" opacity="0.25"/>
+  <circle cx="155" cy="195" r="1" fill="white" opacity="0.3"/>
+  <circle cx="115" cy="215" r="1" fill="white" opacity="0.25"/>
+  <circle cx="195" cy="255" r="1" fill="white" opacity="0.3"/>
+  <circle cx="75" cy="175" r="1" fill="white" opacity="0.25"/>
+  <circle cx="255" cy="95" r="1" fill="white" opacity="0.3"/>
+  <circle cx="275" cy="175" r="1" fill="white" opacity="0.25"/>
+  <circle cx="235" cy="215" r="1" fill="white" opacity="0.3"/>
+  <circle cx="295" cy="255" r="1" fill="white" opacity="0.25"/>
+  <circle cx="315" cy="135" r="1" fill="white" opacity="0.3"/>
+  <circle cx="335" cy="295" r="1" fill="white" opacity="0.25"/>
+  <circle cx="355" cy="195" r="1" fill="white" opacity="0.3"/>
+  <circle cx="375" cy="335" r="1" fill="white" opacity="0.25"/>
+  <circle cx="395" cy="115" r="1" fill="white" opacity="0.3"/>
+  <circle cx="415" cy="275" r="1" fill="white" opacity="0.25"/>
+  <circle cx="435" cy="155" r="1" fill="white" opacity="0.3"/>
+  <circle cx="455" cy="315" r="1" fill="white" opacity="0.25"/>
+  <circle cx="475" cy="95" r="1" fill="white" opacity="0.3"/>
+  <circle cx="495" cy="215" r="1" fill="white" opacity="0.25"/>
+  <circle cx="515" cy="355" r="1" fill="white" opacity="0.3"/>
+  <circle cx="535" cy="135" r="1" fill="white" opacity="0.25"/>
+  <circle cx="555" cy="295" r="1" fill="white" opacity="0.3"/>
+
+  <!-- 连接线（营造网络感） -->
+  <line x1="80" y1="80" x2="120" y2="120" stroke="white" stroke-width="0.5" opacity="0.2"/>
+  <line x1="120" y1="120" x2="200" y2="140" stroke="white" stroke-width="0.5" opacity="0.2"/>
+  <line x1="200" y1="140" x2="260" y2="160" stroke="white" stroke-width="0.5" opacity="0.2"/>
+  <line x1="260" y1="160" x2="300" y2="120" stroke="white" stroke-width="0.5" opacity="0.2"/>
+  <line x1="300" y1="120" x2="380" y2="100" stroke="white" stroke-width="0.5" opacity="0.2"/>
+  <line x1="380" y1="100" x2="460" y2="80" stroke="white" stroke-width="0.5" opacity="0.2"/>
+  <line x1="460" y1="80" x2="540" y2="60" stroke="white" stroke-width="0.5" opacity="0.2"/>
+  <line x1="540" y1="60" x2="600" y2="160" stroke="white" stroke-width="0.5" opacity="0.2"/>
+  <line x1="140" y1="180" x2="220" y2="200" stroke="white" stroke-width="0.5" opacity="0.15"/>
+  <line x1="220" y1="200" x2="320" y2="280" stroke="white" stroke-width="0.5" opacity="0.15"/>
+  <line x1="320" y1="280" x2="400" y2="260" stroke="white" stroke-width="0.5" opacity="0.15"/>
+  <line x1="400" y1="260" x2="480" y2="200" stroke="white" stroke-width="0.5" opacity="0.15"/>
+  <line x1="480" y1="200" x2="560" y2="240" stroke="white" stroke-width="0.5" opacity="0.15"/>
+
+  <!-- 右侧分隔线 -->
+  <line x1="650" y1="60" x2="650" y2="340" stroke="white" stroke-width="0.5" opacity="0.15"/>
+
+  <!-- 主标题 VESTIO -->
+  <text x="680" y="155" font-family="'SF Pro Display', 'Helvetica Neue', Arial, sans-serif" font-size="88" font-weight="800" fill="white" letter-spacing="8">VESTIO</text>
+
+  <!-- 副标题 -->
+  <text x="680" y="200" font-family="'SF Pro Display', 'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="400" fill="white" opacity="0.85" letter-spacing="3">AI-POWERED SMART WARDROBE SYSTEM</text>
+
+  <!-- 中文副标题 -->
+  <text x="680" y="230" font-family="'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="16" font-weight="300" fill="white" opacity="0.6" letter-spacing="2">智能穿衣镜 · 衣物管理 · AI搭配 · 风格分析</text>
+
+  <!-- 技术栈标签 -->
+  <text x="680" y="280" font-family="'SF Mono', 'Fira Code', 'Consolas', monospace" font-size="13" fill="white" opacity="0.45" letter-spacing="1.5">Vue3 · FastAPI · PyTorch · DeepSeek · 通义千问VL</text>
+
+  <!-- 底部装饰线 -->
+  <line x1="680" y1="310" x2="1140" y2="310" stroke="white" stroke-width="0.5" opacity="0.15"/>
+
+  <!-- 底部标签 -->
+  <text x="680" y="340" font-family="'SF Mono', 'Fira Code', 'Consolas', monospace" font-size="11" fill="white" opacity="0.35" letter-spacing="1">FASHION · AI · WARDROBE · RECOMMENDATION</text>
+
+</svg>
