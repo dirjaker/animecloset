@@ -42,19 +42,18 @@ class SPAMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
-        # API、health、docs、静态资源 → 正常处理
+        # API、health、docs、后端静态资源 → 正常处理
         if (path.startswith("/api") or path.startswith("/health") or
                 path.startswith("/docs") or path.startswith("/openapi") or
-                path.startswith("/static") or path.startswith("/uploads") or
-                path.startswith("/assets") or path.startswith("/favicon")):
+                path.startswith("/static") or path.startswith("/uploads")):
             return await call_next(request)
 
-        # 尝试返回前端静态文件
+        # 前端 dist 静态文件（assets、favicon 等）
         if FRONTEND_DIST.exists():
             file_path = FRONTEND_DIST / path.lstrip("/")
             if file_path.is_file():
                 return FileResponse(str(file_path))
-            # SPA 所有其他路径返回 index.html
+            # 非 API 路径 → SPA index.html
             return FileResponse(str(FRONTEND_DIST / "index.html"))
 
         return await call_next(request)
