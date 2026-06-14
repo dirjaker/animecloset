@@ -4,7 +4,7 @@
 
 <br>
 
-### 🪞 智能穿衣镜系统
+### 🪞 智慧衣橱系统
 
 [![Stars](https://img.shields.io/github/stars/dirjaker/vestio?style=flat-square&label=Stars&color=FFD700)](https://github.com/dirjaker/vestio/stargazers)
 [![Forks](https://img.shields.io/github/forks/dirjaker/vestio?style=flat-square&label=Forks&color=4A90D9)](https://github.com/dirjaker/vestio/network/members)
