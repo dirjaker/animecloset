@@ -5,10 +5,14 @@ main.py — FastAPI 应用入口
 """
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, Response
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 
 from app.core.config import settings
 from app.core.database import init_db
@@ -29,6 +33,32 @@ from app.api.share import router as share_router
 from app.api.weather import router as weather_router
 from app.api.ai import router as ai_router
 
+# 前端 dist 目录
+FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
+
+
+class SPAMiddleware(BaseHTTPMiddleware):
+    """SPA 中间件：非 API 请求返回前端 index.html"""
+
+    async def dispatch(self, request: Request, call_next):
+        path = request.url.path
+        # API、health、docs、静态资源 → 正常处理
+        if (path.startswith("/api") or path.startswith("/health") or
+                path.startswith("/docs") or path.startswith("/openapi") or
+                path.startswith("/static") or path.startswith("/uploads") or
+                path.startswith("/assets") or path.startswith("/favicon")):
+            return await call_next(request)
+
+        # 尝试返回前端静态文件
+        if FRONTEND_DIST.exists():
+            file_path = FRONTEND_DIST / path.lstrip("/")
+            if file_path.is_file():
+                return FileResponse(str(file_path))
+            # SPA 所有其他路径返回 index.html
+            return FileResponse(str(FRONTEND_DIST / "index.html"))
+
+        return await call_next(request)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -43,6 +73,10 @@ app = FastAPI(
     version=settings.APP_VERSION,
     lifespan=lifespan,
 )
+
+# SPA 中间件（必须在 CORS 之前）
+if FRONTEND_DIST.exists():
+    app.add_middleware(SPAMiddleware)
 
 # CORS 中间件（前端跨域）
 app.add_middleware(
@@ -63,7 +97,7 @@ uploads_dir = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(uploads_dir, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
-# 注册路由
+# 注册 API 路由
 app.include_router(auth_router, prefix="/api")
 app.include_router(garments_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
@@ -75,15 +109,6 @@ app.include_router(packing_router, prefix="/api")
 app.include_router(share_router, prefix="/api")
 app.include_router(weather_router, prefix="/api")
 app.include_router(ai_router, prefix="/api")
-
-
-@app.get("/")
-async def root():
-    return {
-        "name": settings.APP_NAME,
-        "version": settings.APP_VERSION,
-        "docs": "/docs",
-    }
 
 
 @app.get("/health")
