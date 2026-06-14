@@ -142,7 +142,7 @@
   <text x="680" y="200" font-family="'SF Pro Display', 'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="400" fill="white" opacity="0.85" letter-spacing="3">AI-POWERED SMART WARDROBE SYSTEM</text>
 
   <!-- 中文副标题 -->
-  <text x="680" y="230" font-family="'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="16" font-weight="300" fill="white" opacity="0.6" letter-spacing="2">智能穿衣镜 · 衣物管理 · AI搭配 · 风格分析</text>
+  <text x="680" y="230" font-family="'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="16" font-weight="300" fill="white" opacity="0.6" letter-spacing="2">智慧衣橱 · 衣物管理 · AI搭配 · 风格分析</text>
 
   <!-- 技术栈标签 -->
   <text x="680" y="280" font-family="'SF Mono', 'Fira Code', 'Consolas', monospace" font-size="13" fill="white" opacity="0.45" letter-spacing="1.5">Vue3 · FastAPI · PyTorch · DeepSeek · 通义千问VL</text>
