@@ -4,6 +4,7 @@ main.py — FastAPI 应用入口
 启动命令：uvicorn main:app --reload --host 0.0.0.0 --port 8000
 """
 
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -78,9 +79,10 @@ if FRONTEND_DIST.exists():
     app.add_middleware(SPAMiddleware)
 
 # CORS 中间件（前端跨域）
+CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost,http://127.0.0.1").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
