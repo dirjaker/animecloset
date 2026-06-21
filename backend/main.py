@@ -51,9 +51,12 @@ class SPAMiddleware(BaseHTTPMiddleware):
 
         # 前端 dist 静态文件（assets、favicon 等）
         if FRONTEND_DIST.exists():
-            file_path = FRONTEND_DIST / path.lstrip("/")
-            if file_path.is_file():
-                return FileResponse(str(file_path))
+            # 防止路径穿越：解析后必须在 FRONTEND_DIST 内
+            resolved = os.path.realpath(os.path.join(str(FRONTEND_DIST), path.lstrip("/")))
+            if not resolved.startswith(str(FRONTEND_DIST)):
+                return Response(status_code=403)
+            if os.path.isfile(resolved):
+                return FileResponse(resolved)
             # 非 API 路径 → SPA index.html
             return FileResponse(str(FRONTEND_DIST / "index.html"))
 
