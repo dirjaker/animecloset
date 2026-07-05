@@ -1,7 +1,7 @@
 """
 main.py — FastAPI 应用入口
 
-启动命令：uvicorn main:app --reload --host 0.0.0.0 --port 8000
+启动命令：uvicorn main:app --reload --host 0.0.0.0 --port 10001
 """
 
 import os
